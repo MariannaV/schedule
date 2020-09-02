@@ -37,7 +37,7 @@ function Page(props: CoursePageProps) {
 
   const handleSubmit = async (values: any) => {
     const { courseTaskId } = values;
-    const task = courseTasks.find(t => t.id === courseTaskId);
+    const task = courseTasks.find((t) => t.id === courseTaskId);
     if (!task) {
       return;
     }
@@ -89,7 +89,7 @@ function Page(props: CoursePageProps) {
     loadVerifications();
   };
 
-  const courseTask = courseTasks.find(t => t.id === courseTaskId);
+  const courseTask = courseTasks.find((t) => t.id === courseTaskId);
   return (
     <PageLayout loading={loading} title="Auto-Test" courseName={props.course.name} githubId={props.session.githubId}>
       <Row gutter={24}>
@@ -279,7 +279,7 @@ function renderDescription(descriptionUrl: string | null | undefined) {
 
 function filterAutoTestTasks(tasks: CourseTask[]) {
   return tasks.filter(
-    task =>
+    (task) =>
       task.studentEndDate &&
       (new Date(task.studentEndDate).getTime() > Date.now() ||
         task.type === 'codewars' ||
@@ -304,7 +304,7 @@ function getSubmitData(task: CourseTask, values: any) {
       data = {
         codecademy: values.codecademy,
         htmlacademy: values.htmlacademy,
-        udemy: [values.udemy1, values.udemy2].filter(it => !!it),
+        udemy: [values.udemy1, values.udemy2].filter((it) => !!it),
       };
       break;
 
