@@ -5,24 +5,36 @@
   "scripts": {
     "postinstall": "concurrently \"cd ./client && npm install\" \"cd ./server && npm install\"",
     "start": "concurrently \"cd ./client && npm start\" \"cd ./server && npm start\"",
+    "format:fix": "prettier --write \"server/**/*.{ts,tsx}\" \"client/**/*.{ts,tsx,js}\" \"common/**/*.{ts,tsx,js}\"",
+    "format:check": "prettier --check \"server/**/*.{ts,tsx}\" \"client/**/*.{ts,tsx,js}\" \"common/**/*.{ts,tsx,js}\"",
+    "lint:js": "eslint . --ext .ts,.tsx",
     "test": "cd ./client && npm run test && cd ../server && npm run test && cd ..",
     "test-watch": "cd ./client && npm run test-watch && cd ../server && npm run test-watch",
     "coverage": "cd ./client && npm run coverage && cd ../server && npm run coverage",
-    "lint:js": "eslint . --ext .ts,.tsx",
-    "format:fix": "prettier --write \"server/**/*.{ts,tsx}\" \"client/**/*.{ts,tsx,js}\" \"common/**/*.{ts,tsx,js}\"",
-    "format:check": "prettier --check \"server/**/*.{ts,tsx}\" \"client/**/*.{ts,tsx,js}\" \"common/**/*.{ts,tsx,js}\"",
-    "ci:build": "concurrently \"cd ./client && npm run ci:build\" \"cd ./server npm run build\"",
+    "ci:build": "concurrently \"cd ./client && npm run ci:build\" \"cd ./server && npm run build\"",
+    "db:up": "docker-compose -f ./setup/docker-compose.yml up  -d",
     "db:restore": "docker exec -i db psql -U rs_master -d rs_school < ./setup/backup-local.sql",
     "db:dump": "pg_dump -h localhost --username rs_master rs_school --file backup-local.sql",
-    "db:up": "docker-compose -f ./setup/docker-compose.yml up  -d",
     "db:down": "docker-compose -f ./setup/docker-compose.yml down"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run format:check && npm run lint:js",
+      "post-commit": "git update-index --again"
+    }
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.26.0",
     "@typescript-eslint/parser": "^2.26.0",
-    "concurrently": "5.1.0",
+    "concurrently": "5.3.0",
     "eslint": "~6.8.0",
-    "prettier": "^1.19.1",
+    "prettier": "2.1.1",
     "typescript": "^3.8.3"
+  },
+  "optionalDependencies": {
+    "husky": "4.2.5",
+    "lint-staged": "10.2.11",
+    "npm-check-updates": "7.0.3",
+    "netlify-cli": "2.59.0"
   }
 }
