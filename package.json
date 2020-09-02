@@ -20,6 +20,7 @@
   "husky": {
     "hooks": {
       "pre-commit": "npm run format:check && npm run lint:js",
+      "pre-push": "npm run test",
       "post-commit": "git update-index --again"
     }
   },
