@@ -1,13 +1,9 @@
 import { QuestionCircleOutlined, YoutubeOutlined } from '@ant-design/icons';
-import { Table, Tag, Row, Tooltip, Select } from 'antd';
-import { withSession, GithubUserLink, PageLayout } from 'components';
-import withCourseData from 'components/withCourseData';
-import { useState, useMemo } from 'react';
+import { Table, Tag, Tooltip, Spin } from 'antd';
+import { GithubUserLink } from 'components';
+import { useState } from 'react';
 import { CourseEvent, CourseService, CourseTaskDetails } from 'services/course';
-import { CoursePageProps } from 'services/models';
-import css from 'styled-jsx/css';
 import moment from 'moment-timezone';
-import { TIMEZONES } from '../../configs/timezones';
 import { useAsync } from 'react-use';
 import { useLoading } from 'components/useLoading';
 
@@ -59,11 +55,10 @@ const EventTypeToName: Record<string, string> = {
   'codewars:stage2': 'codewars',
 };
 
-export function SchedulePage(props: CoursePageProps) {
+export function ScheduleTable(props: { timeZone: string; courseService: CourseService }) {
+  const { timeZone, courseService } = props;
   const [loading, withLoading] = useLoading(false);
   const [data, setData] = useState<CourseEvent[]>([]);
-  const [timeZone, setTimeZone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
-  const courseService = useMemo(() => new CourseService(props.course.id), [props.course.id]);
   const startOfToday = moment().startOf('day');
 
   useAsync(
@@ -79,21 +74,7 @@ export function SchedulePage(props: CoursePageProps) {
   );
 
   return (
-    <PageLayout loading={loading} title="Schedule" githubId={props.session.githubId}>
-      <Row justify="space-between" style={{ marginBottom: 16 }}>
-        <Select
-          style={{ width: 200 }}
-          placeholder="Please select a timezone"
-          defaultValue={timeZone}
-          onChange={setTimeZone}
-        >
-          {TIMEZONES.map((tz) => (
-            <Select.Option key={tz} value={tz}>
-              {tz}
-            </Select.Option>
-          ))}
-        </Select>
-      </Row>
+    <Spin spinning={loading}>
       <Table
         rowKey={(record) => (record.event.type === TaskTypes.deadline ? `${record.id}d` : record.id).toString()}
         pagination={false}
@@ -174,8 +155,7 @@ export function SchedulePage(props: CoursePageProps) {
           { title: 'Comment', dataIndex: 'comment' },
         ]}
       />
-      <style jsx>{styles}</style>
-    </PageLayout>
+    </Spin>
   );
 }
 
@@ -209,11 +189,3 @@ const createCourseEventFromTask = (task: CourseTaskDetails, type: string): Cours
     },
   } as CourseEvent;
 };
-
-const styles = css`
-  :global(.rs-table-row-disabled) {
-    opacity: 0.5;
-  }
-`;
-
-export default withCourseData(withSession(SchedulePage));
