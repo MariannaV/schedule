@@ -10,9 +10,9 @@
     "edge >= 14"
   ],
   "scripts": {
-    "start": "node server.js",
-    "build": "next build src",
-    "prod": "cd ./src && next start -p 8080",
+    "develop": "node server.js",
+    "build": "cd ./src && next build",
+    "start": "cd ./src && next start -p 8080",
     "test": "jest --config=./src/jest.config.js",
     "test-watch": "jest --config=./src/jest.config.js --watch",
     "coverage": "jest --coverage --config=./src/jest.config.js"
