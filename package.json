@@ -39,6 +39,7 @@
   },
   "dependencies": {
     "antd": "^4.6.2",
+    "jest": "^26.4.2",
     "pino-pretty": "^4.2.0",
     "sass": "^1.26.10",
     "ts-node-dev": "^1.0.0-pre.62"

@@ -114,7 +114,7 @@ export function ScheduleTable(props: { timeZone: string; courseService: CourseSe
           },
           {
             title: 'Action',
-            width: 300,
+            width: 310,
             dataIndex: ['event', 'checker'] || '',
             render: (value: string, record) =>
               record.checker ? actionButtonRenderer(record.checker) : actionButtonRenderer(''),
