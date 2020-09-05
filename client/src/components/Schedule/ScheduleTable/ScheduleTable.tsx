@@ -1,11 +1,14 @@
 import { QuestionCircleOutlined, YoutubeOutlined } from '@ant-design/icons';
-import { Table, Tag, Tooltip, Spin } from 'antd';
+import { Table, Tag, Tooltip, Spin, Button } from 'antd';
+import { useRouter } from 'next/router';
 import { GithubUserLink } from 'components';
 import { useState } from 'react';
 import { CourseEvent, CourseService, CourseTaskDetails } from 'services/course';
 import moment from 'moment-timezone';
 import { useAsync } from 'react-use';
 import { useLoading } from 'components/useLoading';
+
+import styles from './style.module.scss';
 
 enum EventTypeColor {
   deadline = 'red',
@@ -30,7 +33,6 @@ enum EventTypeColor {
 }
 
 const TaskTypes = {
-  deadline: 'deadline',
   test: 'test',
   newtask: 'newtask',
   lecture: 'lecture',
@@ -76,14 +78,32 @@ export function ScheduleTable(props: { timeZone: string; courseService: CourseSe
   return (
     <Spin spinning={loading}>
       <Table
-        rowKey={(record) => (record.event.type === TaskTypes.deadline ? `${record.id}d` : record.id).toString()}
+        rowKey={(record) => record.id.toString()}
         pagination={false}
         size="small"
         dataSource={data}
         rowClassName={(record) => (moment(record.dateTime).isBefore(startOfToday) ? 'rs-table-row-disabled' : '')}
         columns={[
-          { title: 'Date', width: 120, dataIndex: 'dateTime', render: dateRenderer(timeZone) },
-          { title: 'Time', width: 60, dataIndex: 'dateTime', render: timeRenderer(timeZone) },
+          { title: 'Start Date', width: 180, dataIndex: 'dateTime', render: dateRenderer(timeZone) },
+          {
+            title: 'Name',
+            dataIndex: ['event', 'name'],
+            render: (value: string, record) => {
+              return record.event.descriptionUrl ? (
+                <a target="_blank" href={record.event.descriptionUrl}>
+                  {value}
+                </a>
+              ) : (
+                value
+              );
+            },
+          },
+          {
+            title: 'DeadLine',
+            width: 180,
+            dataIndex: 'deadLine',
+            render: dateRenderer(timeZone),
+          },
           {
             title: 'Type',
             width: 100,
@@ -91,6 +111,13 @@ export function ScheduleTable(props: { timeZone: string; courseService: CourseSe
             render: (value: keyof typeof EventTypeColor) => (
               <Tag color={EventTypeColor[value]}>{EventTypeToName[value] || value}</Tag>
             ),
+          },
+          {
+            title: 'Action',
+            width: 300,
+            dataIndex: ['event', 'checker'] || '',
+            render: (value: string, record) =>
+              record.checker ? actionButtonRenderer(record.checker) : actionButtonRenderer(''),
           },
           {
             title: 'Place',
@@ -103,19 +130,6 @@ export function ScheduleTable(props: { timeZone: string; courseService: CourseSe
                     <QuestionCircleOutlined />
                   </Tooltip>
                 </div>
-              ) : (
-                value
-              );
-            },
-          },
-          {
-            title: 'Name',
-            dataIndex: ['event', 'name'],
-            render: (value: string, record) => {
-              return record.event.descriptionUrl ? (
-                <a target="_blank" href={record.event.descriptionUrl}>
-                  {value}
-                </a>
               ) : (
                 value
               );
@@ -160,25 +174,71 @@ export function ScheduleTable(props: { timeZone: string; courseService: CourseSe
 }
 
 const dateRenderer = (timeZone: string) => (value: string) =>
-  value ? moment(value, 'YYYY-MM-DD HH:mmZ').tz(timeZone).format('YYYY-MM-DD') : '';
+  value ? moment(value, 'YYYY-MM-DD HH:mmZ').tz(timeZone).format('DD.MM.YYYY HH:mm') : '';
 
-const timeRenderer = (timeZone: string) => (value: string) =>
-  value ? moment(value, 'YYYY-MM-DD HH:mmZ').tz(timeZone).format('HH:mm') : '';
+const actionButtonRenderer = (checker: string) => {
+  const router = useRouter();
+  switch (checker) {
+    case 'crossCheck':
+      return (
+        <>
+          <Button type={'primary'} className={styles.btn}>
+            Details
+          </Button>
+          <Button
+            type={'primary'}
+            className={`${styles.btn} ${styles.submit}`}
+            onClick={() => router.push(`/course/student/cross-check-submit?course=test-course`)}
+          >
+            Submit
+          </Button>
+          <Button
+            type={'primary'}
+            className={`${styles.btn} ${styles.check}`}
+            onClick={() => router.push(`/course/student/cross-check-review?course=test-course`)}
+          >
+            Crosscheck
+          </Button>
+        </>
+      );
+    case 'auto-test':
+      return (
+        <>
+          <Button type={'primary'} className={styles.btn}>
+            Details
+          </Button>
+          <Button
+            type={'primary'}
+            className={`${styles.btn} ${styles.check}`}
+            onClick={() => router.push(`/course/student/auto-test?course=test-course`)}
+          >
+            Auto-Test
+          </Button>
+        </>
+      );
+    default:
+      return (
+        <Button type={'primary'} className={styles.btn}>
+          Details
+        </Button>
+      );
+  }
+};
 
 const tasksToEvents = (tasks: CourseTaskDetails[]) => {
   return tasks.reduce((acc: Array<CourseEvent>, task: CourseTaskDetails) => {
-    if (task.type !== TaskTypes.test) {
-      acc.push(createCourseEventFromTask(task, task.type));
-    }
-    acc.push(createCourseEventFromTask(task, task.type === TaskTypes.test ? TaskTypes.test : TaskTypes.deadline));
+    acc.push(createCourseEventFromTask(task, task.type));
     return acc;
   }, []);
 };
 
 const createCourseEventFromTask = (task: CourseTaskDetails, type: string): CourseEvent => {
+  console.log(task);
   return {
     id: task.id,
-    dateTime: (type === TaskTypes.deadline ? task.studentEndDate : task.studentStartDate) || '',
+    checker: task.checker,
+    dateTime: task.studentStartDate || '',
+    deadLine: task.studentEndDate || '',
     event: {
       type: type,
       name: task.name,
