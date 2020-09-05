@@ -11,7 +11,7 @@ export function SchedulePage(props: CoursePageProps) {
   const [timeZone, setTimeZone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone),
     courseService = useMemo(() => new CourseService(props.course.id), [props.course.id]);
 
-  const [viewOfView, changeView] = useState('Please Select View');
+  const [viewOfView, changeView] = useState('table');
 
   const ScheduleHeader = () => {
     return (
@@ -28,7 +28,12 @@ export function SchedulePage(props: CoursePageProps) {
             </Select.Option>
           ))}
         </Select>
-        <Select style={{ width: 200 }} defaultValue={viewOfView} onChange={(value) => changeView(value)}>
+        <Select
+          style={{ width: 200 }}
+          placeholder="Please Select View"
+          defaultValue={viewOfView}
+          onChange={(value) => changeView(value)}
+        >
           <Select.Option value="table">Table</Select.Option>
           <Select.Option value="list">List</Select.Option>
           <Select.Option value="calendar">Calendar</Select.Option>
@@ -38,12 +43,14 @@ export function SchedulePage(props: CoursePageProps) {
   };
 
   const ScheduleView = () => {
-    if (viewOfView === 'table' || viewOfView === 'Please Select View') {
-      return <ScheduleTable timeZone={timeZone} courseService={courseService} />;
-    } else if (viewOfView === 'list') {
-      return <ScheduleList />;
-    } else {
-      return <ScheduleCalendar />;
+    switch (viewOfView) {
+      case 'list':
+        return <ScheduleList />;
+      case 'calendar':
+        return <ScheduleCalendar />;
+      case 'table':
+      default:
+        return <ScheduleTable timeZone={timeZone} courseService={courseService} />;
     }
   };
 
