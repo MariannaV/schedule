@@ -1,3 +1,3 @@
 export function ScheduleCalendar() {
-  return null;
+  return <h2 style={{ textAlign: 'center', backgroundColor: '#ffa', height: '80vh' }}>Calendar View</h2>;
 }
