@@ -2,8 +2,11 @@
   "name": "rsschool-app",
   "version": "1.0.0",
   "private": true,
+  "workspaces": [
+    "./client/**",
+    "./server/**"
+  ],
   "scripts": {
-    "postinstall": "concurrently \"cd ./client && npm install\" \"cd ./server && npm install\"",
     "start": "concurrently \"cd ./client && npm run develop\" \"cd ./server && npm start\"",
     "format:fix": "prettier --write \"server/**/*.{ts,tsx}\" \"client/**/*.{ts,tsx,js}\" \"common/**/*.{ts,tsx,js}\"",
     "format:check": "prettier --check \"server/**/*.{ts,tsx}\" \"client/**/*.{ts,tsx,js}\" \"common/**/*.{ts,tsx,js}\"",
