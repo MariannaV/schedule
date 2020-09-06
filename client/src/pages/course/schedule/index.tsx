@@ -50,7 +50,7 @@ export function SchedulePage(props: CoursePageProps) {
         return <ScheduleCalendar />;
       case 'table':
       default:
-        return <ScheduleTable timeZone={timeZone} courseService={courseService} />;
+        return <ScheduleTable timeZone={timeZone} />;
     }
   };
 

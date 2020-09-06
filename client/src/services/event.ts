@@ -1,15 +1,15 @@
 import axios from 'axios';
 
 export interface Event {
-  id: 'string';
-  name: 'string';
-  description: 'string';
-  descriptionUrl: 'string';
-  type: 'string';
-  timeZon: 'string';
-  dateTime: 'string';
-  place: 'string';
-  comment: 'string';
+  id: string;
+  name: string;
+  description: string;
+  descriptionUrl: string;
+  type: string;
+  timeZone: string;
+  dateTime: string;
+  place: string;
+  comment: string;
 }
 
 export class EventService {
@@ -31,7 +31,7 @@ export class EventService {
     return result.data.data;
   }
 
-  async updateEvent(eventId: number, data: Partial<Event>) {
+  async updateEvent(eventId: string, data: Partial<Event>) {
     const result = await axios.put<{ data: Event }>(`${this.baseUrl}/event/${eventId}`, data);
     return result.data.data;
   }
@@ -41,7 +41,7 @@ export class EventService {
     return result.data.data;
   }
 
-  async deleteEvent(eventId: number) {
+  async deleteEvent(eventId: string) {
     const result = await axios.delete<{ data: Event }>(`${this.baseUrl}/event/${eventId}`);
     return result.data.data;
   }

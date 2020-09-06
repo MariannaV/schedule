@@ -39,7 +39,7 @@ function Page(props: Props) {
     setModalAction('update');
   };
 
-  const handleDeleteItem = async (id: number) => {
+  const handleDeleteItem = async (id: string) => {
     try {
       await service.deleteEvent(id);
       const data = await service.getEvents();
@@ -90,15 +90,20 @@ function Page(props: Props) {
             <Select.Option value="info">Info (additional announcements)</Select.Option>
             <Select.Option value="workshop">Workshop</Select.Option>
             <Select.Option value="meetup">Meetup</Select.Option>
-          </Select>
-        </Form.Item>
-        <Form.Item name="discipline" label="Discipline">
-          <Select>
-            {disciplines.map(({ id, name }) => (
-              <Select.Option key={id} value={id}>
-                {name}
-              </Select.Option>
-            ))}
+            <Select.Option value="jstask">JS task</Select.Option>
+            <Select.Option value="kotlintask">Kotlin task</Select.Option>
+            <Select.Option value="objctask">ObjC task</Select.Option>
+            <Select.Option value="htmltask">HTML task</Select.Option>
+            <Select.Option value="htmlcssacademy">HTML/CSS Academy</Select.Option>
+            <Select.Option value="cv:markdown">CV Markdown</Select.Option>
+            <Select.Option value="cv:html">CV HTML</Select.Option>
+            <Select.Option value="codewars">Codewars</Select.Option>
+            <Select.Option value="codewars:stage1">Codewars stage 1</Select.Option>
+            <Select.Option value="codewars:stage2">Codewars stage 2</Select.Option>
+            <Select.Option value="test">Test</Select.Option>
+            <Select.Option value="codejam">Code Jam</Select.Option>
+            <Select.Option value="interview">Interview</Select.Option>
+            <Select.Option value="stage-interview">Technical Screening</Select.Option>
           </Select>
         </Form.Item>
 
@@ -146,7 +151,6 @@ function createRecord(values: any) {
     description: values.description,
     descriptionUrl: values.descriptionUrl,
     type: values.type,
-    discipline: values.discipline,
   };
   return data;
 }
@@ -161,10 +165,6 @@ function getColumns(handleEditItem: any, handleDeleteItem: any) {
       title: 'Name',
       dataIndex: 'name',
       sorter: stringSorter<Event>('name'),
-    },
-    {
-      title: 'Discipline',
-      dataIndex: 'discipline',
     },
     {
       title: 'Description URL',

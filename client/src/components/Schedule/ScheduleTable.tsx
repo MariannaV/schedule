@@ -29,13 +29,6 @@ enum EventTypeColor {
   interview = '#63ab91',
 }
 
-const TaskTypes = {
-  deadline: 'deadline',
-  test: 'test',
-  newtask: 'newtask',
-  lecture: 'lecture',
-};
-
 const EventTypeToName: Record<string, string> = {
   lecture_online: 'online lecture',
   lecture_offline: 'offline lecture',
