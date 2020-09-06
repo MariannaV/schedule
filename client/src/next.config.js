@@ -3,6 +3,7 @@ const webpack = require('webpack');
 const withTranspiledModules = require('next-transpile-modules');
 
 const nextConfig = {
+  target: 'serverless',
   serverRuntimeConfig: {
     rsHost: process.env.RS_HOST || 'http://localhost:3000',
   },
