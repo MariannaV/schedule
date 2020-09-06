@@ -1,34 +1,48 @@
 import axios from 'axios';
 
 export interface Event {
-  id: number;
-  createdDate: string;
-  updatedDate: string;
-  name: string;
-  descriptionUrl: string;
-  description: string;
-  type: string;
-  discipline: string;
+  id: 'string';
+  name: 'string';
+  description: 'string';
+  descriptionUrl: 'string';
+  type: 'string';
+  timeZon: 'string';
+  dateTime: 'string';
+  place: 'string';
+  comment: 'string';
 }
 
 export class EventService {
-  async getEvents() {
-    const result = await axios.get<{ data: Event[] }>(`/api/events`);
-    return result.data.data.sort((a, b) => b.id - a.id);
+  private baseUrl: string;
+  private teamId: number;
+
+  constructor() {
+    this.teamId = 42;
+    this.baseUrl = `https://rs-react-schedule.firebaseapp.com/api/team/${this.teamId}`;
   }
 
-  async updateEvent(id: number, data: Partial<Event>) {
-    const result = await axios.put<{ data: Event }>(`/api/event/${id}`, data);
+  async getEvents() {
+    const result = await axios.get<{ data: Event[] }>(`${this.baseUrl}/events`);
+    return result.data.data;
+  }
+
+  async getEvent(eventId: string) {
+    const result = await axios.get<{ data: Event[] }>(`${this.baseUrl}/event/${eventId}`);
+    return result.data.data;
+  }
+
+  async updateEvent(eventId: number, data: Partial<Event>) {
+    const result = await axios.put<{ data: Event }>(`${this.baseUrl}/event/${eventId}`, data);
     return result.data.data;
   }
 
   async createEvent(data: Partial<Event>) {
-    const result = await axios.post<{ data: Event }>(`/api/event/`, data);
+    const result = await axios.post<{ data: Event }>(`${this.baseUrl}/event/`, data);
     return result.data.data;
   }
 
-  async deleteEvent(id: number) {
-    const result = await axios.delete<{ data: Event }>(`/api/event/${id}`);
+  async deleteEvent(eventId: number) {
+    const result = await axios.delete<{ data: Event }>(`${this.baseUrl}/event/${eventId}`);
     return result.data.data;
   }
 }

@@ -2,7 +2,7 @@ import { QuestionCircleOutlined, YoutubeOutlined } from '@ant-design/icons';
 import { Table, Tag, Tooltip, Spin } from 'antd';
 import { GithubUserLink } from 'components';
 import { useState } from 'react';
-import { CourseEvent, CourseService, CourseTaskDetails } from 'services/course';
+import { Event, EventService } from '../../services/event';
 import moment from 'moment-timezone';
 import { useAsync } from 'react-use';
 import { useLoading } from 'components/useLoading';
@@ -55,28 +55,25 @@ const EventTypeToName: Record<string, string> = {
   'codewars:stage2': 'codewars',
 };
 
-export function ScheduleTable(props: { timeZone: string; courseService: CourseService }) {
-  const { timeZone, courseService } = props;
+export function ScheduleTable(props: { timeZone: string }) {
+  const { timeZone } = props;
+  const eventService = new EventService();
   const [loading, withLoading] = useLoading(false);
-  const [data, setData] = useState<CourseEvent[]>([]);
+  const [data, setData] = useState<Event[]>([]);
   const startOfToday = moment().startOf('day');
 
   useAsync(
     withLoading(async () => {
-      const [events, tasks] = await Promise.all([
-        courseService.getCourseEvents(),
-        courseService.getCourseTasksDetails(),
-      ]);
-      const data = events.concat(tasksToEvents(tasks)).sort((a, b) => a.dateTime.localeCompare(b.dateTime));
+      const data = await eventService.getEvents();
       setData(data);
     }),
-    [courseService],
+    [EventService],
   );
 
   return (
     <Spin spinning={loading}>
       <Table
-        rowKey={(record) => (record.event.type === TaskTypes.deadline ? `${record.id}d` : record.id).toString()}
+        rowKey={(record) => record.id.toString()}
         pagination={false}
         size="small"
         dataSource={data}
@@ -87,7 +84,7 @@ export function ScheduleTable(props: { timeZone: string; courseService: CourseSe
           {
             title: 'Type',
             width: 100,
-            dataIndex: ['event', 'type'],
+            dataIndex: 'type',
             render: (value: keyof typeof EventTypeColor) => (
               <Tag color={EventTypeColor[value]}>{EventTypeToName[value] || value}</Tag>
             ),
@@ -110,10 +107,10 @@ export function ScheduleTable(props: { timeZone: string; courseService: CourseSe
           },
           {
             title: 'Name',
-            dataIndex: ['event', 'name'],
+            dataIndex: 'name',
             render: (value: string, record) => {
-              return record.event.descriptionUrl ? (
-                <a target="_blank" href={record.event.descriptionUrl}>
+              return record.descriptionUrl ? (
+                <a target="_blank" href={record.descriptionUrl}>
                   {value}
                 </a>
               ) : (
@@ -164,28 +161,3 @@ const dateRenderer = (timeZone: string) => (value: string) =>
 
 const timeRenderer = (timeZone: string) => (value: string) =>
   value ? moment(value, 'YYYY-MM-DD HH:mmZ').tz(timeZone).format('HH:mm') : '';
-
-const tasksToEvents = (tasks: CourseTaskDetails[]) => {
-  return tasks.reduce((acc: Array<CourseEvent>, task: CourseTaskDetails) => {
-    if (task.type !== TaskTypes.test) {
-      acc.push(createCourseEventFromTask(task, task.type));
-    }
-    acc.push(createCourseEventFromTask(task, task.type === TaskTypes.test ? TaskTypes.test : TaskTypes.deadline));
-    return acc;
-  }, []);
-};
-
-const createCourseEventFromTask = (task: CourseTaskDetails, type: string): CourseEvent => {
-  return {
-    id: task.id,
-    dateTime: (type === TaskTypes.deadline ? task.studentEndDate : task.studentStartDate) || '',
-    event: {
-      type: type,
-      name: task.name,
-      descriptionUrl: task.descriptionUrl,
-    },
-    organizer: {
-      githubId: task.taskOwner ? task.taskOwner.githubId : '',
-    },
-  } as CourseEvent;
-};
