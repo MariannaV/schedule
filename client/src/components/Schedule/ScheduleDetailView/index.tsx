@@ -1,6 +1,7 @@
 import { Spin } from 'antd';
 import { API_Events, Event } from 'services/event';
 import viewStyles from './ScheduleDetailView.module.scss';
+import { EventForm } from './EventForm';
 
 interface IScheduleDetailView {
   eventId: Event['id'];
@@ -14,10 +15,7 @@ export function ScheduleDetailView(props: IScheduleDetailView) {
   return (
     <section className={[viewStyles.ScheduleDetailView, props.classes].filter(Boolean).join(' ')}>
       {eventLoading === false ? (
-        <>
-          <h2>Detail View</h2>
-          {console.log('@@', eventData)}
-        </>
+        <EventForm formData={eventData!} eventId={eventId} />
       ) : (
         <Spin wrapperClassName={viewStyles.spinner} />
       )}

@@ -6,11 +6,18 @@ export interface Event {
   name: string;
   description: string;
   descriptionUrl: string;
-  type: string;
+  type: eventTypes;
   timeZone: string;
   dateTime: string;
   place: string;
   comment: string;
+}
+
+export enum eventTypes {
+  video = 'Video',
+  course = 'Course',
+  'self-education' = 'Self-education',
+  task = 'Task',
 }
 
 export class EventService {
@@ -71,7 +78,8 @@ const hooks = {
     return React.useMemo(() => ({ eventsLoading, eventsData }), [eventsLoading, eventsData]);
   },
   useEventData(params: { eventId: Event['id'] }) {
-    const [eventData, setData] = React.useState<null | Event>(null),
+    const { eventId } = params,
+      [eventData, setData] = React.useState<null | Event>(null),
       [eventLoading, setLoading] = React.useState<null | boolean>(null);
 
     React.useEffect(() => {
@@ -80,14 +88,15 @@ const hooks = {
       async function fetchEventsData() {
         setLoading(true);
         try {
-          setData(await new EventService().getEvent(params.eventId));
+          if (!eventId) return; //throw `${eventId} is incorrenct eventId`;
+          setData(await new EventService().getEvent(eventId));
         } catch (error) {
           console.error(error);
         } finally {
           setLoading(false);
         }
       }
-    }, []);
+    }, [eventId]);
 
     return React.useMemo(() => ({ eventLoading, eventData }), [eventLoading, eventData]);
   },
