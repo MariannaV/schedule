@@ -1,4 +1,4 @@
-import viewStyles from './ScheduleDetailView.module.css';
+import viewStyles from './ScheduleDetailView.module.scss';
 
 interface IScheduleDetailView {
   classes?: Array<string>;

@@ -1,6 +1,8 @@
 .ScheduleListWrapper {
-  display: grid;
-  grid-template-columns: repeat(16, 1fr);
+  [class='ant-spin-container'] {
+    display: grid;
+    grid-template-columns: repeat(16, 1fr);
+  }
 }
 
 .ScheduleList {

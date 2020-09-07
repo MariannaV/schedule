@@ -1,4 +1,4 @@
-import listStyles from './ScheduleList.module.css';
+import listStyles from './ScheduleList.module.scss';
 
 interface IScheduleList {
   classes?: Array<string>;
