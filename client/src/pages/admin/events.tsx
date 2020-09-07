@@ -7,15 +7,12 @@ import { stringSorter, stringTrimRenderer } from 'components/Table';
 import { Event, EventService } from 'services/event';
 import { urlPattern } from 'services/validators';
 import { useAsync } from 'react-use';
-import { PRIMARY_SKILLS } from 'services/reference-data/primarySkills';
 import { isAnyCoursePowerUserManager } from '../../domain/user';
 
 const { Content } = Layout;
 
 type Props = { session: Session };
 const service = new EventService();
-
-const disciplines = PRIMARY_SKILLS;
 
 function Page(props: Props) {
   const [data, setData] = useState([] as Event[]);
