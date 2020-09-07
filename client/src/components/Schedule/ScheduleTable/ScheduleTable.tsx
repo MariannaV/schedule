@@ -3,7 +3,7 @@ import { Table, Tag, Tooltip, Spin, Button } from 'antd';
 import { useRouter } from 'next/router';
 import { GithubUserLink } from 'components';
 import { useState } from 'react';
-import { CourseEvent, CourseService, CourseTaskDetails } from 'services/course';
+import { Event, EventService } from '../../../services/event';
 import moment from 'moment-timezone';
 import { useAsync } from 'react-use';
 import { useLoading } from 'components/useLoading';
@@ -32,12 +32,6 @@ enum EventTypeColor {
   interview = '#63ab91',
 }
 
-const TaskTypes = {
-  test: 'test',
-  newtask: 'newtask',
-  lecture: 'lecture',
-};
-
 const EventTypeToName: Record<string, string> = {
   lecture_online: 'online lecture',
   lecture_offline: 'offline lecture',
@@ -57,22 +51,19 @@ const EventTypeToName: Record<string, string> = {
   'codewars:stage2': 'codewars',
 };
 
-export function ScheduleTable(props: { timeZone: string; courseService: CourseService }) {
-  const { timeZone, courseService } = props;
+export function ScheduleTable(props: { timeZone: string }) {
+  const { timeZone } = props;
+  const eventService = new EventService();
   const [loading, withLoading] = useLoading(false);
-  const [data, setData] = useState<CourseEvent[]>([]);
+  const [data, setData] = useState<Event[]>([]);
   const startOfToday = moment().startOf('day');
 
   useAsync(
     withLoading(async () => {
-      const [events, tasks] = await Promise.all([
-        courseService.getCourseEvents(),
-        courseService.getCourseTasksDetails(),
-      ]);
-      const data = events.concat(tasksToEvents(tasks)).sort((a, b) => a.dateTime.localeCompare(b.dateTime));
+      const data = await eventService.getEvents();
       setData(data);
     }),
-    [courseService],
+    [EventService],
   );
 
   return (
@@ -87,16 +78,7 @@ export function ScheduleTable(props: { timeZone: string; courseService: CourseSe
           { title: 'Start Date', width: 180, dataIndex: 'dateTime', render: dateRenderer(timeZone) },
           {
             title: 'Name',
-            dataIndex: ['event', 'name'],
-            render: (value: string, record) => {
-              return record.event.descriptionUrl ? (
-                <a target="_blank" href={record.event.descriptionUrl}>
-                  {value}
-                </a>
-              ) : (
-                value
-              );
-            },
+            dataIndex: 'name',
           },
           {
             title: 'DeadLine',
@@ -107,7 +89,7 @@ export function ScheduleTable(props: { timeZone: string; courseService: CourseSe
           {
             title: 'Type',
             width: 100,
-            dataIndex: ['event', 'type'],
+            dataIndex: 'type',
             render: (value: keyof typeof EventTypeColor) => (
               <Tag color={EventTypeColor[value]}>{EventTypeToName[value] || value}</Tag>
             ),
@@ -115,9 +97,8 @@ export function ScheduleTable(props: { timeZone: string; courseService: CourseSe
           {
             title: 'Action',
             width: 310,
-            dataIndex: ['event', 'checker'] || '',
-            render: (value: string, record) =>
-              record.checker ? actionButtonRenderer(record.checker) : actionButtonRenderer(''),
+            dataIndex: 'checker',
+            render: (value: string) => (value ? actionButtonRenderer(value) : actionButtonRenderer('')),
           },
           {
             title: 'Place',
@@ -132,6 +113,17 @@ export function ScheduleTable(props: { timeZone: string; courseService: CourseSe
                 </div>
               ) : (
                 value
+              );
+            },
+          },
+          {
+            title: 'Description Url',
+            dataIndex: 'descriptionUrl',
+            render: (value: string) => {
+              return (
+                <a target="_blank" href={value}>
+                  {value}
+                </a>
               );
             },
           },
@@ -155,18 +147,11 @@ export function ScheduleTable(props: { timeZone: string; courseService: CourseSe
             render: (value: string) => (value ? <GithubUserLink value={value} /> : ''),
           },
           {
-            title: 'Details Url',
-            dataIndex: 'detailsUrl',
-            render: (url: string) =>
-              url ? (
-                <a target="_blank" href={url}>
-                  Details
-                </a>
-              ) : (
-                ''
-              ),
+            title: 'Description',
+            width: 300,
+            dataIndex: 'description',
           },
-          { title: 'Comment', dataIndex: 'comment' },
+          { title: 'Comment', width: 300, dataIndex: 'comment' },
         ]}
       />
     </Spin>
@@ -223,29 +208,4 @@ const actionButtonRenderer = (checker: string) => {
         </Button>
       );
   }
-};
-
-const tasksToEvents = (tasks: CourseTaskDetails[]) => {
-  return tasks.reduce((acc: Array<CourseEvent>, task: CourseTaskDetails) => {
-    acc.push(createCourseEventFromTask(task, task.type));
-    return acc;
-  }, []);
-};
-
-const createCourseEventFromTask = (task: CourseTaskDetails, type: string): CourseEvent => {
-  console.log(task);
-  return {
-    id: task.id,
-    checker: task.checker,
-    dateTime: task.studentStartDate || '',
-    deadLine: task.studentEndDate || '',
-    event: {
-      type: type,
-      name: task.name,
-      descriptionUrl: task.descriptionUrl,
-    },
-    organizer: {
-      githubId: task.taskOwner ? task.taskOwner.githubId : '',
-    },
-  } as CourseEvent;
 };

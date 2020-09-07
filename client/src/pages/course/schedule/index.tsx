@@ -1,18 +1,18 @@
 import { Row, Select } from 'antd';
 import { withSession, PageLayout } from 'components';
 import withCourseData from 'components/withCourseData';
-import { useState, useMemo } from 'react';
-import { CourseService } from 'services/course';
+import { useState } from 'react';
 import { CoursePageProps } from 'services/models';
 import { TIMEZONES } from 'configs/timezones';
-import { ScheduleTable } from 'components/Schedule';
+import { ScheduleTable, ScheduleList, ScheduleCalendar } from 'components/Schedule';
 
 export function SchedulePage(props: CoursePageProps) {
-  const [timeZone, setTimeZone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone),
-    courseService = useMemo(() => new CourseService(props.course.id), [props.course.id]);
+  const [timeZone, setTimeZone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
 
-  return (
-    <PageLayout title="Schedule" githubId={props.session.githubId} loading={false}>
+  const [viewOfView, changeView] = useState('table');
+
+  const ScheduleHeader = () => {
+    return (
       <Row justify="space-between" style={{ marginBottom: 16 }}>
         <Select
           style={{ width: 200 }}
@@ -26,8 +26,36 @@ export function SchedulePage(props: CoursePageProps) {
             </Select.Option>
           ))}
         </Select>
+        <Select
+          style={{ width: 200 }}
+          placeholder="Please Select View"
+          defaultValue={viewOfView}
+          onChange={(value) => changeView(value)}
+        >
+          <Select.Option value="table">Table</Select.Option>
+          <Select.Option value="list">List</Select.Option>
+          <Select.Option value="calendar">Calendar</Select.Option>
+        </Select>
       </Row>
-      <ScheduleTable timeZone={timeZone} courseService={courseService} />
+    );
+  };
+
+  const ScheduleView = () => {
+    switch (viewOfView) {
+      case 'list':
+        return <ScheduleList />;
+      case 'calendar':
+        return <ScheduleCalendar />;
+      case 'table':
+      default:
+        return <ScheduleTable timeZone={timeZone} />;
+    }
+  };
+
+  return (
+    <PageLayout title="Schedule" githubId={props.session.githubId} loading={false}>
+      <ScheduleHeader />
+      <ScheduleView />
     </PageLayout>
   );
 }
