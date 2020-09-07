@@ -1,15 +1,13 @@
 import { Row, Select } from 'antd';
 import { withSession, PageLayout } from 'components';
 import withCourseData from 'components/withCourseData';
-import { useState, useMemo } from 'react';
-import { CourseService } from 'services/course';
+import { useState } from 'react';
 import { CoursePageProps } from 'services/models';
 import { TIMEZONES } from 'configs/timezones';
 import { ScheduleTable, ScheduleList, ScheduleCalendar } from 'components/Schedule';
 
 export function SchedulePage(props: CoursePageProps) {
-  const [timeZone, setTimeZone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone),
-    courseService = useMemo(() => new CourseService(props.course.id), [props.course.id]);
+  const [timeZone, setTimeZone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
 
   const [viewOfView, changeView] = useState('table');
 
@@ -50,7 +48,7 @@ export function SchedulePage(props: CoursePageProps) {
         return <ScheduleCalendar />;
       case 'table':
       default:
-        return <ScheduleTable timeZone={timeZone} courseService={courseService} />;
+        return <ScheduleTable timeZone={timeZone} />;
     }
   };
 
