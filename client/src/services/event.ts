@@ -1,3 +1,4 @@
+import React from 'react';
 import axios from 'axios';
 
 export interface Event {
@@ -27,8 +28,8 @@ export class EventService {
   }
 
   async getEvent(eventId: string) {
-    const result = await axios.get<{ data: Event[] }>(`${this.baseUrl}/event/${eventId}`);
-    return result.data.data;
+    const result = await axios.get<Event>(`${this.baseUrl}/event/${eventId}`);
+    return result.data;
   }
 
   async updateEvent(eventId: string, data: Partial<Event>) {
@@ -46,3 +47,53 @@ export class EventService {
     return result.data.data;
   }
 }
+
+const hooks = {
+  useEventsData() {
+    const [eventsData, setData] = React.useState<Event[]>([]),
+      [eventsLoading, setLoading] = React.useState<null | boolean>(null);
+
+    React.useEffect(() => {
+      fetchEventsData();
+
+      async function fetchEventsData() {
+        setLoading(true);
+        try {
+          setData(await new EventService().getEvents());
+        } catch (error) {
+          console.error(error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    }, []);
+
+    return React.useMemo(() => ({ eventsLoading, eventsData }), [eventsLoading, eventsData]);
+  },
+  useEventData(params: { eventId: Event['id'] }) {
+    const [eventData, setData] = React.useState<null | Event>(null),
+      [eventLoading, setLoading] = React.useState<null | boolean>(null);
+
+    React.useEffect(() => {
+      fetchEventsData();
+
+      async function fetchEventsData() {
+        setLoading(true);
+        try {
+          setData(await new EventService().getEvent(params.eventId));
+        } catch (error) {
+          console.error(error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    }, []);
+
+    return React.useMemo(() => ({ eventLoading, eventData }), [eventLoading, eventData]);
+  },
+};
+
+export const API_Events = {
+  EventService,
+  hooks,
+};
