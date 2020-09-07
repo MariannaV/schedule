@@ -1,12 +1,10 @@
 import { Row, Select } from 'antd';
-import { withSession, PageLayout } from 'components';
-import withCourseData from 'components/withCourseData';
+import { PageLayout } from 'components';
 import { useState } from 'react';
-import { CoursePageProps } from 'services/models';
 import { TIMEZONES } from 'configs/timezones';
 import { ScheduleTable, ScheduleList, ScheduleCalendar } from 'components/Schedule';
 
-export function SchedulePage(props: CoursePageProps) {
+export function SchedulePage() {
   const [timeZone, setTimeZone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
 
   const [viewOfView, changeView] = useState('table');
@@ -53,11 +51,11 @@ export function SchedulePage(props: CoursePageProps) {
   };
 
   return (
-    <PageLayout title="Schedule" githubId={props.session.githubId} loading={false}>
+    <PageLayout title="Schedule" githubId={'props.session.githubId'} loading={false}>
       <ScheduleHeader />
       <ScheduleView />
     </PageLayout>
   );
 }
 
-export default withCourseData(withSession(SchedulePage));
+export default SchedulePage;
