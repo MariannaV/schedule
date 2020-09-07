@@ -2,12 +2,12 @@ import { Row, Select } from 'antd';
 import { PageLayout } from 'components';
 import { useState } from 'react';
 import { TIMEZONES } from 'configs/timezones';
-import { ScheduleTable, ScheduleList, ScheduleCalendar } from 'components/Schedule';
+import { ScheduleTable, ScheduleListWrapper, ScheduleCalendar } from 'components/Schedule';
 
 export function SchedulePage() {
   const [timeZone, setTimeZone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
 
-  const [viewOfView, changeView] = useState('table');
+  const [viewOfView, changeView] = useState('list');
 
   const ScheduleHeader = () => {
     return (
@@ -41,7 +41,7 @@ export function SchedulePage() {
   const ScheduleView = () => {
     switch (viewOfView) {
       case 'list':
-        return <ScheduleList />;
+        return <ScheduleListWrapper />;
       case 'calendar':
         return <ScheduleCalendar />;
       case 'table':

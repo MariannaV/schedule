@@ -1,0 +1,15 @@
+.ScheduleListWrapper {
+  display: grid;
+  grid-template-columns: repeat(16, 1fr);
+}
+
+.ScheduleList {
+  grid-row: 1 / -1;
+  grid-column: 1 / 9;
+  border-right: 1px solid;
+}
+
+.ScheduleView {
+  grid-row: 1 / -1;
+  grid-column: 9 / -1;
+}
