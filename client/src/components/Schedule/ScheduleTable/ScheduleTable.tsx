@@ -75,16 +75,28 @@ export function ScheduleTable(props: { timeZone: string }) {
         dataSource={data}
         rowClassName={(record) => (moment(record.dateTime).isBefore(startOfToday) ? 'rs-table-row-disabled' : '')}
         columns={[
-          { title: 'Start Date', width: 180, dataIndex: 'dateTime', render: dateRenderer(timeZone) },
+          {
+            title: 'Start Date',
+            width: 180,
+            dataIndex: 'dateTime',
+            render: dateRenderer(timeZone),
+            defaultSortOrder: 'ascend',
+            sorter: (a, b) => (a.dateTime > b.dateTime ? 1 : -1),
+            sortDirections: ['ascend', 'descend', 'ascend'],
+          },
           {
             title: 'Name',
             dataIndex: 'name',
+            sorter: (a, b) => (a.name > b.name ? 1 : -1),
+            sortDirections: ['ascend', 'descend', 'ascend'],
           },
           {
             title: 'DeadLine',
             width: 180,
             dataIndex: 'deadLine',
             render: dateRenderer(timeZone),
+            sorter: (a, b) => (a.deadLine > b.deadLine ? 1 : -1),
+            sortDirections: ['ascend', 'descend', 'ascend'],
           },
           {
             title: 'Type',
@@ -93,6 +105,8 @@ export function ScheduleTable(props: { timeZone: string }) {
             render: (value: keyof typeof EventTypeColor) => (
               <Tag color={EventTypeColor[value]}>{EventTypeToName[value] || value}</Tag>
             ),
+            sorter: (a, b) => (a.type > b.type ? 1 : -1),
+            sortDirections: ['ascend', 'descend', 'ascend'],
           },
           {
             title: 'Action',
@@ -115,6 +129,8 @@ export function ScheduleTable(props: { timeZone: string }) {
                 value
               );
             },
+            sorter: (a, b) => (a.place > b.place ? 1 : -1),
+            sortDirections: ['ascend', 'descend', 'ascend'],
           },
           {
             title: 'Description Url',
@@ -143,8 +159,10 @@ export function ScheduleTable(props: { timeZone: string }) {
           {
             title: 'Organizer',
             width: 140,
-            dataIndex: ['organizer', 'githubId'],
+            dataIndex: 'organizer',
             render: (value: string) => (value ? <GithubUserLink value={value} /> : ''),
+            sorter: (a, b) => (a.organizer > b.organizer ? 1 : -1),
+            sortDirections: ['ascend', 'descend', 'ascend'],
           },
           {
             title: 'Description',

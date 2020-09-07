@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 export interface Event {
+  deadLine: string;
   id: string;
   name: string;
   description: string;
@@ -11,6 +12,7 @@ export interface Event {
   place: string;
   comment: string;
   checker: string;
+  organizer: string;
 }
 
 export class EventService {
