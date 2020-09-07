@@ -1,7 +1,8 @@
+import React from 'react';
 import { Row, Select } from 'antd';
 import { PageLayout } from 'components';
 import { useState } from 'react';
-import { TIMEZONES } from 'configs/timezones';
+import { FieldTimezone } from 'components/Forms/fields';
 import { ScheduleTable, ScheduleListWrapper, ScheduleCalendar } from 'components/Schedule';
 
 export function SchedulePage() {
@@ -12,18 +13,7 @@ export function SchedulePage() {
   const ScheduleHeader = () => {
     return (
       <Row justify="space-between" style={{ marginBottom: 16 }}>
-        <Select
-          style={{ width: 200 }}
-          placeholder="Please select a timezone"
-          defaultValue={timeZone}
-          onChange={setTimeZone}
-        >
-          {TIMEZONES.map((tz) => (
-            <Select.Option key={tz} value={tz}>
-              {tz}
-            </Select.Option>
-          ))}
-        </Select>
+        <FieldTimezone style={{ width: 200 }} defaultValue={timeZone} onChange={setTimeZone} />
         <Select
           style={{ width: 200 }}
           placeholder="Please Select View"
