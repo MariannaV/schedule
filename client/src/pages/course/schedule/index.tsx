@@ -8,7 +8,7 @@ import { ScheduleTable, ScheduleListWrapper, ScheduleCalendar } from 'components
 export function SchedulePage() {
   const [timeZone, setTimeZone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
 
-  const [viewOfView, changeView] = useState('list');
+  const [viewOfView, changeView] = useState('table');
 
   const ScheduleHeader = () => {
     return (
