@@ -1,3 +1,4 @@
+import React from 'react';
 import axios from 'axios';
 
 export interface Event {
@@ -5,11 +6,18 @@ export interface Event {
   name: string;
   description: string;
   descriptionUrl: string;
-  type: string;
+  type: eventTypes;
   timeZone: string;
   dateTime: string;
   place: string;
   comment: string;
+}
+
+export enum eventTypes {
+  video = 'Video',
+  course = 'Course',
+  'self-education' = 'Self-education',
+  task = 'Task',
 }
 
 export class EventService {
@@ -27,8 +35,8 @@ export class EventService {
   }
 
   async getEvent(eventId: string) {
-    const result = await axios.get<{ data: Event[] }>(`${this.baseUrl}/event/${eventId}`);
-    return result.data.data;
+    const result = await axios.get<Event>(`${this.baseUrl}/event/${eventId}`);
+    return result.data;
   }
 
   async updateEvent(eventId: string, data: Partial<Event>) {
@@ -46,3 +54,55 @@ export class EventService {
     return result.data.data;
   }
 }
+
+const hooks = {
+  useEventsData() {
+    const [eventsData, setData] = React.useState<Event[]>([]),
+      [eventsLoading, setLoading] = React.useState<null | boolean>(null);
+
+    React.useEffect(() => {
+      fetchEventsData();
+
+      async function fetchEventsData() {
+        setLoading(true);
+        try {
+          setData(await new EventService().getEvents());
+        } catch (error) {
+          console.error(error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    }, []);
+
+    return React.useMemo(() => ({ eventsLoading, eventsData }), [eventsLoading, eventsData]);
+  },
+  useEventData(params: { eventId: Event['id'] }) {
+    const { eventId } = params,
+      [eventData, setData] = React.useState<null | Event>(null),
+      [eventLoading, setLoading] = React.useState<null | boolean>(null);
+
+    React.useEffect(() => {
+      fetchEventsData();
+
+      async function fetchEventsData() {
+        setLoading(true);
+        try {
+          if (!eventId) return; //throw `${eventId} is incorrenct eventId`;
+          setData(await new EventService().getEvent(eventId));
+        } catch (error) {
+          console.error(error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    }, [eventId]);
+
+    return React.useMemo(() => ({ eventLoading, eventData }), [eventLoading, eventData]);
+  },
+};
+
+export const API_Events = {
+  EventService,
+  hooks,
+};

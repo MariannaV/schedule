@@ -37,7 +37,8 @@
     "react-gauge-chart": "^0.2.5",
     "react-masonry-css": "^1.0.14",
     "react-use": "^13.27.1",
-    "styled-jsx": "~3.2.5"
+    "styled-jsx": "~3.2.5",
+    "sass": "1.26.10"
   },
   "devDependencies": {
     "@babel/plugin-proposal-decorators": "^7.7.4",
