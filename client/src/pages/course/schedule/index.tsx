@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Select } from 'antd';
+import { Row, Select, Switch } from 'antd';
 import { PageLayout } from 'components';
 import { useState } from 'react';
 import { FieldTimezone } from 'components/Forms/fields';
@@ -9,26 +9,39 @@ export function SchedulePage() {
   const [timeZone, setTimeZone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
 
   const [viewOfView, changeView] = useState('table');
+  const [isActiveMentorMode, changeMentorMode] = useState(true);
+  const onChangeViewMode = React.useCallback((value) => changeView(value), []);
+  const onToggleMentorMode = React.useCallback(() => changeMentorMode((state) => !state), []);
 
-  const ScheduleHeader = () => {
+  const ScheduleHeader = React.useCallback(() => {
     return (
-      <Row justify="space-between" style={{ marginBottom: 16 }}>
-        <FieldTimezone style={{ width: 200 }} defaultValue={timeZone} onChange={setTimeZone} />
-        <Select
-          style={{ width: 200 }}
-          placeholder="Please Select View"
-          defaultValue={viewOfView}
-          onChange={(value) => changeView(value)}
-        >
-          <Select.Option value="table">Table</Select.Option>
-          <Select.Option value="list">List</Select.Option>
-          <Select.Option value="calendar">Calendar</Select.Option>
-        </Select>
-      </Row>
+      <>
+        <Row justify="space-between" style={{ marginBottom: 16 }}>
+          <FieldTimezone style={{ width: 200, marginRight: '250px' }} defaultValue={timeZone} onChange={setTimeZone} />
+          <Select
+            style={{ width: 200 }}
+            placeholder="Please Select View"
+            defaultValue={viewOfView}
+            onChange={onChangeViewMode}
+          >
+            <Select.Option value="table">Table</Select.Option>
+            <Select.Option value="list">List</Select.Option>
+            <Select.Option value="calendar">Calendar</Select.Option>
+          </Select>
+        </Row>
+        <Row justify="end" style={{ marginBottom: '10px' }}>
+          <Switch
+            checkedChildren="mentor"
+            unCheckedChildren="student"
+            defaultChecked={isActiveMentorMode}
+            onClick={onToggleMentorMode}
+          />
+        </Row>
+      </>
     );
-  };
+  }, []);
 
-  const ScheduleView = () => {
+  const ScheduleView = React.useCallback(() => {
     switch (viewOfView) {
       case 'list':
         return <ScheduleListWrapper />;
@@ -38,7 +51,7 @@ export function SchedulePage() {
       default:
         return <ScheduleTable timeZone={timeZone} />;
     }
-  };
+  }, [viewOfView]);
 
   return (
     <PageLayout title="Schedule" githubId={'props.session.githubId'} loading={false}>
