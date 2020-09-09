@@ -10,7 +10,6 @@ export function SchedulePage() {
 
   const [viewOfView, changeView] = useState('table');
   const [isActiveMentorMode, changeMentorMode] = useState(true);
-
   const onChangeViewMode = React.useCallback((value) => changeView(value), []);
   const onToggleMentorMode = React.useCallback(() => changeMentorMode((state) => !state), []);
 
@@ -34,8 +33,7 @@ export function SchedulePage() {
           <Switch
             checkedChildren="mentor"
             unCheckedChildren="student"
-            defaultChecked
-            checked={isActiveMentorMode}
+            defaultChecked={isActiveMentorMode}
             onClick={onToggleMentorMode}
           />
         </Row>
