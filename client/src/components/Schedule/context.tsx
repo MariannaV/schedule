@@ -1,4 +1,6 @@
 import React, { useReducer } from 'react';
+import { useAsync } from 'react-use';
+import { Event, EventService } from '../../services/event';
 
 export const ScheduleContext = React.createContext();
 
@@ -22,6 +24,12 @@ const reducer = (state, action) => {
         viewMode: action.nextView,
       };
 
+    case 'SET_DATA':
+      return {
+        ...state,
+        data: action.setdata,
+      };
+
     default:
       return state;
   }
@@ -29,6 +37,7 @@ const reducer = (state, action) => {
 
 export const StateContext = (props) => {
   const [store, dispatch] = useReducer(reducer, initialState);
+  const eventService = new EventService();
 
   const changeViewMode = (nextView) => {
     dispatch({ type: 'CHANGE_VIEW_MODE', nextView: nextView });
@@ -37,6 +46,11 @@ export const StateContext = (props) => {
   const toggleMentorMode = () => {
     dispatch({ type: 'TOGGLE_MENTOR_MODE' });
   };
+
+  useAsync(async () => {
+    const data = await eventService.getEvents();
+    dispatch({ type: 'SET_DATA', setdata: data });
+  }, [EventService]);
 
   return (
     <ScheduleContext.Provider
