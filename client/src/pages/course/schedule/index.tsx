@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { Row, Select, Switch } from 'antd';
 import { PageLayout } from 'components';
 import { useState } from 'react';
