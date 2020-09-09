@@ -4,16 +4,15 @@ import { PageLayout } from 'components';
 import { useState } from 'react';
 import { FieldTimezone } from 'components/Forms/fields';
 import { ScheduleTable, ScheduleListWrapper, ScheduleCalendar } from 'components/Schedule';
+import { StateContext, ScheduleContext } from 'components/Schedule/context';
 
 export function SchedulePage() {
   const [timeZone, setTimeZone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
 
-  const [viewOfView, changeView] = useState('table');
-  const [isActiveMentorMode, changeMentorMode] = useState(true);
-  const onChangeViewMode = React.useCallback((value) => changeView(value), []);
-  const onToggleMentorMode = React.useCallback(() => changeMentorMode((state) => !state), []);
+  // const onChangeViewMode = React.useCallback((value) => changeView(value), []);
+  // const onToggleMentorMode = React.useCallback(() => changeMentorMode((state) => !state), []);
 
-  const ScheduleHeader = React.useCallback(() => {
+  const ScheduleHeader = React.useCallback((data) => {
     return (
       <>
         <Row justify="space-between" style={{ marginBottom: 16 }}>
@@ -21,8 +20,8 @@ export function SchedulePage() {
           <Select
             style={{ width: 200 }}
             placeholder="Please Select View"
-            defaultValue={viewOfView}
-            onChange={onChangeViewMode}
+            defaultValue={data.view}
+            onChange={(value) => data.changeViewMode(value)}
           >
             <Select.Option value="table">Table</Select.Option>
             <Select.Option value="list">List</Select.Option>
@@ -33,16 +32,16 @@ export function SchedulePage() {
           <Switch
             checkedChildren="mentor"
             unCheckedChildren="student"
-            defaultChecked={isActiveMentorMode}
-            onClick={onToggleMentorMode}
+            defaultChecked={data.mentorMode}
+            onClick={() => data.toggleMentorMode()}
           />
         </Row>
       </>
     );
   }, []);
 
-  const ScheduleView = React.useCallback(() => {
-    switch (viewOfView) {
+  const ScheduleView = React.useCallback((data) => {
+    switch (data.view) {
       case 'list':
         return <ScheduleListWrapper />;
       case 'calendar':
@@ -51,13 +50,26 @@ export function SchedulePage() {
       default:
         return <ScheduleTable timeZone={timeZone} />;
     }
-  }, [viewOfView]);
+  }, []);
 
   return (
-    <PageLayout title="Schedule" githubId={'props.session.githubId'} loading={false}>
-      <ScheduleHeader />
-      <ScheduleView />
-    </PageLayout>
+    <StateContext>
+      <ScheduleContext.Consumer>
+        {(schedulecontext) => {
+          return (
+            <PageLayout title="Schedule" githubId={'props.session.githubId'} loading={false}>
+              <ScheduleHeader
+                changeViewMode={schedulecontext.changeViewMode}
+                toggleMentorMode={schedulecontext.toggleMentorMode}
+                view={schedulecontext.view}
+                mentorMode={schedulecontext.mentorMode}
+              />
+              <ScheduleView view={schedulecontext.view} />
+            </PageLayout>
+          );
+        }}
+      </ScheduleContext.Consumer>
+    </StateContext>
   );
 }
 
