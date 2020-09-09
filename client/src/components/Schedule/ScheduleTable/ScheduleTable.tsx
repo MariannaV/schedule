@@ -119,7 +119,7 @@ export function ScheduleTable(props: { timeZone: string }) {
                 value: 'test',
               },
             ],
-            onFilter: (value: string | number | boolean, record: Event) => record.type.indexOf(value) === 0,
+            onFilter: (value: string | number | boolean, record: Event) => record.type.indexOf(value.toString()) === 0,
           },
           {
             title: 'Action',

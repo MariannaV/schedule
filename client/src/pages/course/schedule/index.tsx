@@ -1,63 +1,64 @@
-import { Row, Select } from 'antd';
-import { withSession, PageLayout } from 'components';
-import withCourseData from 'components/withCourseData';
+import React from 'react';
+import { Row, Select, Switch } from 'antd';
+import { PageLayout } from 'components';
 import { useState } from 'react';
-import { CoursePageProps } from 'services/models';
-import { TIMEZONES } from 'configs/timezones';
-import { ScheduleTable, ScheduleList, ScheduleCalendar } from 'components/Schedule';
+import { FieldTimezone } from 'components/Forms/fields';
+import { ScheduleTable, ScheduleListWrapper, ScheduleCalendar } from 'components/Schedule';
 
-export function SchedulePage(props: CoursePageProps) {
+export function SchedulePage() {
   const [timeZone, setTimeZone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
 
   const [viewOfView, changeView] = useState('table');
+  const [isActiveMentorMode, changeMentorMode] = useState(true);
+  const onChangeViewMode = React.useCallback((value) => changeView(value), []);
+  const onToggleMentorMode = React.useCallback(() => changeMentorMode((state) => !state), []);
 
-  const ScheduleHeader = () => {
+  const ScheduleHeader = React.useCallback(() => {
     return (
-      <Row justify="space-between" style={{ marginBottom: 16 }}>
-        <Select
-          style={{ width: 200 }}
-          placeholder="Please select a timezone"
-          defaultValue={timeZone}
-          onChange={setTimeZone}
-        >
-          {TIMEZONES.map((tz) => (
-            <Select.Option key={tz} value={tz}>
-              {tz}
-            </Select.Option>
-          ))}
-        </Select>
-        <Select
-          style={{ width: 200 }}
-          placeholder="Please Select View"
-          defaultValue={viewOfView}
-          onChange={(value) => changeView(value)}
-        >
-          <Select.Option value="table">Table</Select.Option>
-          <Select.Option value="list">List</Select.Option>
-          <Select.Option value="calendar">Calendar</Select.Option>
-        </Select>
-      </Row>
+      <>
+        <Row justify="space-between" style={{ marginBottom: 16 }}>
+          <FieldTimezone style={{ width: 200, marginRight: '250px' }} defaultValue={timeZone} onChange={setTimeZone} />
+          <Select
+            style={{ width: 200 }}
+            placeholder="Please Select View"
+            defaultValue={viewOfView}
+            onChange={onChangeViewMode}
+          >
+            <Select.Option value="table">Table</Select.Option>
+            <Select.Option value="list">List</Select.Option>
+            <Select.Option value="calendar">Calendar</Select.Option>
+          </Select>
+        </Row>
+        <Row justify="end" style={{ marginBottom: '10px' }}>
+          <Switch
+            checkedChildren="mentor"
+            unCheckedChildren="student"
+            defaultChecked={isActiveMentorMode}
+            onClick={onToggleMentorMode}
+          />
+        </Row>
+      </>
     );
-  };
+  }, []);
 
-  const ScheduleView = () => {
+  const ScheduleView = React.useCallback(() => {
     switch (viewOfView) {
       case 'list':
-        return <ScheduleList />;
+        return <ScheduleListWrapper />;
       case 'calendar':
         return <ScheduleCalendar />;
       case 'table':
       default:
         return <ScheduleTable timeZone={timeZone} />;
     }
-  };
+  }, [viewOfView]);
 
   return (
-    <PageLayout title="Schedule" githubId={props.session.githubId} loading={false}>
+    <PageLayout title="Schedule" githubId={'props.session.githubId'} loading={false}>
       <ScheduleHeader />
       <ScheduleView />
     </PageLayout>
   );
 }
 
-export default withCourseData(withSession(SchedulePage));
+export default SchedulePage;

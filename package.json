@@ -7,7 +7,8 @@
     "./server/**"
   ],
   "scripts": {
-    "start": "concurrently \"cd ./client && npm run develop\" \"cd ./server && npm start\"",
+    "start:client": "cd ./client && yarn develop",
+    "start": "concurrently \"yarn start:client\" \"cd ./server && npm start\"",
     "format:fix": "prettier --write \"server/**/*.{ts,tsx}\" \"client/**/*.{ts,tsx,js}\" \"common/**/*.{ts,tsx,js}\"",
     "format:check": "prettier --check \"server/**/*.{ts,tsx}\" \"client/**/*.{ts,tsx,js}\" \"common/**/*.{ts,tsx,js}\"",
     "lint:js": "eslint . --ext .ts,.tsx",
