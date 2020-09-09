@@ -10,53 +10,29 @@ import { useLoading } from 'components/useLoading';
 
 import styles from './style.module.scss';
 
-enum EventTypeColor {
-  deadline = 'red',
-  test = '#63ab91',
-  jstask = 'green',
-  htmltask = 'green',
-  htmlcssacademy = 'green',
-  externaltask = 'green',
-  codewars = 'green',
-  codejam = 'green',
-  newtask = 'green',
-  lecture = 'blue',
-  lecture_online = 'blue',
-  lecture_offline = 'blue',
-  lecture_mixed = 'blue',
-  lecture_self_study = 'blue',
-  info = '#ff7b00',
-  warmup = '#63ab91',
-  meetup = '#bde04a',
-  workshop = '#bde04a',
-  interview = '#63ab91',
-}
-
-const EventTypeToName: Record<string, string> = {
-  lecture_online: 'online lecture',
-  lecture_offline: 'offline lecture',
-  lecture_mixed: 'mixed lecture',
-  lecture_self_study: 'self study',
-  warmup: 'warm-up',
-  jstask: 'js task',
-  kotlintask: 'kotlin task',
-  objctask: 'objc task',
-  htmltask: 'html task',
-  codejam: 'code jam',
-  externaltask: 'external task',
-  htmlcssacademy: 'html/css academy',
-  codewars: 'codewars',
-  // TODO: Left hardcoded (codewars:stage1|codewars:stage2) configs only for backward compatibility. Delete them in the future.
-  'codewars:stage1': 'codewars',
-  'codewars:stage2': 'codewars',
+const tagColors = {
+  codejam: 'green',
+  codewars: 'green',
+  course: 'green',
+  interview: 'volcano',
+  lecture: 'purple',
+  'self-education': 'gold',
+  task: 'green',
+  test: 'cyan',
 };
+
+function isRowDisabled(dateTime, deadLine) {
+  const startOfToday = moment().startOf('day');
+  return deadLine
+    ? moment(dateTime).isBefore(startOfToday) && moment(deadLine).isBefore(startOfToday)
+    : moment(dateTime).isBefore(startOfToday);
+}
 
 export function ScheduleTable(props: { timeZone: string }) {
   const { timeZone } = props;
   const eventService = new EventService();
   const [loading, withLoading] = useLoading(false);
   const [data, setData] = useState<Event[]>([]);
-  const startOfToday = moment().startOf('day');
 
   useAsync(
     withLoading(async () => {
@@ -73,7 +49,11 @@ export function ScheduleTable(props: { timeZone: string }) {
         pagination={false}
         size="small"
         dataSource={data}
-        rowClassName={(record) => (moment(record.dateTime).isBefore(startOfToday) ? 'rs-table-row-disabled' : '')}
+        rowClassName={(record) =>
+          isRowDisabled(record.dateTime, record.deadLine)
+            ? 'rs-table-row-disabled'
+            : styles[record.type.split(' ').join('')]
+        }
         columns={[
           {
             title: 'Start Date',
@@ -101,12 +81,45 @@ export function ScheduleTable(props: { timeZone: string }) {
           {
             title: 'Type',
             width: 100,
-            dataIndex: 'type',
-            render: (value: keyof typeof EventTypeColor) => (
-              <Tag color={EventTypeColor[value]}>{EventTypeToName[value] || value}</Tag>
-            ),
+            dataIndex: 'type' || '',
+            render: (value: keyof typeof tagColors) => <Tag color={tagColors[value]}>{value}</Tag>,
             sorter: (a, b) => (a.type > b.type ? 1 : -1),
             sortDirections: ['ascend', 'descend', 'ascend'],
+            filters: [
+              {
+                text: 'code jam',
+                value: 'code jam',
+              },
+              {
+                text: 'codewars',
+                value: 'codewars',
+              },
+              {
+                text: 'course',
+                value: 'course',
+              },
+              {
+                text: 'interview',
+                value: 'interview',
+              },
+              {
+                text: 'lecture',
+                value: 'lecture',
+              },
+              {
+                text: 'self-education',
+                value: 'self-education',
+              },
+              {
+                text: 'task',
+                value: 'task',
+              },
+              {
+                text: 'test',
+                value: 'test',
+              },
+            ],
+            onFilter: (value: string | number | boolean, record: Event) => record.type.indexOf(value) === 0,
           },
           {
             title: 'Action',

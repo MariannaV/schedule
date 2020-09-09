@@ -31,3 +31,38 @@
     }
   }
 }
+
+.codejam, .codewars, .course, .task {
+  background-color: $color-task-background;
+  & .ant-table-column-sort {
+    background-color: $color-task-background;
+  }
+}
+
+.interview {
+  background-color: $color-interview-background;
+  & .ant-table-column-sort {
+    background-color: $color-interview-background;
+  }
+}
+
+.lecture {
+  background-color: $color-lecture-background;
+  & .ant-table-column-sort {
+    background-color: $color-lecture-background;
+  }
+}
+
+.self-education {
+  background-color: $color-self-education-background;
+  & .ant-table-column-sort {
+    background-color: $color-self-education-background;
+  }
+}
+
+.test {
+  background-color: $color-test-background;
+  & .ant-table-column-sort {
+    background-color: $color-test-background;
+  }
+}
