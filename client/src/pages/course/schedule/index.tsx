@@ -39,7 +39,7 @@ export function SchedulePage() {
         </Row>
       </>
     );
-  }, [isActiveMentorMode]);
+  }, []);
 
   const ScheduleView = React.useCallback(() => {
     switch (viewOfView) {
@@ -51,7 +51,7 @@ export function SchedulePage() {
       default:
         return <ScheduleTable timeZone={timeZone} />;
     }
-  }, []);
+  }, [viewOfView]);
 
   return (
     <PageLayout title="Schedule" githubId={'props.session.githubId'} loading={false}>
