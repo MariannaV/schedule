@@ -9,12 +9,12 @@ export function SchedulePage() {
   const [timeZone, setTimeZone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
 
   const [viewOfView, changeView] = useState('table');
-  const [isActivMentorMode, changeMentorMode] = useState(true);
+  const [isActiveMentorMode, changeMentorMode] = useState(true);
 
   const onChangeViewMode = React.useCallback((value) => changeView(value), []);
   const onToggleMentorMode = React.useCallback(() => changeMentorMode((state) => !state), []);
 
-  const ScheduleHeader = () => {
+  const ScheduleHeader = React.useCallback(() => {
     return (
       <>
         <Row justify="space-between" style={{ marginBottom: 16 }}>
@@ -35,15 +35,15 @@ export function SchedulePage() {
             checkedChildren="mentor"
             unCheckedChildren="student"
             defaultChecked
-            checked={isActivMentorMode}
+            checked={isActiveMentorMode}
             onClick={onToggleMentorMode}
-          ></Switch>
+          />
         </Row>
       </>
     );
-  };
+  }, [isActiveMentorMode]);
 
-  const ScheduleView = () => {
+  const ScheduleView = React.useCallback(() => {
     switch (viewOfView) {
       case 'list':
         return <ScheduleListWrapper />;
@@ -53,7 +53,7 @@ export function SchedulePage() {
       default:
         return <ScheduleTable timeZone={timeZone} />;
     }
-  };
+  }, []);
 
   return (
     <PageLayout title="Schedule" githubId={'props.session.githubId'} loading={false}>
