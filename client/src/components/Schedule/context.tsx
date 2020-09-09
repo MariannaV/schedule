@@ -1,39 +1,53 @@
-import React, { Component } from 'react';
+import React, { useReducer } from 'react';
 
 export const ScheduleContext = React.createContext();
 
-export class StateContext extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      data: {},
-      mentorMode: true,
-      viewMode: 'table',
-    };
-  }
+const initialState = {
+  data: {},
+  mentorMode: true,
+  viewMode: 'table',
+};
 
-  render() {
-    return (
-      <ScheduleContext.Provider
-        value={{
-          view: this.state.viewMode,
-          mentorMode: this.state.mentorMode,
-          changeViewMode: this.changeViewMode,
-          toggleMentorMode: this.toggleMentorMode,
-        }}
-      >
-        {this.props.children}
-      </ScheduleContext.Provider>
-    );
-  }
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'TOGGLE_MENTOR_MODE':
+      return {
+        ...state,
+        mentorMode: !state.mentorMode,
+      };
 
-  changeViewMode = (value) => {
-    console.log('Change view to ', value);
-    this.setState({ viewMode: value });
+    case 'CHANGE_VIEW_MODE':
+      return {
+        ...state,
+        viewMode: action.nextView,
+      };
+
+    default:
+      return state;
+  }
+};
+
+export const StateContext = (props) => {
+  const [store, dispatch] = useReducer(reducer, initialState);
+
+  const changeViewMode = (nextView) => {
+    dispatch({ type: 'CHANGE_VIEW_MODE', nextView: nextView });
   };
 
-  toggleMentorMode = () => {
-    console.log('changing mentor mode');
-    this.setState({ mentorMode: !this.state.mentorMode });
+  const toggleMentorMode = () => {
+    dispatch({ type: 'TOGGLE_MENTOR_MODE' });
   };
-}
+
+  return (
+    <ScheduleContext.Provider
+      value={{
+        view: store.viewMode,
+        mentorMode: store.mentorMode,
+        changeViewMode: changeViewMode,
+        toggleMentorMode: toggleMentorMode,
+      }}
+    >
+      {props.children}
+    </ScheduleContext.Provider>
+  );
+};
