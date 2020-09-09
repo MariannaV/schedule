@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Row, Select, Switch } from 'antd';
 import { PageLayout } from 'components';
 import { useState } from 'react';
@@ -11,6 +11,9 @@ export function SchedulePage() {
   const [viewOfView, changeView] = useState('table');
   const [isActivMentorMode, changeMentorMode] = useState(true);
 
+  const onChangeViewMode = React.useCallback((value) => changeView(value), []);
+  const onToggleMentorMode = React.useCallback(() => changeMentorMode((state) => !state), []);
+
   const ScheduleHeader = () => {
     return (
       <>
@@ -20,7 +23,7 @@ export function SchedulePage() {
             style={{ width: 200 }}
             placeholder="Please Select View"
             defaultValue={viewOfView}
-            onChange={(value) => changeView(value)}
+            onChange={onChangeViewMode}
           >
             <Select.Option value="table">Table</Select.Option>
             <Select.Option value="list">List</Select.Option>
@@ -33,7 +36,7 @@ export function SchedulePage() {
             unCheckedChildren="student"
             defaultChecked
             checked={isActivMentorMode}
-            onClick={() => changeMentorMode(!isActivMentorMode)}
+            onClick={onToggleMentorMode}
           ></Switch>
         </Row>
       </>
