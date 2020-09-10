@@ -26,5 +26,6 @@ module.exports = {
     '@typescript-eslint/no-empty-interface': 0,
     '@typescript-eslint/no-namespace': 0,
     '@typescript-eslint/ban-ts-comment': 0,
+    '@typescript-eslint/ban-ts-ignore': 0,
   },
 };
