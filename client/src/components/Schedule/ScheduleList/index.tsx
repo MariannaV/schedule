@@ -11,10 +11,10 @@ export function ScheduleListWrapper() {
     { eventsData, eventsLoading } = API_Events.hooks.useEventsData();
 
   React.useEffect(() => {
-    if (!eventsData.length || Object.keys(router.query).length) return;
+    if (!eventsData.list.length || Object.keys(router.query).length) return;
 
     const initState = {
-      openedItem: eventsData[0].id,
+      openedItem: eventsData.list[0],
       step: 'view',
     };
 
