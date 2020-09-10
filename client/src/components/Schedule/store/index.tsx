@@ -19,10 +19,10 @@ const initialState: NSchedule.IStore = {
 function reducer(store: NSchedule.IStore, action: NSchedule.IActions) {
   switch (action.type) {
     case NSchedule.ActionTypes.USER_ROLE_CHANGE:
-      return { ...store, user: { ...store, role: action.payload.role } };
+      return { ...store, user: { ...store.user, role: action.payload.role } };
 
     case NSchedule.ActionTypes.USER_TIMEZONE:
-      return { ...store, user: { ...store, timeZone: action.payload.timeZone } };
+      return { ...store, user: { ...store.user, timeZone: action.payload.timeZone } };
 
     case NSchedule.ActionTypes.EVENTS_SET: {
       return {
