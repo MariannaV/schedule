@@ -1,6 +1,6 @@
 import React, { useReducer } from 'react';
 import { useAsync } from 'react-use';
-import { Event, EventService } from '../../services/event';
+import { EventService } from '../../services/event';
 
 export const ScheduleContext = React.createContext();
 
