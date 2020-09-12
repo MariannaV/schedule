@@ -1,11 +1,10 @@
 import { QuestionCircleOutlined, YoutubeOutlined } from '@ant-design/icons';
 import { Table, Tag, Tooltip, Spin } from 'antd';
 import { GithubUserLink } from 'components';
-import { useState } from 'react';
-import { Event, EventService } from '../../services/event';
+import React from 'react';
+import { API_Events } from 'services/event';
 import moment from 'moment-timezone';
-import { useAsync } from 'react-use';
-import { useLoading } from 'components/useLoading';
+import { ScheduleStore } from './store';
 
 enum EventTypeColor {
   deadline = 'red',
@@ -48,28 +47,22 @@ const EventTypeToName: Record<string, string> = {
   'codewars:stage2': 'codewars',
 };
 
-export function ScheduleTable(props: { timeZone: string }) {
-  const { timeZone } = props;
-  const eventService = new EventService();
-  const [loading, withLoading] = useLoading(false);
-  const [data, setData] = useState<Event[]>([]);
+export function ScheduleTable() {
+  const { store } = React.useContext(ScheduleStore.context),
+    { timeZone } = store.user;
+
+  const { eventsLoading, eventsData } = API_Events.hooks.useEventsData(),
+    tableData = React.useMemo(() => eventsData.list.map((eventId) => eventsData.map[eventId]), [eventsData]);
+
   const startOfToday = moment().startOf('day');
 
-  useAsync(
-    withLoading(async () => {
-      const data = await eventService.getEvents();
-      setData(data);
-    }),
-    [EventService],
-  );
-
   return (
-    <Spin spinning={loading}>
+    <Spin spinning={!!eventsLoading}>
       <Table
         rowKey={(record) => record.id.toString()}
         pagination={false}
         size="small"
-        dataSource={data}
+        dataSource={tableData}
         rowClassName={(record) => (moment(record.dateTime).isBefore(startOfToday) ? 'rs-table-row-disabled' : '')}
         columns={[
           { title: 'Date', width: 120, dataIndex: 'dateTime', render: dateRenderer(timeZone) },

@@ -20,6 +20,12 @@ const nextConfig = {
     config.plugins.push(new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en-gb/));
     return withGaugeChartCss(config);
   },
+  typescript: {
+    // !! WARN !!
+    // Dangerously allow production builds to successfully complete even if your project has type errors.
+    ignoreBuildErrors: true,
+    // !! WARN !!
+  },
 };
 module.exports = withTranspiledModules(['react-gauge-chart'])(nextConfig);
 
