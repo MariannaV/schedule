@@ -17,9 +17,13 @@ export const FormItem: React.FC<IFormItem> = React.memo((props) => {
       [className, isReadOnly],
     );
 
-  if (isReadOnly) return <Form.Item className={classes} {...formItemProps} children={<FieldView type={type} />} />;
-
-  return <Form.Item {...formItemProps} className={classes} />;
+  return (
+    <Form.Item
+      {...formItemProps}
+      className={classes}
+      children={isReadOnly ? <FieldView type={type} /> : props.children}
+    />
+  );
 });
 
 interface IFieldView {
@@ -41,7 +45,9 @@ function FieldView(props: IFieldView) {
     }, [value, type]);
 
   React.useEffect(function hideEmptyField() {
-    if (!fieldValue) (ref.current as any).closest('.ant-form-item').classList.add('isEmpty');
+    const formItemNode = (ref.current as any).closest('.ant-form-item');
+    if (!fieldValue) formItemNode.classList.add('isEmpty');
+    return () => formItemNode.classList.remove('isEmpty');
   }, []);
 
   return <p children={fieldValue} ref={ref} />;
