@@ -23,16 +23,18 @@ export const ScheduleDetailView: React.FC<IScheduleDetailView> = React.memo((pro
 function ScheduleDetailViewHeader() {
   const openedItem = ScheduleStore.useSelector(ScheduleStore.selectors.getDetailViewOpenedId),
     detailViewMode = ScheduleStore.useSelector(ScheduleStore.selectors.getDetailViewMode),
+    isCreateMode = detailViewMode === NSchedule.FormModes.CREATE,
+    isViewMode = detailViewMode === NSchedule.FormModes.VIEW,
     isMentor = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsMentor),
     { dispatch } = React.useContext(ScheduleStore.context),
     onToggleViewMode = React.useCallback(
       () =>
         ScheduleStore.API.detailViewModeChange(dispatch)({
           payload: {
-            mode: detailViewMode === NSchedule.FormModes.VIEW ? NSchedule.FormModes.EDIT : NSchedule.FormModes.VIEW,
+            mode: isViewMode ? NSchedule.FormModes.EDIT : NSchedule.FormModes.VIEW,
           },
         }),
-      [detailViewMode],
+      [isViewMode],
     ),
     onDelete = React.useCallback(async () => {
       await ScheduleStore.API.eventDelete(dispatch)({
@@ -49,20 +51,17 @@ function ScheduleDetailViewHeader() {
     menu = React.useMemo(
       () => (
         <Menu>
-          <Menu.Item
-            children={detailViewMode === NSchedule.FormModes.VIEW ? 'Edit' : 'View'}
-            onClick={onToggleViewMode}
-          />
+          <Menu.Item children={isViewMode ? 'Edit' : 'View'} onClick={onToggleViewMode} />
           <Menu.Item children="Delete" onClick={onDelete} />
         </Menu>
       ),
-      [detailViewMode],
+      [isViewMode],
     );
 
   return (
     <header className={viewStyles.ScheduleDetailViewHeader}>
       <Typography.Title children="Event" data-id={openedItem ?? 'new'} level={3} />
-      {isMentor && <Dropdown.Button overlay={menu} />}
+      {!isCreateMode && isMentor && <Dropdown.Button overlay={menu} />}
     </header>
   );
 }

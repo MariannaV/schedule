@@ -44,6 +44,20 @@ function reducer(store: NSchedule.IStore, action: NSchedule.IActions) {
       };
     }
 
+    case NSchedule.ActionTypes.EVENT_CREATE: {
+      return {
+        ...store,
+        events: {
+          ...store.events,
+          list: [...store.events.list, action.payload.eventData.id],
+          map: {
+            ...store.events.map,
+            [action.payload.eventData.id]: action.payload.eventData,
+          },
+        },
+      };
+    }
+
     case NSchedule.ActionTypes.EVENT_DELETE: {
       return {
         ...store,
@@ -77,6 +91,23 @@ export const API_Schedule = {
     dispatch({ type: NSchedule.ActionTypes.EVENTS_FETCH_START, ...params }),
   eventsSet: (dispatch: Dispatch<NSchedule.IActions>) => (params: Omit<NSchedule.IEventsSet, 'type'>) =>
     dispatch({ type: NSchedule.ActionTypes.EVENTS_SET, ...params }),
+  eventCreate: (dispatch: Dispatch<NSchedule.IActions>) => async (params: Omit<NSchedule.IEventCreate, 'type'>) => {
+    try {
+      const { eventData } = params.payload;
+      const { id } = await new EventService().createEvent(eventData);
+      eventData.id = id;
+      dispatch({
+        type: NSchedule.ActionTypes.EVENT_CREATE,
+        payload: {
+          eventData,
+        },
+      });
+      return { eventData };
+    } catch (error) {
+      console.error(error);
+      throw Error('eventCreate went wrong');
+    }
+  },
   eventDelete: (dispatch: Dispatch<NSchedule.IActions>) => async (params: Omit<NSchedule.IEventDelete, 'type'>) => {
     try {
       await new EventService().deleteEvent(params.payload.eventId);

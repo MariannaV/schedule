@@ -20,14 +20,14 @@ function ScheduleListHeader() {
     isMentor = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsMentor),
     eventsList = ScheduleStore.useSelector(ScheduleStore.selectors.getEventsList),
     onCreateNewClick = React.useCallback(() => {
-      ScheduleStore.API.detailViewSetOpened(dispatch)({
-        payload: {
-          openedId: null,
-        },
-      });
       ScheduleStore.API.detailViewModeChange(dispatch)({
         payload: {
           mode: NSchedule.FormModes.CREATE,
+        },
+      });
+      ScheduleStore.API.detailViewSetOpened(dispatch)({
+        payload: {
+          openedId: null,
         },
       });
     }, []);

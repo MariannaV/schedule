@@ -17,20 +17,33 @@ function EventForm(props: IEventForm) {
   const { dispatch } = React.useContext(ScheduleStore.context),
     isMentor = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsMentor),
     formMode = ScheduleStore.useSelector(ScheduleStore.selectors.getDetailViewMode),
+    isCreation = formMode === NSchedule.FormModes.CREATE,
     isReadOnly = formMode === NSchedule.FormModes.VIEW;
 
   const [form] = Form.useForm(),
     onSubmit = React.useCallback(
-      async (sendingData) => {
-        const isCreating = Boolean(eventId);
-
-        if (isCreating) {
-          await new API_Events.EventService().createEvent(sendingData);
+      async (sendingData: Event) => {
+        if (isCreation) {
+          const { eventData } = await ScheduleStore.API.eventCreate(dispatch)({
+            payload: {
+              eventData: sendingData,
+            },
+          });
+          ScheduleStore.API.detailViewSetOpened(dispatch)({
+            payload: {
+              openedId: eventData.id,
+            },
+          });
         } else {
           await new API_Events.EventService().updateEvent(eventId!, sendingData);
         }
+        ScheduleStore.API.detailViewModeChange(dispatch)({
+          payload: {
+            mode: NSchedule.FormModes.VIEW,
+          },
+        });
       },
-      [eventId],
+      [eventId, isCreation],
     );
 
   React.useEffect(
@@ -126,7 +139,7 @@ function EventForm(props: IEventForm) {
 
       <FormItem label="Comment" name="comment" type="input" children={<Input />} isReadOnly={isReadOnly} />
 
-      {!isReadOnly && <Button htmlType="submit" children="Create" />}
+      {!isReadOnly && <Button htmlType="submit" children={isCreation ? 'Create' : 'Update'} />}
     </Form>
   );
 }
