@@ -2,6 +2,8 @@ import React from 'react';
 import { Form, Input, Select, Button } from 'antd';
 import { API_Events, Event, eventTypes } from 'services/event';
 import { FieldTimezone } from 'components/Forms/fields';
+import { FormItem } from 'components/Forms/FormItem';
+import { ScheduleStore } from 'components/Schedule/store';
 import formStyles from './ScheduleDetailView.module.scss';
 
 interface IEventForm {
@@ -10,7 +12,12 @@ interface IEventForm {
 }
 
 function EventForm(props: IEventForm) {
-  const { eventId } = props,
+  const { eventId, formData } = props;
+
+  const isMentor = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsMentor),
+    isReadOnly = !isMentor;
+
+  const [form] = Form.useForm(),
     onSubmit = React.useCallback(
       async (sendingData) => {
         const isCreating = Boolean(eventId);
@@ -31,25 +38,35 @@ function EventForm(props: IEventForm) {
       [eventId],
     );
 
+  React.useEffect(() => {
+    if (!formData) form.resetFields();
+  }, [formData]);
+
   return (
     <Form
       name="eventForm"
+      form={form}
       initialValues={props.formData}
       className={formStyles.EventForm}
       layout="vertical"
-      requiredMark="optional"
+      scrollToFirstError
+      requiredMark={!isReadOnly && 'optional'}
       onFinish={onSubmit}
     >
-      <Form.Item
+      <FormItem
         label="Name"
         name="name"
         rules={[{ required: true, message: 'Please input event name!' }]}
+        type="input"
         children={<Input />}
+        isReadOnly={isReadOnly}
       />
-      <Form.Item
+
+      <FormItem
         label="Event type"
         name="type"
         rules={[{ required: true, message: 'Please select event type!' }]}
+        type="select"
         children={
           <Select
             children={Object.entries({ ...eventTypes }).map(([key, value]) => (
@@ -57,35 +74,48 @@ function EventForm(props: IEventForm) {
             ))}
           />
         }
+        isReadOnly={isReadOnly}
       />
-      <Form.Item
+      <FormItem
         label="Description"
         name="description"
         rules={[{ required: true, message: 'Please input event description!' }]}
+        type="input"
         children={<Input />}
+        isReadOnly={isReadOnly}
       />
-      <Form.Item label="Link with description" name="descriptionUrl" children={<Input />} />
+      <FormItem
+        label="Link with description"
+        name="descriptionUrl"
+        type="input"
+        children={<Input />}
+        isReadOnly={isReadOnly}
+      />
 
       <Input.Group compact>
-        <Form.Item
+        <FormItem
           label="Timezone"
           name="timeZone"
           rules={[{ required: true, message: 'Please select event timeZone!' }]}
+          type="input"
           children={<FieldTimezone style={{ width: 200 }} />}
+          isReadOnly={isReadOnly}
         />
-        <Form.Item
+        <FormItem
           label="Time"
           name="dateTime"
           rules={[{ required: true, message: 'Please select event time!' }]}
+          type="time"
           children={<Input />}
+          isReadOnly={isReadOnly}
         />
       </Input.Group>
 
-      <Form.Item label="Place" name="place" children={<Input />} />
+      <FormItem label="Place" name="place" type="input" children={<Input />} isReadOnly={isReadOnly} />
 
-      <Form.Item label="Comment" name="comment" children={<Input />} />
+      <FormItem label="Comment" name="comment" type="input" children={<Input />} isReadOnly={isReadOnly} />
 
-      <Button htmlType="submit" children="Create" />
+      {!isReadOnly && <Button htmlType="submit" children="Create" />}
     </Form>
   );
 }

@@ -1,19 +1,19 @@
-import { API_Events, Event } from 'services/event';
+import React from 'react';
+import { ScheduleStore } from 'components/Schedule/store';
 import viewStyles from './ScheduleDetailView.module.scss';
 import { EventForm } from './EventForm';
 
 interface IScheduleDetailView {
-  eventId: Event['id'];
-  classes?: Array<string>;
+  className?: string;
 }
 
-export function ScheduleDetailView(props: IScheduleDetailView) {
-  const { eventId } = props,
-    { eventData } = API_Events.hooks.useEventData({ eventId });
+export const ScheduleDetailView: React.FC<IScheduleDetailView> = React.memo((props) => {
+  const openedItem = ScheduleStore.useSelector(ScheduleStore.selectors.getDetailViewOpenedId),
+    eventData = ScheduleStore.useSelector(ScheduleStore.selectors.getEvent({ eventId: openedItem }));
 
   return (
-    <section className={[viewStyles.ScheduleDetailView, props.classes].filter(Boolean).join(' ')}>
-      <EventForm formData={eventData!} eventId={eventId} />
+    <section className={[viewStyles.ScheduleDetailView, props.className].filter(Boolean).join(' ')}>
+      <EventForm formData={eventData} eventId={openedItem} />
     </section>
   );
-}
+});
