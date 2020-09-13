@@ -1,5 +1,23 @@
 .ScheduleList {
-  text-align: center;
-  background-color: #ffa;
-  height: 80vh;
+}
+
+.ScheduleListHeader {
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ScheduleListHeaderTitle {
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  column-gap: 0.5rem;
+
+  &::after {
+    content: attr(data-events-amount);
+    display: block;
+    color: gray;
+    font-size: 0.7em;
+  }
 }
