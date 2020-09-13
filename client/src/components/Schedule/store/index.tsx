@@ -1,4 +1,5 @@
 import React, { Dispatch } from 'react';
+import { EventService } from 'services/event';
 import { NSchedule } from './@types';
 import { scheduleSelectors } from './selectors';
 
@@ -43,6 +44,20 @@ function reducer(store: NSchedule.IStore, action: NSchedule.IActions) {
       };
     }
 
+    case NSchedule.ActionTypes.EVENT_DELETE: {
+      return {
+        ...store,
+        events: {
+          ...store.events,
+          list: store.events.list.filter((eventId) => eventId !== action.payload.eventId),
+          map: {
+            ...store.events.map,
+            [action.payload.eventId]: undefined,
+          },
+        },
+      };
+    }
+
     case NSchedule.ActionTypes.DETAIL_VIEW_MODE_CHANGE:
     case NSchedule.ActionTypes.DETAIL_VIEW_SET_OPENED:
       return { ...store, detailView: { ...store.detailView, ...action.payload } };
@@ -62,6 +77,14 @@ export const API_Schedule = {
     dispatch({ type: NSchedule.ActionTypes.EVENTS_FETCH_START, ...params }),
   eventsSet: (dispatch: Dispatch<NSchedule.IActions>) => (params: Omit<NSchedule.IEventsSet, 'type'>) =>
     dispatch({ type: NSchedule.ActionTypes.EVENTS_SET, ...params }),
+  eventDelete: (dispatch: Dispatch<NSchedule.IActions>) => async (params: Omit<NSchedule.IEventDelete, 'type'>) => {
+    try {
+      await new EventService().deleteEvent(params.payload.eventId);
+      dispatch({ type: NSchedule.ActionTypes.EVENT_DELETE, ...params });
+    } catch (error) {
+      console.error(error);
+    }
+  },
   detailViewModeChange: (dispatch: Dispatch<NSchedule.IActions>) => (
     params: Omit<NSchedule.IDetailViewModeChange, 'type'>,
   ) => dispatch({ type: NSchedule.ActionTypes.DETAIL_VIEW_MODE_CHANGE, ...params }),

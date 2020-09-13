@@ -39,6 +39,7 @@ export namespace NSchedule {
     | IUserTimeZoneChange
     | IEventsFetchStart
     | IEventsSet
+    | IEventDelete
     | IDetailViewModeChange
     | IDetailViewSetOpened;
 
@@ -47,6 +48,7 @@ export namespace NSchedule {
     USER_TIMEZONE,
     EVENTS_FETCH_START,
     EVENTS_SET,
+    EVENT_DELETE,
     DETAIL_VIEW_MODE_CHANGE,
     DETAIL_VIEW_SET_OPENED,
   }
@@ -73,6 +75,13 @@ export namespace NSchedule {
     type: ActionTypes.EVENTS_SET;
     payload: {
       events: Array<Event>;
+    };
+  }
+
+  export interface IEventDelete {
+    type: ActionTypes.EVENT_DELETE;
+    payload: {
+      eventId: Event['id'];
     };
   }
 

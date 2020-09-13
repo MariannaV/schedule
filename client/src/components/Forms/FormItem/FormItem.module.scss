@@ -8,4 +8,10 @@
   &[class~='isEmpty'] {
     display: none;
   }
+
+  [class~='ant-form-item-control-input-content'] {
+    p {
+      margin: 0;
+    }
+  }
 }

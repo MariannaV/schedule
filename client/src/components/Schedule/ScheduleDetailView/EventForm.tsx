@@ -3,7 +3,7 @@ import { Form, Input, Select, Button } from 'antd';
 import { API_Events, Event, eventTypes } from 'services/event';
 import { FieldTimezone } from 'components/Forms/fields';
 import { FormItem } from 'components/Forms/FormItem';
-import { ScheduleStore } from 'components/Schedule/store';
+import { NSchedule, ScheduleStore } from 'components/Schedule/store';
 import formStyles from './ScheduleDetailView.module.scss';
 
 interface IEventForm {
@@ -14,8 +14,10 @@ interface IEventForm {
 function EventForm(props: IEventForm) {
   const { eventId, formData } = props;
 
-  const isMentor = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsMentor),
-    isReadOnly = !isMentor;
+  const { dispatch } = React.useContext(ScheduleStore.context),
+    isMentor = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsMentor),
+    formMode = ScheduleStore.useSelector(ScheduleStore.selectors.getDetailViewMode),
+    isReadOnly = formMode === NSchedule.FormModes.VIEW;
 
   const [form] = Form.useForm(),
     onSubmit = React.useCallback(
@@ -27,20 +29,28 @@ function EventForm(props: IEventForm) {
         } else {
           await new API_Events.EventService().updateEvent(eventId!, sendingData);
         }
-
-        /*route.replace({
-          ...prev,
-            eventId,
-            step: 'VIEW',
-          },
-        })*/
       },
       [eventId],
     );
 
-  React.useEffect(() => {
-    if (!formData) form.resetFields();
-  }, [formData]);
+  React.useEffect(
+    function formResetting() {
+      if (!formData) form.resetFields();
+    },
+    [formData],
+  );
+
+  React.useEffect(
+    function checkPermissions() {
+      if (!isMentor)
+        ScheduleStore.API.detailViewModeChange(dispatch)({
+          payload: {
+            mode: NSchedule.FormModes.VIEW,
+          },
+        });
+    },
+    [isMentor],
+  );
 
   return (
     <Form
@@ -50,6 +60,7 @@ function EventForm(props: IEventForm) {
       className={formStyles.EventForm}
       layout="vertical"
       scrollToFirstError
+      preserve
       requiredMark={!isReadOnly && 'optional'}
       onFinish={onSubmit}
     >

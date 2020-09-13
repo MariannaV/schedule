@@ -35,7 +35,7 @@ function useDetailViewInit() {
       });
       setFinished(true);
     }
-  }, []);
+  }, [openedItem, eventsList.length]);
 
   return isFinished;
 }

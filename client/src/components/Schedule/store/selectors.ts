@@ -39,4 +39,7 @@ export const scheduleSelectors = {
   get getDetailViewOpenedId() {
     return createSelector(this.getDetailView, (detailView) => detailView.openedId);
   },
+  get getDetailViewMode() {
+    return createSelector(this.getDetailView, (detailView) => detailView.mode);
+  },
 };
