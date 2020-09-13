@@ -5,6 +5,7 @@ import { FieldTimezone } from 'components/Forms/fields';
 import { ScheduleTable, ScheduleListWrapper, ScheduleCalendar } from 'components/Schedule';
 import { NSchedule } from 'components/Schedule/store/@types';
 import { ScheduleStore, API_Schedule } from 'components/Schedule/store';
+import { API_Events } from 'services/event';
 
 enum View {
   table = 'Table',
@@ -12,7 +13,7 @@ enum View {
   calendar = 'Calendar',
 }
 
-export function SchedulePage() {
+function SchedulePage() {
   const [currentView, changeView] = React.useState<View>(View.table);
 
   const ScheduleView = React.useCallback(() => {
@@ -33,6 +34,7 @@ export function SchedulePage() {
         <ScheduleHeader onChangeViewMode={changeView} />
         <ScheduleView />
       </PageLayout>
+      <FetcherCommonData />
     </ScheduleStore.provider>
   );
 }
@@ -42,7 +44,8 @@ interface IScheduleHeader {
 }
 
 const ScheduleHeader = React.memo((props: IScheduleHeader) => {
-  const { store, dispatch } = React.useContext(ScheduleStore.context);
+  const { store, dispatch } = React.useContext(ScheduleStore.context),
+    isMentor = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsMentor);
 
   const onToggleUserMode = React.useCallback(() => {
       API_Schedule.userRoleChange(dispatch)({
@@ -84,12 +87,17 @@ const ScheduleHeader = React.memo((props: IScheduleHeader) => {
         <Switch
           checkedChildren="mentor"
           unCheckedChildren="student"
-          defaultChecked={store.user.isMentor}
+          defaultChecked={isMentor}
           onClick={onToggleUserMode}
         />
       </Row>
     </>
   );
 });
+
+function FetcherCommonData() {
+  API_Events.hooks.useEventsData();
+  return null;
+}
 
 export default SchedulePage;
