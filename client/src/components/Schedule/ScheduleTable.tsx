@@ -1,8 +1,7 @@
-import { QuestionCircleOutlined, YoutubeOutlined } from '@ant-design/icons';
-import { Table, Tag, Tooltip, Spin } from 'antd';
-import { GithubUserLink } from 'components';
 import React from 'react';
-import { API_Events } from 'services/event';
+import { QuestionCircleOutlined, YoutubeOutlined } from '@ant-design/icons';
+import { Table, Tag, Tooltip } from 'antd';
+import { GithubUserLink } from 'components';
 import moment from 'moment-timezone';
 import { ScheduleStore } from './store';
 
@@ -48,97 +47,94 @@ const EventTypeToName: Record<string, string> = {
 };
 
 export function ScheduleTable() {
-  const { store } = React.useContext(ScheduleStore.context),
-    { timeZone } = store.user;
+  const { timeZone } = ScheduleStore.useSelector(ScheduleStore.selectors.getUser);
 
-  const { eventsLoading, eventsData } = API_Events.hooks.useEventsData(),
+  const eventsData = ScheduleStore.useSelector(ScheduleStore.selectors.getEvents),
     tableData = React.useMemo(() => eventsData.list.map((eventId) => eventsData.map[eventId]), [eventsData]);
 
   const startOfToday = moment().startOf('day');
 
   return (
-    <Spin spinning={!!eventsLoading}>
-      <Table
-        rowKey={(record) => record.id.toString()}
-        pagination={false}
-        size="small"
-        dataSource={tableData}
-        rowClassName={(record) => (moment(record.dateTime).isBefore(startOfToday) ? 'rs-table-row-disabled' : '')}
-        columns={[
-          { title: 'Date', width: 120, dataIndex: 'dateTime', render: dateRenderer(timeZone) },
-          { title: 'Time', width: 60, dataIndex: 'dateTime', render: timeRenderer(timeZone) },
-          {
-            title: 'Type',
-            width: 100,
-            dataIndex: 'type',
-            render: (value: keyof typeof EventTypeColor) => (
-              <Tag color={EventTypeColor[value]}>{EventTypeToName[value] || value}</Tag>
+    <Table
+      rowKey={(record) => record.id.toString()}
+      pagination={false}
+      size="small"
+      dataSource={tableData}
+      rowClassName={(record) => (moment(record.dateTime).isBefore(startOfToday) ? 'rs-table-row-disabled' : '')}
+      columns={[
+        { title: 'Date', width: 120, dataIndex: 'dateTime', render: dateRenderer(timeZone) },
+        { title: 'Time', width: 60, dataIndex: 'dateTime', render: timeRenderer(timeZone) },
+        {
+          title: 'Type',
+          width: 100,
+          dataIndex: 'type',
+          render: (value: keyof typeof EventTypeColor) => (
+            <Tag color={EventTypeColor[value]}>{EventTypeToName[value] || value}</Tag>
+          ),
+        },
+        {
+          title: 'Place',
+          dataIndex: 'place',
+          render: (value: string) => {
+            return value === 'Youtube Live' ? (
+              <div>
+                <YoutubeOutlined /> {value}{' '}
+                <Tooltip title="Ссылка будет в Discord">
+                  <QuestionCircleOutlined />
+                </Tooltip>
+              </div>
+            ) : (
+              value
+            );
+          },
+        },
+        {
+          title: 'Name',
+          dataIndex: 'name',
+          render: (value: string, record) => {
+            return record.descriptionUrl ? (
+              <a target="_blank" href={record.descriptionUrl}>
+                {value}
+              </a>
+            ) : (
+              value
+            );
+          },
+        },
+        {
+          title: 'Broadcast Url',
+          width: 140,
+          dataIndex: 'broadcastUrl',
+          render: (url: string) =>
+            url ? (
+              <a target="_blank" href={url}>
+                Link
+              </a>
+            ) : (
+              ''
             ),
-          },
-          {
-            title: 'Place',
-            dataIndex: 'place',
-            render: (value: string) => {
-              return value === 'Youtube Live' ? (
-                <div>
-                  <YoutubeOutlined /> {value}{' '}
-                  <Tooltip title="Ссылка будет в Discord">
-                    <QuestionCircleOutlined />
-                  </Tooltip>
-                </div>
-              ) : (
-                value
-              );
-            },
-          },
-          {
-            title: 'Name',
-            dataIndex: 'name',
-            render: (value: string, record) => {
-              return record.descriptionUrl ? (
-                <a target="_blank" href={record.descriptionUrl}>
-                  {value}
-                </a>
-              ) : (
-                value
-              );
-            },
-          },
-          {
-            title: 'Broadcast Url',
-            width: 140,
-            dataIndex: 'broadcastUrl',
-            render: (url: string) =>
-              url ? (
-                <a target="_blank" href={url}>
-                  Link
-                </a>
-              ) : (
-                ''
-              ),
-          },
-          {
-            title: 'Organizer',
-            width: 140,
-            dataIndex: ['organizer', 'githubId'],
-            render: (value: string) => (value ? <GithubUserLink value={value} /> : ''),
-          },
-          {
-            title: 'Details Url',
-            dataIndex: 'detailsUrl',
-            render: (url: string) =>
-              url ? (
-                <a target="_blank" href={url}>
-                  Details
-                </a>
-              ) : (
-                ''
-              ),
-          },
-          { title: 'Comment', dataIndex: 'comment' },
-        ]}
-      />
-    </Spin>
+        },
+        {
+          title: 'Organizer',
+          width: 140,
+          dataIndex: ['organizer', 'githubId'],
+          render: (value: string) => (value ? <GithubUserLink value={value} /> : ''),
+        },
+        {
+          title: 'Details Url',
+          dataIndex: 'detailsUrl',
+          render: (url: string) =>
+            url ? (
+              <a target="_blank" href={url}>
+                Details
+              </a>
+            ) : (
+              ''
+            ),
+        },
+        { title: 'Comment', dataIndex: 'comment' },
+      ]}
+    />
   );
 }
 

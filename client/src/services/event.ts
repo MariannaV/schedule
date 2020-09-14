@@ -47,7 +47,7 @@ export class EventService {
 
   async createEvent(data: Partial<Event>) {
     const result = await axios.post<{ data: Event }>(`${this.baseUrl}/event/`, data);
-    return result.data.data;
+    return result.data;
   }
 
   async deleteEvent(eventId: string) {
@@ -64,7 +64,7 @@ const hooks = {
 
     React.useEffect(() => {
       const isFirstFetching = !eventsData.list.length;
-      if (isFirstFetching) fetchEventsData();
+      if (isFirstFetching && !eventsLoading) fetchEventsData();
 
       async function fetchEventsData() {
         setLoading(true);
@@ -81,33 +81,9 @@ const hooks = {
           setLoading(false);
         }
       }
-    }, [eventsData]);
+    }, [eventsData, eventsLoading]);
 
     return React.useMemo(() => ({ eventsLoading, eventsData }), [eventsLoading, eventsData]);
-  },
-  useEventData(params: { eventId: Event['id'] }) {
-    const { eventId } = params,
-      { store } = React.useContext(ScheduleStore.context),
-      [eventData, setData] = React.useState<null | Event>(store.events.map[eventId]),
-      [eventLoading, setLoading] = React.useState<null | boolean>(null);
-
-    React.useEffect(() => {
-      if (!eventData) fetchEventsData();
-
-      async function fetchEventsData() {
-        setLoading(true);
-        try {
-          if (!eventId) return; //throw `${eventId} is incorrenct eventId`;
-          setData(await new EventService().getEvent(eventId));
-        } catch (error) {
-          console.error(error);
-        } finally {
-          setLoading(false);
-        }
-      }
-    }, [eventId, eventData]);
-
-    return React.useMemo(() => ({ eventLoading, eventData }), [eventLoading, eventData]);
   },
 };
 
