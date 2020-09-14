@@ -13,6 +13,7 @@ const initialState: NSchedule.IStore = {
     get isMentor() {
       return this.role === NSchedule.UserRoles.MENTOR;
     },
+    isActiveDates: true,
   },
 };
 
@@ -38,6 +39,9 @@ function reducer(store: NSchedule.IStore, action: NSchedule.IActions) {
       };
     }
 
+    case NSchedule.ActionTypes.IS_ACTIVE_DATES_SET:
+      return { ...store, user: { ...store.user, isActiveDates: action.payload.isActiveDates } };
+
     default:
       return store;
   }
@@ -51,6 +55,8 @@ export const API_Schedule = {
   ) => dispatch({ type: NSchedule.ActionTypes.USER_TIMEZONE, ...params }),
   eventsSet: (dispatch: Dispatch<NSchedule.IActions>) => (params: Omit<NSchedule.IEventsSet, 'type'>) =>
     dispatch({ type: NSchedule.ActionTypes.EVENTS_SET, ...params }),
+  isActiveDatesSet: (dispatch: Dispatch<NSchedule.IActions>) => (params: Omit<NSchedule.IIsActiveDatesSet, 'type'>) =>
+    dispatch({ type: NSchedule.ActionTypes.IS_ACTIVE_DATES_SET, ...params }),
 };
 
 const storeContext = React.createContext<NSchedule.IStoreContext>(null!);

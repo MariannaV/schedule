@@ -12,6 +12,7 @@ export namespace NSchedule {
       role: UserRoles;
       timeZone: string;
       isMentor: boolean;
+      isActiveDates: boolean;
     };
   }
 
@@ -25,12 +26,13 @@ export namespace NSchedule {
     STUDENT = 'STUDENT',
   }
 
-  export type IActions = IUserRoleChange | IUserTimeZoneChange | IEventsSet;
+  export type IActions = IUserRoleChange | IUserTimeZoneChange | IEventsSet | IIsActiveDatesSet;
 
   export enum ActionTypes {
     USER_ROLE_CHANGE,
     USER_TIMEZONE,
     EVENTS_SET,
+    IS_ACTIVE_DATES_SET,
   }
 
   export interface IUserRoleChange {
@@ -51,6 +53,13 @@ export namespace NSchedule {
     type: ActionTypes.EVENTS_SET;
     payload: {
       events: Array<Event>;
+    };
+  }
+
+  export interface IIsActiveDatesSet {
+    type: ActionTypes.IS_ACTIVE_DATES_SET;
+    payload: {
+      isActiveDates: boolean;
     };
   }
 }

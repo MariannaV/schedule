@@ -32,7 +32,7 @@ function isRowDisabled(dateTime, deadLine) {
 
 export function ScheduleTable() {
   const { store } = React.useContext(ScheduleStore.context),
-    { timeZone } = store.user;
+    { timeZone, isActiveDates } = store.user;
 
   const { eventsLoading, eventsData } = API_Events.hooks.useEventsData(),
     tableData = React.useMemo(() => eventsData.list.map((eventId) => eventsData.map[eventId]), [eventsData]);
@@ -47,7 +47,9 @@ export function ScheduleTable() {
           rowKey={(record) => record.id.toString()}
           pagination={false}
           size="small"
-          dataSource={tableData}
+          dataSource={
+            isActiveDates ? tableData.filter((data) => !isRowDisabled(data.dateTime, data.deadLine)) : tableData
+          }
           rowClassName={(record) =>
             isRowDisabled(record.dateTime, record.deadLine)
               ? 'rs-table-row-disabled'
