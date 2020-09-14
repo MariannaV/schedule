@@ -25,7 +25,7 @@ export function ScheduleListWrapper() {
 
   return (
     <Spin spinning={Boolean(eventsLoading)} wrapperClassName={wrapperStyles.ScheduleListWrapper}>
-      <ScheduleList classes={[wrapperStyles.ScheduleList]} />
+      <ScheduleList eventsData={eventsData} classes={[wrapperStyles.ScheduleList]} />
       <ScheduleDetailView eventId={router.query.openedItem as string} classes={[wrapperStyles.ScheduleView]} />
     </Spin>
   );

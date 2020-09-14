@@ -1,5 +1,16 @@
 .ScheduleList {
-  text-align: center;
-  background-color: #ffa;
+  text-align: left;
   height: 80vh;
+}
+
+.ant-list-item {
+  border: 1px solid black;
+  padding: 10px;
+}
+
+.one_list_item {
+  padding: 20px;
+  border-radius: 5px;
+  border: 1px solid #f0f0f0;
+  margin-top: 10px;
 }
