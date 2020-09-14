@@ -27,7 +27,7 @@ export function Filter({
   };
 
   const handleClickOutsideFilter = (event) => {
-    if (ref.current && !ref.current.contains(event.target)) {
+    if (ref.current && ref.current.contains(event.target)) {
       setIsFilterOpened(false);
       document.removeEventListener('click', handleClickOutsideFilter);
     }

@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import { ScheduleStore, API_Schedule } from 'components/Schedule/store';
 
 export interface Event {
   deadLine: string;
@@ -60,33 +61,41 @@ export class EventService {
 
 const hooks = {
   useEventsData() {
-    const [eventsData, setData] = React.useState<Event[]>([]),
+    const { store, dispatch } = React.useContext(ScheduleStore.context),
+      eventsData = store.events,
       [eventsLoading, setLoading] = React.useState<null | boolean>(null);
 
     React.useEffect(() => {
-      fetchEventsData();
+      const isFirstFetching = !eventsData.list.length;
+      if (isFirstFetching) fetchEventsData();
 
       async function fetchEventsData() {
         setLoading(true);
         try {
-          setData(await new EventService().getEvents());
+          const events = await new EventService().getEvents();
+          API_Schedule.eventsSet(dispatch)({
+            payload: {
+              events,
+            },
+          });
         } catch (error) {
           console.error(error);
         } finally {
           setLoading(false);
         }
       }
-    }, []);
+    }, [eventsData]);
 
     return React.useMemo(() => ({ eventsLoading, eventsData }), [eventsLoading, eventsData]);
   },
   useEventData(params: { eventId: Event['id'] }) {
     const { eventId } = params,
-      [eventData, setData] = React.useState<null | Event>(null),
+      { store } = React.useContext(ScheduleStore.context),
+      [eventData, setData] = React.useState<null | Event>(store.events.map[eventId]),
       [eventLoading, setLoading] = React.useState<null | boolean>(null);
 
     React.useEffect(() => {
-      fetchEventsData();
+      if (!eventData) fetchEventsData();
 
       async function fetchEventsData() {
         setLoading(true);
@@ -99,7 +108,7 @@ const hooks = {
           setLoading(false);
         }
       }
-    }, [eventId]);
+    }, [eventId, eventData]);
 
     return React.useMemo(() => ({ eventLoading, eventData }), [eventLoading, eventData]);
   },

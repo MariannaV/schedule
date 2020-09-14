@@ -2,13 +2,13 @@ import { QuestionCircleOutlined, YoutubeOutlined } from '@ant-design/icons';
 import { Table, Tag, Tooltip, Spin, Button } from 'antd';
 import { useRouter } from 'next/router';
 import { GithubUserLink } from 'components';
+import React from 'react';
 import { useState } from 'react';
-import { Event, EventService } from '../../../services/event';
 import moment from 'moment-timezone';
-import { useAsync } from 'react-use';
-import { useLoading } from 'components/useLoading';
+import { API_Events, Event } from '../../../services/event';
 import { rowsFilter, columnsFilter, defaultColumnsFilter } from './config';
 import { Filter } from './components/Filter/Filter';
+import { ScheduleStore } from '../store';
 
 import styles from './style.module.scss';
 
@@ -30,30 +30,24 @@ function isRowDisabled(dateTime, deadLine) {
     : moment(dateTime).isBefore(startOfToday);
 }
 
-export function ScheduleTable(props: { timeZone: string }) {
-  const { timeZone } = props;
-  const eventService = new EventService();
-  const [loading, withLoading] = useLoading(false);
-  const [data, setData] = useState<Event[]>([]);
+export function ScheduleTable() {
+  const { store } = React.useContext(ScheduleStore.context),
+    { timeZone } = store.user;
+
+  const { eventsLoading, eventsData } = API_Events.hooks.useEventsData(),
+    tableData = React.useMemo(() => eventsData.list.map((eventId) => eventsData.map[eventId]), [eventsData]);
+
   const [checkedColumns, setCheckedColumns] = useState(defaultColumnsFilter);
 
-  useAsync(
-    withLoading(async () => {
-      const data = await eventService.getEvents();
-      setData(data);
-    }),
-    [EventService],
-  );
-
   return (
-    <Spin spinning={loading}>
+    <Spin spinning={!!eventsLoading}>
       <Filter checkedColumns={checkedColumns} setCheckedColumns={setCheckedColumns} filterOptions={columnsFilter} />
       {checkedColumns.length && (
         <Table
           rowKey={(record) => record.id.toString()}
           pagination={false}
           size="small"
-          dataSource={data}
+          dataSource={tableData}
           rowClassName={(record) =>
             isRowDisabled(record.dateTime, record.deadLine)
               ? 'rs-table-row-disabled'
