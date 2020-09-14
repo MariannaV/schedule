@@ -6,6 +6,7 @@ export interface Event {
   name: string;
   description: string;
   descriptionUrl: string;
+  deadLine: string;
   type: eventTypes;
   timeZone: string;
   dateTime: string;

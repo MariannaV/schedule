@@ -6,6 +6,7 @@ export function ScheduleCalendar() {
   if (eventsLoading) return <Spin />;
   const days = [] as any;
   const months = [] as any;
+
   eventsData.forEach((elem) => {
     const transformed = new Date(elem.dateTime).getDay() + 1;
     days.push(transformed);
@@ -15,43 +16,48 @@ export function ScheduleCalendar() {
     months.push(transformed);
   });
 
-  console.log(eventsData);
+  //   ol, ul, dl {
+  //     margin-top: 0;
+  //     margin-bottom: 0;
+  //     margin-left: 0;
+  //     padding-inline-start: 0;
+  // }
 
   function getListData(value) {
+    console.log('eventsData', eventsData);
+
     let listData;
-    switch (value.date()) {
-      case days[0] && months[0]:
-        listData = [
-          { type: 'warning', content: `${eventsData[0].name}` },
-          { type: 'success', content: `${eventsData[0].name}` },
-        ];
-        break;
-      // case 10:
-      //   listData = [
-      //     { type: 'warning', content: 'This is warning event.' },
-      //     { type: 'success', content: 'This is usual event.' },
-      //     { type: 'error', content: 'This is error event.' },
-      //   ];
-      //   break;
-      // case 15:
-      //   listData = [
-      //     { type: 'warning', content: 'This is warning event' },
-      //     { type: 'success', content: 'This is very long usual event。。....' },
-      //     { type: 'error', content: 'This is error event 1.' },
-      //     { type: 'error', content: 'This is error event 2.' },
-      //     { type: 'error', content: 'This is error event 3.' },
-      //     { type: 'error', content: 'This is error event 4.' },
-      //   ];
-      //   break;
-      default:
+    // days.forEach((index) => {
+    //   if(value.date()+1 == days[index] && value.month()+1 == months[index] ){
+    //     if(eventsData[index].deadLine){
+    //       listData = [
+    //         { type: 'error', content: `${eventsData[index].name}` },
+    //       ];
+    //     }else{
+    //       listData = [
+    //         { type: 'success', content: `${eventsData[index].name}` },
+    //       ];
+    //     }
+
+    // }
+    // });
+    for (let index = 0; index < days.length; index++) {
+      if (value.date() + 1 == days[index] && value.month() + 1 == months[index]) {
+        if (eventsData[index].deadLine) {
+          listData = [{ type: 'error', content: `${eventsData[index].name}` }];
+        } else {
+          listData = [{ type: 'success', content: `${eventsData[index].name}` }];
+        }
+      }
     }
+
     return listData || [];
   }
 
   function dateCellRender(value) {
     const listData = getListData(value);
     return (
-      <ul className="events">
+      <ul className="events" style={{ listStyle: 'none' }}>
         {listData.map((item) => (
           <li key={item.content}>
             <Badge status={item.type} text={item.content} />
