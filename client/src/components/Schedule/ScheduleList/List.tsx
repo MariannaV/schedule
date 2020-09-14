@@ -46,7 +46,7 @@ const EventTypeToName: Record<string, string> = {
 };
 
 interface IScheduleList {
-  classes?: Array<String>;
+  classes?: Array<string>;
   eventsData: Array<Event>;
 }
 
