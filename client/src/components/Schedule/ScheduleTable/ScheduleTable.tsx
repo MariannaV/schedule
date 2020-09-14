@@ -7,6 +7,8 @@ import { Event, EventService } from '../../../services/event';
 import moment from 'moment-timezone';
 import { useAsync } from 'react-use';
 import { useLoading } from 'components/useLoading';
+import { rowsFilter, columnsFilter, defaultColumnsFilter } from './config';
+import { Filter } from './components/Filter/Filter';
 
 import styles from './style.module.scss';
 
@@ -33,6 +35,7 @@ export function ScheduleTable(props: { timeZone: string }) {
   const eventService = new EventService();
   const [loading, withLoading] = useLoading(false);
   const [data, setData] = useState<Event[]>([]);
+  const [checkedColumns, setCheckedColumns] = useState(defaultColumnsFilter);
 
   useAsync(
     withLoading(async () => {
@@ -44,147 +47,118 @@ export function ScheduleTable(props: { timeZone: string }) {
 
   return (
     <Spin spinning={loading}>
-      <Table
-        rowKey={(record) => record.id.toString()}
-        pagination={false}
-        size="small"
-        dataSource={data}
-        rowClassName={(record) =>
-          isRowDisabled(record.dateTime, record.deadLine)
-            ? 'rs-table-row-disabled'
-            : styles[record.type.split(' ').join('')]
-        }
-        columns={[
-          {
-            title: 'Start Date',
-            width: 180,
-            dataIndex: 'dateTime',
-            render: dateRenderer(timeZone),
-            defaultSortOrder: 'ascend',
-            sorter: (a, b) => (a.dateTime > b.dateTime ? 1 : -1),
-            sortDirections: ['ascend', 'descend', 'ascend'],
-          },
-          {
-            title: 'Name',
-            dataIndex: 'name',
-            sorter: (a, b) => (a.name > b.name ? 1 : -1),
-            sortDirections: ['ascend', 'descend', 'ascend'],
-          },
-          {
-            title: 'DeadLine',
-            width: 180,
-            dataIndex: 'deadLine',
-            render: dateRenderer(timeZone),
-            sorter: (a, b) => (a.deadLine > b.deadLine ? 1 : -1),
-            sortDirections: ['ascend', 'descend', 'ascend'],
-          },
-          {
-            title: 'Type',
-            width: 100,
-            dataIndex: 'type' || '',
-            render: (value: keyof typeof tagColors) => <Tag color={tagColors[value]}>{value}</Tag>,
-            sorter: (a, b) => (a.type > b.type ? 1 : -1),
-            sortDirections: ['ascend', 'descend', 'ascend'],
-            filters: [
-              {
-                text: 'code jam',
-                value: 'code jam',
-              },
-              {
-                text: 'codewars',
-                value: 'codewars',
-              },
-              {
-                text: 'course',
-                value: 'course',
-              },
-              {
-                text: 'interview',
-                value: 'interview',
-              },
-              {
-                text: 'lecture',
-                value: 'lecture',
-              },
-              {
-                text: 'self-education',
-                value: 'self-education',
-              },
-              {
-                text: 'task',
-                value: 'task',
-              },
-              {
-                text: 'test',
-                value: 'test',
-              },
-            ],
-            onFilter: (value: string | number | boolean, record: Event) => record.type.indexOf(value.toString()) === 0,
-          },
-          {
-            title: 'Action',
-            width: 310,
-            dataIndex: 'checker',
-            render: (value: string) => (value ? actionButtonRenderer(value) : actionButtonRenderer('')),
-          },
-          {
-            title: 'Place',
-            dataIndex: 'place',
-            render: (value: string) => {
-              return value === 'Youtube Live' ? (
-                <div>
-                  <YoutubeOutlined /> {value}{' '}
-                  <Tooltip title="Ссылка будет в Discord">
-                    <QuestionCircleOutlined />
-                  </Tooltip>
-                </div>
-              ) : (
-                value
-              );
+      <Filter checkedColumns={checkedColumns} setCheckedColumns={setCheckedColumns} filterOptions={columnsFilter} />
+      {checkedColumns.length && (
+        <Table
+          rowKey={(record) => record.id.toString()}
+          pagination={false}
+          size="small"
+          dataSource={data}
+          rowClassName={(record) =>
+            isRowDisabled(record.dateTime, record.deadLine)
+              ? 'rs-table-row-disabled'
+              : styles[record.type.split(' ').join('')]
+          }
+          columns={[
+            {
+              title: 'Start Date',
+              width: 180,
+              dataIndex: 'dateTime',
+              render: dateRenderer(timeZone),
+              defaultSortOrder: 'ascend',
+              sorter: (a, b) => (a.dateTime > b.dateTime ? 1 : -1),
+              sortDirections: ['ascend', 'descend', 'ascend'],
             },
-            sorter: (a, b) => (a.place > b.place ? 1 : -1),
-            sortDirections: ['ascend', 'descend', 'ascend'],
-          },
-          {
-            title: 'Description Url',
-            dataIndex: 'descriptionUrl',
-            render: (value: string) => {
-              return (
-                <a target="_blank" href={value}>
-                  {value}
-                </a>
-              );
+            {
+              title: 'Name',
+              dataIndex: 'name',
+              sorter: (a, b) => (a.name > b.name ? 1 : -1),
+              sortDirections: ['ascend', 'descend', 'ascend'],
             },
-          },
-          {
-            title: 'Broadcast Url',
-            width: 140,
-            dataIndex: 'broadcastUrl',
-            render: (url: string) =>
-              url ? (
-                <a target="_blank" href={url}>
-                  Link
-                </a>
-              ) : (
-                ''
-              ),
-          },
-          {
-            title: 'Organizer',
-            width: 140,
-            dataIndex: 'organizer',
-            render: (value: string) => (value ? <GithubUserLink value={value} /> : ''),
-            sorter: (a, b) => (a.organizer > b.organizer ? 1 : -1),
-            sortDirections: ['ascend', 'descend', 'ascend'],
-          },
-          {
-            title: 'Description',
-            width: 300,
-            dataIndex: 'description',
-          },
-          { title: 'Comment', width: 300, dataIndex: 'comment' },
-        ]}
-      />
+            {
+              title: 'DeadLine',
+              width: 180,
+              dataIndex: 'deadLine',
+              render: dateRenderer(timeZone),
+              sorter: (a, b) => (a.deadLine > b.deadLine ? 1 : -1),
+              sortDirections: ['ascend', 'descend', 'ascend'],
+            },
+            {
+              title: 'Type',
+              width: 100,
+              dataIndex: 'type' || '',
+              render: (value: keyof typeof tagColors) => <Tag color={tagColors[value]}>{value}</Tag>,
+              sorter: (a, b) => (a.type > b.type ? 1 : -1),
+              sortDirections: ['ascend', 'descend', 'ascend'],
+              filters: rowsFilter,
+              onFilter: (value: string | number | boolean, record: Event) =>
+                record.type.indexOf(value.toString()) === 0,
+            },
+            {
+              title: 'Action',
+              width: 310,
+              dataIndex: 'checker',
+              render: (value: string) => (value ? actionButtonRenderer(value) : actionButtonRenderer('')),
+            },
+            {
+              title: 'Place',
+              dataIndex: 'place',
+              render: (value: string) => {
+                return value === 'Youtube Live' ? (
+                  <div>
+                    <YoutubeOutlined /> {value}{' '}
+                    <Tooltip title="Ссылка будет в Discord">
+                      <QuestionCircleOutlined />
+                    </Tooltip>
+                  </div>
+                ) : (
+                  value
+                );
+              },
+              sorter: (a, b) => (a.place > b.place ? 1 : -1),
+              sortDirections: ['ascend', 'descend', 'ascend'],
+            },
+            {
+              title: 'Description URL',
+              dataIndex: 'descriptionUrl',
+              render: (value: string) => {
+                return (
+                  <a target="_blank" href={value}>
+                    {value}
+                  </a>
+                );
+              },
+            },
+            {
+              title: 'Broadcast URL',
+              width: 140,
+              dataIndex: 'broadcastUrl',
+              render: (url: string) =>
+                url ? (
+                  <a target="_blank" href={url}>
+                    Link
+                  </a>
+                ) : (
+                  ''
+                ),
+            },
+            {
+              title: 'Organizer',
+              width: 140,
+              dataIndex: 'organizer',
+              render: (value: string) => (value ? <GithubUserLink value={value} /> : ''),
+              sorter: (a, b) => (a.organizer > b.organizer ? 1 : -1),
+              sortDirections: ['ascend', 'descend', 'ascend'],
+            },
+            {
+              title: 'Description',
+              width: 300,
+              dataIndex: 'description',
+            },
+            { title: 'Comment', width: 300, dataIndex: 'comment' },
+          ].filter((column) => checkedColumns.includes(column.title))}
+        />
+      )}
     </Spin>
   );
 }
