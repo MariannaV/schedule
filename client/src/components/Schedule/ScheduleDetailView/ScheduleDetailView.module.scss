@@ -2,13 +2,11 @@
   position: relative;
 }
 
-.spinner {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
+.ScheduleDetailViewHeader {
+  display: grid;
+  grid-template-columns: auto max-content;
+  align-items: center;
 }
 
 .EventForm {
-  padding: 16px;
 }
