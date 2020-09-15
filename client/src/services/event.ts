@@ -9,6 +9,7 @@ export interface Event {
   type: eventTypes;
   timeZone: string;
   dateTime: string;
+  deadLine: string;
   place: string;
   comment: string;
 }

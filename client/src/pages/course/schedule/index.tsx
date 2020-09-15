@@ -1,5 +1,6 @@
 import React from 'react';
-import { Row, Select } from 'antd';
+import { Row, Select, Menu, Dropdown } from 'antd';
+import { DownloadOutlined } from '@ant-design/icons';
 import { PageLayout } from 'components';
 import { useState } from 'react';
 import { FieldTimezone } from 'components/Forms/fields';
@@ -10,10 +11,29 @@ export function SchedulePage() {
 
   const [viewOfView, changeView] = useState('table');
 
+  const fileFormats = (
+    <Menu>
+      <Menu.Item key="1" onClick={() => alert(`saving to PDF`)}>
+        to PDF format
+      </Menu.Item>
+      <Menu.Item key="2" onClick={() => alert(`saving to TXT`)}>
+        to TXT format
+      </Menu.Item>
+      <Menu.Item key="3" onClick={() => alert(`saving to CSV`)}>
+        to CSV format
+      </Menu.Item>
+    </Menu>
+  );
+
   const ScheduleHeader = () => {
     return (
       <Row justify="space-between" style={{ marginBottom: 16 }}>
         <FieldTimezone style={{ width: 200 }} defaultValue={timeZone} onChange={setTimeZone} />
+
+        <Dropdown.Button overlay={fileFormats} icon={<DownloadOutlined />}>
+          Download
+        </Dropdown.Button>
+
         <Select
           style={{ width: 200 }}
           placeholder="Please Select View"
