@@ -138,7 +138,7 @@ export function ScheduleTable() {
   );
 }
 
-const dateRenderer = (timeZone: string) => (value: string) =>
+export const dateRenderer = (timeZone: string) => (value: string) =>
   value ? moment(value, 'YYYY-MM-DD HH:mmZ').tz(timeZone).format('YYYY-MM-DD') : '';
 
 const timeRenderer = (timeZone: string) => (value: string) =>
