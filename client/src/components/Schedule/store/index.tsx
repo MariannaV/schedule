@@ -94,8 +94,8 @@ export const API_Schedule = {
   eventCreate: (dispatch: Dispatch<NSchedule.IActions>) => async (params: Omit<NSchedule.IEventCreate, 'type'>) => {
     try {
       const { eventData } = params.payload;
-      const { id } = await new EventService().createEvent(eventData);
-      eventData.id = id;
+      const { data } = await new EventService().createEvent(eventData);
+      eventData.id = data.id;
       dispatch({
         type: NSchedule.ActionTypes.EVENT_CREATE,
         payload: {
