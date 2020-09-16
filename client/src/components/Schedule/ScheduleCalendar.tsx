@@ -27,17 +27,28 @@ export function ScheduleCalendar({ props }) {
 
   function dateCellRender(value) {
     const currentDate = dateRenderer(timeZone)(value),
+      isMentor = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsMentor),
       currentEvents = eventIdsByDate[currentDate];
 
-    if (!currentEvents) return null;
+    if (!currentEvents)
+      return (
+        <section className="events">
+          {isMentor && <Button children="+" type="primary" size="small" onClick={handleMouseClick} />}
+        </section>
+      );
 
     return (
       <section className="events">
+        {isMentor && <Button children="+" type="primary" size="small" onClick={handleMouseClick} />}
         {currentEvents.map((eventId) => (
           <CalendarEvent eventId={eventId} key={eventId} />
         ))}
       </section>
     );
+  }
+
+  function handleMouseClick() {
+    console.log('click');
   }
 
   return (
@@ -52,7 +63,6 @@ function CalendarEvent(props: { eventId: Event['id'] }) {
     eventData = ScheduleStore.useSelector(ScheduleStore.selectors.getEvent({ eventId }));
 
   const { dispatch } = React.useContext(ScheduleStore.context),
-    isMentor = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsMentor),
     onClick = React.useCallback(() => {
       ScheduleStore.API.detailViewSetOpened(dispatch)({
         payload: {
@@ -70,29 +80,8 @@ function CalendarEvent(props: { eventId: Event['id'] }) {
     }
   }, [eventData.deadLine]);
 
-  function isHovered() {
-    if (document.querySelector('ant-picker-cell')) {
-      console.log('true');
-    }
-  }
-
-  function handleMouseEnter() {
-    if (document.querySelector('ant-picker-cell')) {
-      console.log('true');
-    }
-  }
-
-  function handleMouseClick() {
-    if (document.querySelector('ant-picker-cell')) {
-      console.log('true');
-    }
-  }
-
   return (
     <article onClick={onClick}>
-      {isMentor && isHovered && (
-        <Button children="+ Add event" type="primary" onClick={handleMouseClick} onMouseEnter={handleMouseEnter} />
-      )}
       <Badge status={type} text={eventData.name} />
     </article>
   );
