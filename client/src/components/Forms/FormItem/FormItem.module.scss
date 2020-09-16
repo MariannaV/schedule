@@ -1,0 +1,17 @@
+.field {
+  [class~='ant-form-item-label'] {
+    font-weight: 700;
+  }
+}
+
+.field[class~='isReadOnly'][class~='ant-form-item'] {
+  &[class~='isEmpty'] {
+    display: none;
+  }
+
+  [class~='ant-form-item-control-input-content'] {
+    p {
+      margin: 0;
+    }
+  }
+}
