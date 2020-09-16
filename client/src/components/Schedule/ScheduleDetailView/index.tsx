@@ -9,13 +9,13 @@ interface IScheduleDetailView {
 }
 
 export const ScheduleDetailView: React.FC<IScheduleDetailView> = React.memo((props) => {
-  const openedItem = ScheduleStore.useSelector(ScheduleStore.selectors.getDetailViewOpenedId),
-    eventData = ScheduleStore.useSelector(ScheduleStore.selectors.getEvent({ eventId: openedItem }));
-
+  const classes = React.useMemo(() => [viewStyles.ScheduleDetailView, props.className].filter(Boolean).join(' '), [
+    props.className,
+  ]);
   return (
-    <section className={[viewStyles.ScheduleDetailView, props.className].filter(Boolean).join(' ')}>
+    <section className={classes}>
       <ScheduleDetailViewHeader />
-      <EventForm formData={eventData} eventId={openedItem} />
+      <EventForm />
     </section>
   );
 });
