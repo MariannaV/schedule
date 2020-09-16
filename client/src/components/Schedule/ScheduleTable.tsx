@@ -1,30 +1,13 @@
 import React from 'react';
 import { QuestionCircleOutlined, YoutubeOutlined } from '@ant-design/icons';
-import { Table, Tag, Tooltip, Spin } from 'antd';
+import { Table, Tag, Tooltip } from 'antd';
+import moment from 'moment-timezone';
+import { EventTypeColor, EventTypeToName } from 'services/event';
 import { GithubUserLink } from 'components';
 import { ScheduleStore } from 'components/Schedule/store';
 
-enum EventTypeColor {
-  deadline = 'red',
-  test = '#63ab91',
-  jstask = 'green',
-  htmltask = 'green',
-  htmlcssacademy = 'green',
-  externaltask = 'green',
-  codewars = 'green',
-  codejam = 'green',
-  newtask = 'green',
-  lecture = 'blue',
-  lecture_online = 'blue',
-  lecture_offline = 'blue',
-  lecture_mixed = 'blue',
-  lecture_self_study = 'blue',
-  info = '#ff7b00',
-  warmup = '#63ab91',
-  meetup = '#bde04a',
-  workshop = '#bde04a',
-  interview = '#63ab91',
-}
+export function ScheduleTable() {
+  const { timeZone } = ScheduleStore.useSelector(ScheduleStore.selectors.getUser);
 
   const eventsData = ScheduleStore.useSelector(ScheduleStore.selectors.getEvents),
     tableData = React.useMemo(() => eventsData.list.map((eventId) => eventsData.map[eventId]), [eventsData]);

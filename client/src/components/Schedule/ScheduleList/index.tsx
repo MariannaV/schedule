@@ -1,32 +1,41 @@
 import React from 'react';
-import { Spin } from 'antd';
-import { useRouter } from 'next/router';
+import { NSchedule, ScheduleStore } from 'components/Schedule/store';
 import { ScheduleDetailView } from 'components/Schedule/ScheduleDetailView';
-import { API_Events } from 'services/event';
 import { ScheduleList } from './List';
 import wrapperStyles from './ScheduleListWrapper.module.scss';
 
 export function ScheduleListWrapper() {
-  const router = useRouter(),
-    { eventsData, eventsLoading } = API_Events.hooks.useEventsData();
-
-  React.useEffect(() => {
-    if (!eventsData.length || Object.keys(router.query).length) return;
-
-    const initState = {
-      openedItem: eventsData[0].id,
-      step: 'view',
-    };
-
-    router.replace(`${router.pathname}?${new URLSearchParams(initState as any)}`, router.pathname, {
-      shallow: true,
-    });
-  }, [eventsLoading]);
+  const initializationFinished = useDetailViewInit();
 
   return (
-    <Spin spinning={Boolean(eventsLoading)} wrapperClassName={wrapperStyles.ScheduleListWrapper}>
-      <ScheduleList eventsData={eventsData} classes={[wrapperStyles.ScheduleList]} />
-      <ScheduleDetailView eventId={router.query.openedItem as string} classes={[wrapperStyles.ScheduleView]} />
-    </Spin>
+    <section className={wrapperStyles.ScheduleListWrapper}>
+      <ScheduleList className={wrapperStyles.ScheduleList} />
+      {initializationFinished && <ScheduleDetailView className={wrapperStyles.ScheduleView} />}
+    </section>
   );
+}
+
+function useDetailViewInit() {
+  const { dispatch } = React.useContext(ScheduleStore.context),
+    eventsList = ScheduleStore.useSelector(ScheduleStore.selectors.getEventsList),
+    openedItem = ScheduleStore.useSelector(ScheduleStore.selectors.getDetailViewOpenedId),
+    [isFinished, setFinished] = React.useState(!!openedItem);
+
+  React.useEffect(() => {
+    if (!openedItem && eventsList.length) {
+      ScheduleStore.API.detailViewSetOpened(dispatch)({
+        payload: {
+          openedId: eventsList[0],
+        },
+      });
+      ScheduleStore.API.detailViewModeChange(dispatch)({
+        payload: {
+          mode: NSchedule.FormModes.VIEW,
+        },
+      });
+      setFinished(true);
+    }
+  }, []);
+
+  return isFinished;
 }

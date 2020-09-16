@@ -1,11 +1,66 @@
-.ScheduleList {
-  text-align: left;
-  height: 80vh;
+.ScheduleListWrapper {
 }
 
-.one_list_item {
-  padding: 20px;
+.ScheduleList {
+  display: grid;
+  row-gap: 0.5rem;
+}
+
+.ScheduleListHeader {
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ScheduleListHeaderTitle {
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  column-gap: 0.5rem;
+
+  &::after {
+    content: attr(data-events-amount);
+    display: block;
+    color: gray;
+    font-size: 0.7em;
+  }
+}
+
+.ScheduleListItem {
+  display: grid;
+  grid-gap: 1rem;
+  padding: 1rem;
   border-radius: 5px;
   border: 1px solid #f0f0f0;
-  margin-top: 10px;
+
+  & > header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    & > h3 {
+      margin: 0;
+    }
+  }
+
+  & > footer {
+    display: grid;
+    align-items: center;
+    grid-auto-flow: column;
+    justify-content: space-between;
+    grid-gap: 0.5rem;
+  }
+
+  .dateStart {
+    color: green;
+  }
+
+  .dateDeadline {
+    color: red;
+  }
+
+  &.isOpened {
+    border-color: lightskyblue;
+  }
 }
