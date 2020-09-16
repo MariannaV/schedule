@@ -1,0 +1,11 @@
+.field {
+  [class~='ant-radio-button-wrapper']:last-child {
+    display: none;
+  }
+}
+.field {
+  [class~='ant-badge-not-a-wrapper']:hover {
+    background: rgb(209 233 255);
+    border-radius: 2px;
+  }
+}

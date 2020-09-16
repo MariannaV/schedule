@@ -1,10 +1,17 @@
 import React from 'react';
-import { Calendar, Badge } from 'antd';
+import { Button, Calendar, Badge } from 'antd';
 import { Event } from 'services/event';
 import { ScheduleStore } from 'components/Schedule/store';
 import { dateRenderer } from 'components/Schedule/ScheduleTable';
+import ScheduleStyles from './ScheduleCalendar.module.scss';
 
-export function ScheduleCalendar() {
+export function ScheduleCalendar({ props }) {
+  const { isReadOnly = false, className } = props,
+    classes = React.useMemo(
+      () => [ScheduleStyles.field, isReadOnly && 'isReadOnly', className].filter(Boolean).join(' '),
+      [className, isReadOnly],
+    );
+
   const { timeZone } = ScheduleStore.useSelector(ScheduleStore.selectors.getUser),
     eventsMap = ScheduleStore.useSelector(ScheduleStore.selectors.getEventsMap),
     eventIdsByDate = React.useMemo(
@@ -33,7 +40,11 @@ export function ScheduleCalendar() {
     );
   }
 
-  return <Calendar dateCellRender={dateCellRender} />;
+  return (
+    <span>
+      <Calendar className={classes} dateCellRender={dateCellRender} />
+    </span>
+  );
 }
 
 function CalendarEvent(props: { eventId: Event['id'] }) {
@@ -41,6 +52,7 @@ function CalendarEvent(props: { eventId: Event['id'] }) {
     eventData = ScheduleStore.useSelector(ScheduleStore.selectors.getEvent({ eventId }));
 
   const { dispatch } = React.useContext(ScheduleStore.context),
+    isMentor = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsMentor),
     onClick = React.useCallback(() => {
       ScheduleStore.API.detailViewSetOpened(dispatch)({
         payload: {
@@ -58,8 +70,29 @@ function CalendarEvent(props: { eventId: Event['id'] }) {
     }
   }, [eventData.deadLine]);
 
+  function isHovered() {
+    if (document.querySelector('ant-picker-cell')) {
+      console.log('true');
+    }
+  }
+
+  function handleMouseEnter() {
+    if (document.querySelector('ant-picker-cell')) {
+      console.log('true');
+    }
+  }
+
+  function handleMouseClick() {
+    if (document.querySelector('ant-picker-cell')) {
+      console.log('true');
+    }
+  }
+
   return (
     <article onClick={onClick}>
+      {isMentor && isHovered && (
+        <Button children="+ Add event" type="primary" onClick={handleMouseClick} onMouseEnter={handleMouseEnter} />
+      )}
       <Badge status={type} text={eventData.name} />
     </article>
   );
