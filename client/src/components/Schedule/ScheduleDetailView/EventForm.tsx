@@ -17,34 +17,50 @@ function EventForm() {
     isReadOnly = formMode === NSchedule.FormModes.VIEW;
 
   const [form] = Form.useForm(),
+    [isSubmitting, setSubmitting] = React.useState<null | boolean>(null),
     onSubmit = React.useCallback(
       async (sendingData: Event) => {
-        if (isCreation) {
-          const { eventData } = await ScheduleStore.API.eventCreate(dispatch)({
+        try {
+          setSubmitting(true);
+          if (isCreation) {
+            const { eventData } = await ScheduleStore.API.eventCreate(dispatch)({
+              payload: {
+                eventData: sendingData,
+              },
+            });
+            ScheduleStore.API.detailViewSetOpened(dispatch)({
+              payload: {
+                openedId: eventData.id,
+              },
+            });
+          } else {
+            await ScheduleStore.API.eventUpdate(dispatch)({
+              payload: {
+                eventId,
+                eventData: sendingData,
+              },
+            });
+          }
+          ScheduleStore.API.detailViewModeChange(dispatch)({
             payload: {
-              eventData: sendingData,
+              mode: NSchedule.FormModes.VIEW,
             },
           });
-          ScheduleStore.API.detailViewSetOpened(dispatch)({
-            payload: {
-              openedId: eventData.id,
-            },
-          });
-        } else {
-          await new API_Events.EventService().updateEvent(eventId!, sendingData);
+        } catch (error) {
+          console.error(error);
+        } finally {
+          setSubmitting(false);
         }
-        ScheduleStore.API.detailViewModeChange(dispatch)({
-          payload: {
-            mode: NSchedule.FormModes.VIEW,
-          },
-        });
       },
       [eventId, isCreation],
     );
 
   React.useEffect(
     function formReOpening() {
-      if (eventId) form.setFieldsValue(eventData);
+      if (eventId) {
+        form.resetFields();
+        form.setFieldsValue(eventData);
+      }
     },
     [eventId],
   );
@@ -142,7 +158,7 @@ function EventForm() {
 
       <FormItem label="Comment" name="comment" type="input" children={<Input />} isReadOnly={isReadOnly} />
 
-      {!isReadOnly && <Button htmlType="submit" children={isCreation ? 'Create' : 'Update'} />}
+      {!isReadOnly && <Button htmlType="submit" children={isCreation ? 'Create' : 'Update'} loading={!!isSubmitting} />}
     </Form>
   );
 }

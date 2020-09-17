@@ -83,18 +83,18 @@ export class EventService {
   }
 
   async updateEvent(eventId: string, data: Partial<Event>) {
-    const result = await axios.put<{ data: Event }>(`${this.baseUrl}/event/${eventId}`, data);
-    return result.data.data;
+    const result = await axios.put<Event>(`${this.baseUrl}/event/${eventId}`, data);
+    return result.data;
   }
 
   async createEvent(data: Partial<Event>) {
-    const result = await axios.post<{ data: Event }>(`${this.baseUrl}/event/`, data);
+    const result = await axios.post<Event>(`${this.baseUrl}/event/`, data);
     return result.data;
   }
 
   async deleteEvent(eventId: string) {
-    const result = await axios.delete<{ data: Event }>(`${this.baseUrl}/event/${eventId}`);
-    return result.data.data;
+    const result = await axios.delete<Event>(`${this.baseUrl}/event/${eventId}`);
+    return result.data;
   }
 }
 

@@ -58,6 +58,22 @@ function reducer(store: NSchedule.IStore, action: NSchedule.IActions) {
       };
     }
 
+    case NSchedule.ActionTypes.EVENT_UPDATE: {
+      return {
+        ...store,
+        events: {
+          ...store.events,
+          map: {
+            ...store.events.map,
+            [action.payload.eventData.id]: {
+              ...store.events.map[action.payload.eventData.id],
+              ...action.payload.eventData,
+            },
+          },
+        },
+      };
+    }
+
     case NSchedule.ActionTypes.EVENT_DELETE: {
       return {
         ...store,

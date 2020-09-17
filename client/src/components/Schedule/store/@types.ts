@@ -40,6 +40,7 @@ export namespace NSchedule {
     | IEventsFetchStart
     | IEventsSet
     | IEventCreate
+    | IEventUpdate
     | IEventDelete
     | IDetailViewModeChange
     | IDetailViewSetOpened;
@@ -50,6 +51,7 @@ export namespace NSchedule {
     EVENTS_FETCH_START,
     EVENTS_SET,
     EVENT_CREATE,
+    EVENT_UPDATE,
     EVENT_DELETE,
     DETAIL_VIEW_MODE_CHANGE,
     DETAIL_VIEW_SET_OPENED,
@@ -83,6 +85,14 @@ export namespace NSchedule {
   export interface IEventCreate {
     type: ActionTypes.EVENT_CREATE;
     payload: {
+      eventData: Event;
+    };
+  }
+
+  export interface IEventUpdate {
+    type: ActionTypes.EVENT_UPDATE;
+    payload: {
+      eventId: Event['id'];
       eventData: Event;
     };
   }
