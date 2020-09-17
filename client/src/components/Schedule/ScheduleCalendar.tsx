@@ -1,17 +1,10 @@
 import React from 'react';
-import { Button, Calendar, Badge } from 'antd';
+import { Calendar, Badge } from 'antd';
 import { Event } from 'services/event';
 import { ScheduleStore } from 'components/Schedule/store';
 import { dateRenderer } from 'components/Schedule/ScheduleTable';
-import ScheduleStyles from './ScheduleCalendar.module.scss';
 
-export function ScheduleCalendar({ props }) {
-  const { isReadOnly = false, className } = props,
-    classes = React.useMemo(
-      () => [ScheduleStyles.field, isReadOnly && 'isReadOnly', className].filter(Boolean).join(' '),
-      [className, isReadOnly],
-    );
-
+export function ScheduleCalendar() {
   const { timeZone } = ScheduleStore.useSelector(ScheduleStore.selectors.getUser),
     eventsMap = ScheduleStore.useSelector(ScheduleStore.selectors.getEventsMap),
     eventIdsByDate = React.useMemo(
@@ -27,19 +20,12 @@ export function ScheduleCalendar({ props }) {
 
   function dateCellRender(value) {
     const currentDate = dateRenderer(timeZone)(value),
-      isMentor = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsMentor),
       currentEvents = eventIdsByDate[currentDate];
 
-    if (!currentEvents)
-      return (
-        <section className="events">
-          {isMentor && <Button children="+" type="primary" size="small" onClick={handleMouseClick} />}
-        </section>
-      );
+    if (!currentEvents) return null;
 
     return (
       <section className="events">
-        {isMentor && <Button children="+" type="primary" size="small" onClick={handleMouseClick} />}
         {currentEvents.map((eventId) => (
           <CalendarEvent eventId={eventId} key={eventId} />
         ))}
@@ -47,15 +33,7 @@ export function ScheduleCalendar({ props }) {
     );
   }
 
-  function handleMouseClick() {
-    console.log('click');
-  }
-
-  return (
-    <span>
-      <Calendar className={classes} dateCellRender={dateCellRender} />
-    </span>
-  );
+  return <Calendar dateCellRender={dateCellRender} />;
 }
 
 function CalendarEvent(props: { eventId: Event['id'] }) {
