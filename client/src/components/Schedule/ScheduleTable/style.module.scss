@@ -33,36 +33,76 @@
 }
 
 .codejam, .codewars, .course, .task {
-  background-color: $color-task-background;
-  & .ant-table-column-sort {
+  & td {
     background-color: $color-task-background;
+  }
+  &:hover > td {
+    background-color: $color-task-background-hover !important;
   }
 }
 
 .interview {
-  background-color: $color-interview-background;
-  & .ant-table-column-sort {
+  & td {
     background-color: $color-interview-background;
+  }
+  &:hover > td {
+    background-color: $color-interview-background-hover !important;
   }
 }
 
-.lecture {
-  background-color: $color-lecture-background;
-  & .ant-table-column-sort {
+.lecture, .video {
+  & td {
     background-color: $color-lecture-background;
+  }
+  &:hover > td {
+    background-color: $color-lecture-background-hover !important;
   }
 }
 
 .self-education {
-  background-color: $color-self-education-background;
-  & .ant-table-column-sort {
+  & td {
     background-color: $color-self-education-background;
+  }
+  &:hover > td {
+    background-color: $color-self-education-background-hover !important;
   }
 }
 
 .test {
-  background-color: $color-test-background;
-  & .ant-table-column-sort {
+  & td {
     background-color: $color-test-background;
   }
+  &:hover > td {
+    background-color: $color-test-background-hover !important;
+  }
+}
+
+.iconHide {
+  display: none;
+  justify-self: self-end;
+  cursor: pointer;
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.activeRow {
+  & td, td:hover {
+    background: $color-background-active !important;
+  }
+  & .iconHide {
+    display: inline-block;
+  }
+}
+
+.settings {
+  display: flex;
+  align-items: center;
+  & span {
+    cursor: pointer;
+  }
+}
+
+.iconShow {
+  margin-right: 5px;
 }

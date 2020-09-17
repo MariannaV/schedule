@@ -1,17 +1,3 @@
-export const columnsFilter = [
-  { label: 'Start Date', value: 'Start Date' },
-  { label: 'Name', value: 'Name' },
-  { label: 'DeadLine', value: 'DeadLine' },
-  { label: 'Type', value: 'Type' },
-  { label: 'Action', value: 'Action' },
-  { label: 'Place', value: 'Place' },
-  { label: 'Description URL', value: 'Description URL' },
-  { label: 'Broadcast URL', value: 'Broadcast URL' },
-  { label: 'Organizer', value: 'Organizer' },
-  { label: 'Description', value: 'Description' },
-  { label: 'Comment', value: 'Comment' },
-];
-
 export const defaultColumnsFilter = [
   'Start Date',
   'Name',

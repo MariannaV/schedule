@@ -1,4 +1,4 @@
-import { QuestionCircleOutlined, YoutubeOutlined } from '@ant-design/icons';
+import { QuestionCircleOutlined, YoutubeOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import { Table, Tag, Tooltip, Spin, Button } from 'antd';
 import { useRouter } from 'next/router';
 import { GithubUserLink } from 'components';
@@ -6,7 +6,7 @@ import React from 'react';
 import { useState } from 'react';
 import moment from 'moment-timezone';
 import { API_Events, Event } from '../../../services/event';
-import { rowsFilter, columnsFilter, defaultColumnsFilter } from './config';
+import { rowsFilter, defaultColumnsFilter } from './config';
 import { Filter } from './components/Filter/Filter';
 import { ScheduleStore } from '../store';
 
@@ -21,6 +21,7 @@ const tagColors = {
   'self-education': 'gold',
   task: 'green',
   test: 'cyan',
+  video: 'purple',
 };
 
 function isRowDisabled(dateTime, deadLine) {
@@ -36,25 +37,73 @@ export function ScheduleTable() {
 
   const { eventsLoading, eventsData } = API_Events.hooks.useEventsData(),
     tableData = React.useMemo(() => eventsData.list.map((eventId) => eventsData.map[eventId]), [eventsData]);
+  console.log(tableData);
 
   const [checkedColumns, setCheckedColumns] = useState(defaultColumnsFilter);
+  const [selectedRows, setSelectedRows] = useState([] as string[]);
+  const [hiddenRows, setHiddenRows] = useState([] as string[]);
+
+  const hideRows = () => {
+    console.log('hide');
+    setHiddenRows([...selectedRows, ...hiddenRows]);
+    console.log(selectedRows, hiddenRows);
+    setSelectedRows([]);
+  };
 
   return (
     <Spin spinning={!!eventsLoading}>
-      <Filter checkedColumns={checkedColumns} setCheckedColumns={setCheckedColumns} filterOptions={columnsFilter} />
+      <div className={styles.settings}>
+        <Filter
+          checkedColumns={checkedColumns}
+          setCheckedColumns={setCheckedColumns}
+          filterOptions={defaultColumnsFilter}
+        />
+        {hiddenRows.length > 0 && (
+          <span onClick={() => setHiddenRows([])}>
+            <EyeOutlined className={styles.iconShow} />
+            <span>Show hidden rows</span>
+          </span>
+        )}
+      </div>
       {checkedColumns.length && (
         <Table
           rowKey={(record) => record.id.toString()}
+          onRow={(record) => {
+            return {
+              onClick: (e) => {
+                console.log(record);
+                if ((e.target as HTMLElement).closest('[data-icon="eye-invisible"]')) {
+                  hideRows();
+                  return;
+                }
+                if (e.shiftKey) {
+                  selectedRows.includes(record.id)
+                    ? setSelectedRows(selectedRows.filter((item) => item !== record.id))
+                    : setSelectedRows([...selectedRows, record.id]);
+                } else {
+                  setSelectedRows([record.id]);
+                }
+              },
+            };
+          }}
           pagination={false}
           size="small"
           dataSource={
-            isActiveDates ? tableData.filter((data) => !isRowDisabled(data.dateTime, data.deadLine)) : tableData
+            isActiveDates
+              ? tableData.filter(
+                  (data) => !isRowDisabled(data.dateTime, data.deadLine) && !hiddenRows.includes(data.id),
+                )
+              : tableData.filter((data) => !hiddenRows.includes(data.id))
           }
-          rowClassName={(record) =>
-            isRowDisabled(record.dateTime, record.deadLine)
-              ? 'rs-table-row-disabled'
-              : styles[record.type.split(' ').join('')]
-          }
+          rowClassName={(record) => {
+            if (selectedRows.includes(record.id)) {
+              return styles.activeRow;
+            }
+            if (isRowDisabled(record.dateTime, record.deadLine)) {
+              return 'rs-table-row-disabled';
+            }
+            return styles[record.type.split(' ').join('')];
+          }}
           columns={[
             {
               title: 'Start Date',
@@ -92,9 +141,9 @@ export function ScheduleTable() {
             },
             {
               title: 'Action',
-              width: 310,
+              width: 325,
               dataIndex: 'checker',
-              render: (value: string) => (value ? actionButtonRenderer(value) : actionButtonRenderer('')),
+              render: (value: string) => (value ? actionButtonsRenderer(value) : actionButtonsRenderer('')),
             },
             {
               title: 'Place',
@@ -162,7 +211,7 @@ export function ScheduleTable() {
 const dateRenderer = (timeZone: string) => (value: string) =>
   value ? moment(value, 'YYYY-MM-DD HH:mmZ').tz(timeZone).format('DD.MM.YYYY HH:mm') : '';
 
-const actionButtonRenderer = (checker: string) => {
+const actionButtonsRenderer = (checker) => {
   const router = useRouter();
   switch (checker) {
     case 'crossCheck':
@@ -185,6 +234,7 @@ const actionButtonRenderer = (checker: string) => {
           >
             Crosscheck
           </Button>
+          <EyeInvisibleOutlined className={styles.iconHide} />
         </>
       );
     case 'auto-test':
@@ -200,13 +250,17 @@ const actionButtonRenderer = (checker: string) => {
           >
             Auto-Test
           </Button>
+          <EyeInvisibleOutlined className={styles.iconHide} />
         </>
       );
     default:
       return (
-        <Button type={'primary'} className={styles.btn}>
-          Details
-        </Button>
+        <>
+          <Button type={'primary'} className={styles.btn}>
+            Details
+          </Button>
+          <EyeInvisibleOutlined className={styles.iconHide} />
+        </>
       );
   }
 };
