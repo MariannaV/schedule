@@ -1,12 +1,12 @@
 import React from 'react';
-import { Form } from 'antd';
+import { Form, Checkbox, Switch } from 'antd';
 import moment from 'moment';
 import { FormItemProps } from 'antd/lib/form';
 import formItemStyles from './FormItem.module.scss';
 
 interface IFormItem extends FormItemProps {
   isReadOnly?: boolean;
-  type: 'input' | 'select' | 'time';
+  type: 'input' | 'select' | 'time' | 'checkbox' | 'switch';
   name: string;
 }
 
@@ -38,6 +38,12 @@ function FieldView(props: IFieldView) {
       switch (type) {
         case 'time':
           return moment(value).format('LT');
+
+        case 'checkbox':
+          return <Checkbox disabled checked={!!value} />;
+
+        case 'switch':
+          return <Switch disabled checked={!!value} />;
 
         default:
           return value;
