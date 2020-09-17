@@ -46,7 +46,7 @@ export namespace NSchedule {
 
   export enum ActionTypes {
     USER_ROLE_CHANGE,
-    USER_TIMEZONE,
+    USER_TIMEZONE_CHANGE,
     EVENTS_FETCH_START,
     EVENTS_SET,
     EVENT_CREATE,
@@ -63,7 +63,7 @@ export namespace NSchedule {
   }
 
   export interface IUserTimeZoneChange {
-    type: ActionTypes.USER_TIMEZONE;
+    type: ActionTypes.USER_TIMEZONE_CHANGE;
     payload: {
       timeZone: IStore['user']['timeZone'];
     };

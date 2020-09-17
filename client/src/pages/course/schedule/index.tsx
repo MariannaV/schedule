@@ -55,14 +55,13 @@ const ScheduleHeader = React.memo((props: IScheduleHeader) => {
         },
       });
     }, [store.user.role]),
-    onChangeTimeZone = React.useCallback(() => {
-      API_Schedule.userRoleChange(dispatch)({
+    onChangeTimeZone = React.useCallback((timeZone: NSchedule.IStore['user']['timeZone']) => {
+      API_Schedule.userTimeZoneChange(dispatch)({
         payload: {
-          role:
-            store.user.role === NSchedule.UserRoles.MENTOR ? NSchedule.UserRoles.STUDENT : NSchedule.UserRoles.MENTOR,
+          timeZone,
         },
       });
-    }, [store.user.role]);
+    }, []);
 
   return (
     <>

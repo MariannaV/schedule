@@ -7,7 +7,7 @@ import { GithubUserLink } from 'components';
 import { ScheduleStore } from 'components/Schedule/store';
 
 export function ScheduleTable() {
-  const { timeZone } = ScheduleStore.useSelector(ScheduleStore.selectors.getUser);
+  const timeZone = ScheduleStore.useSelector(ScheduleStore.selectors.getUserPreferredTimezone);
 
   const eventsData = ScheduleStore.useSelector(ScheduleStore.selectors.getEvents),
     tableData = React.useMemo(() => eventsData.list.map((eventId) => eventsData.map[eventId]), [eventsData]);

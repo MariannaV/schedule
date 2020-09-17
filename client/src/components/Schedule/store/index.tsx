@@ -24,7 +24,7 @@ const initialState: NSchedule.IStore = {
 function reducer(store: NSchedule.IStore, action: NSchedule.IActions) {
   switch (action.type) {
     case NSchedule.ActionTypes.USER_ROLE_CHANGE:
-    case NSchedule.ActionTypes.USER_TIMEZONE:
+    case NSchedule.ActionTypes.USER_TIMEZONE_CHANGE:
       return { ...store, user: { ...store.user, ...action.payload } };
 
     case NSchedule.ActionTypes.EVENTS_FETCH_START:
@@ -86,7 +86,7 @@ export const API_Schedule = {
     dispatch({ type: NSchedule.ActionTypes.USER_ROLE_CHANGE, ...params }),
   userTimeZoneChange: (dispatch: Dispatch<NSchedule.IActions>) => (
     params: Omit<NSchedule.IUserTimeZoneChange, 'type'>,
-  ) => dispatch({ type: NSchedule.ActionTypes.USER_TIMEZONE, ...params }),
+  ) => dispatch({ type: NSchedule.ActionTypes.USER_TIMEZONE_CHANGE, ...params }),
   eventsFetchStart: (dispatch: Dispatch<NSchedule.IActions>) => (params: Omit<NSchedule.IEventsFetchStart, 'type'>) =>
     dispatch({ type: NSchedule.ActionTypes.EVENTS_FETCH_START, ...params }),
   eventsSet: (dispatch: Dispatch<NSchedule.IActions>) => (params: Omit<NSchedule.IEventsSet, 'type'>) =>

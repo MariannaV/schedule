@@ -27,6 +27,9 @@ export const scheduleSelectors = {
       (store) => store.user,
     );
   },
+  get getUserPreferredTimezone() {
+    return createSelector(this.getUser, (user) => user.timeZone);
+  },
   get getUserIsMentor() {
     return createSelector(this.getUser, (user) => user.role === NSchedule.UserRoles.MENTOR);
   },
