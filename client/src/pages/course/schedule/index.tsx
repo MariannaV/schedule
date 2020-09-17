@@ -1,5 +1,6 @@
 import React from 'react';
-import { Row, Select, Switch } from 'antd';
+import { Row, Select, Switch, Menu, Dropdown } from 'antd';
+import { DownloadOutlined } from '@ant-design/icons';
 import { PageLayout } from 'components';
 import { FieldTimezone } from 'components/Forms/fields';
 import { ScheduleTable, ScheduleListWrapper, ScheduleCalendar } from 'components/Schedule';
@@ -64,6 +65,17 @@ const ScheduleHeader = React.memo((props: IScheduleHeader) => {
       });
     }, [store.user.role]);
 
+  const fileFormatsToSave = (
+    <Menu>
+      <Menu.Item key="1" onClick={() => alert(`saving to PDF`)}>
+        to PDF format
+      </Menu.Item>
+      <Menu.Item key="2" onClick={() => alert(`saving to XLS`)}>
+        to XLS format
+      </Menu.Item>
+    </Menu>
+  );
+
   return (
     <>
       <Row justify="space-between" style={{ marginBottom: 16 }}>
@@ -72,6 +84,9 @@ const ScheduleHeader = React.memo((props: IScheduleHeader) => {
           defaultValue={store.user.timeZone}
           onChange={onChangeTimeZone}
         />
+        <Dropdown.Button overlay={fileFormatsToSave} icon={<DownloadOutlined />}>
+          Download
+        </Dropdown.Button>
         <Select
           style={{ width: 200 }}
           placeholder="Please Select View"
