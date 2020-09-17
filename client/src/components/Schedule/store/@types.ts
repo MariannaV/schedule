@@ -1,5 +1,6 @@
 import React from 'react';
 import { Event } from 'services/event';
+import { IComments } from 'components/Comments';
 
 export namespace NSchedule {
   export interface IStore {
@@ -42,6 +43,7 @@ export namespace NSchedule {
     | IEventCreate
     | IEventUpdate
     | IEventDelete
+    | IEventCommentCreate
     | IDetailViewModeChange
     | IDetailViewSetOpened;
 
@@ -53,6 +55,7 @@ export namespace NSchedule {
     EVENT_CREATE,
     EVENT_UPDATE,
     EVENT_DELETE,
+    EVENT_COMMENT_CREATE,
     DETAIL_VIEW_MODE_CHANGE,
     DETAIL_VIEW_SET_OPENED,
   }
@@ -101,6 +104,15 @@ export namespace NSchedule {
     type: ActionTypes.EVENT_DELETE;
     payload: {
       eventId: Event['id'];
+    };
+  }
+
+  export interface IEventCommentCreate {
+    type: ActionTypes.EVENT_COMMENT_CREATE;
+    payload: {
+      eventId: Event['id'];
+      comment: IComments.Comment;
+      eventData: Event;
     };
   }
 

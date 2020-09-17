@@ -1,6 +1,6 @@
 import React from 'react';
-import { Form, Input, Select, Button } from 'antd';
-import { API_Events, Event, eventTypes } from 'services/event';
+import { Form, Input, Select, Switch, Button } from 'antd';
+import { Event, eventTypes } from 'services/event';
 import { FieldTimezone } from 'components/Forms/fields';
 import { FormItem } from 'components/Forms/FormItem';
 import { NSchedule, ScheduleStore } from 'components/Schedule/store';
@@ -156,7 +156,13 @@ function EventForm() {
 
       <FormItem label="Place" name="place" type="input" children={<Input />} isReadOnly={isReadOnly} />
 
-      <FormItem label="Comment" name="comment" type="input" children={<Input />} isReadOnly={isReadOnly} />
+      <FormItem
+        label="Feedback is allowed"
+        name="commentsEnabled"
+        type="switch"
+        children={<Switch defaultChecked={eventData.commentsEnabled} />}
+        isReadOnly={isReadOnly}
+      />
 
       {!isReadOnly && <Button htmlType="submit" children={isCreation ? 'Create' : 'Update'} loading={!!isSubmitting} />}
     </Form>

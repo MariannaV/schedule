@@ -3,6 +3,7 @@ import { Typography, Dropdown, Menu } from 'antd';
 import { NSchedule, ScheduleStore } from 'components/Schedule/store';
 import viewStyles from './ScheduleDetailView.module.scss';
 import { EventForm } from './EventForm';
+import { EventComments } from './EventComments';
 
 interface IScheduleDetailView {
   className?: string;
@@ -16,6 +17,7 @@ export const ScheduleDetailView: React.FC<IScheduleDetailView> = React.memo((pro
     <section className={classes}>
       <ScheduleDetailViewHeader />
       <EventForm />
+      <EventComments />
     </section>
   );
 });

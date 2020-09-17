@@ -1,6 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import { ScheduleStore, API_Schedule } from 'components/Schedule/store';
+import { IComments } from 'components/Comments';
 
 export interface Event {
   id: string;
@@ -12,7 +13,8 @@ export interface Event {
   timeZone: string;
   dateTime: string;
   place: string;
-  comment: string;
+  commentsEnabled: boolean;
+  comments: Array<IComments.Comment>;
 }
 
 export enum eventTypes {
