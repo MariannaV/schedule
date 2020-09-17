@@ -21,7 +21,7 @@ function SchedulePage() {
       case View.list:
         return <ScheduleListWrapper />;
       case View.calendar:
-        return <ScheduleCalendar props="any" />;
+        return <ScheduleCalendar />;
       case View.table:
       default:
         return <ScheduleTable />;
