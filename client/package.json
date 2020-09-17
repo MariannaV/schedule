@@ -39,7 +39,9 @@
     "react-use": "^13.27.1",
     "reselect": "4.0.0",
     "styled-jsx": "~3.2.5",
-    "sass": "1.26.10"
+    "sass": "1.26.10",
+    "react-window": "1.8.5",
+    "react-virtualized-auto-sizer": "1.0.2"
   },
   "devDependencies": {
     "@babel/plugin-proposal-decorators": "^7.7.4",

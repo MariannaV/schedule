@@ -1,6 +1,8 @@
 import React from 'react';
 import { Button, Typography, Tag } from 'antd';
 import moment from 'moment';
+import { FixedSizeList as List } from 'react-window';
+import AutoSizer from 'react-virtualized-auto-sizer';
 import { Event, EventTypeColor, EventTypeToName } from 'services/event';
 import { NSchedule, ScheduleStore } from 'components/Schedule/store';
 import listStyles from './ScheduleList.module.scss';
@@ -11,9 +13,25 @@ interface IScheduleList {
 
 function ScheduleList(props: IScheduleList) {
   const eventsList = ScheduleStore.useSelector(ScheduleStore.selectors.getEventsList),
-    eventItems = React.useMemo(() => eventsList.map((eventId) => <ListItem eventId={eventId} key={eventId} />), [
-      eventsList,
-    ]),
+    renderEventItem = React.useCallback(
+      ({ index, ...rest }: any) => <ListItem {...rest} eventId={eventsList[index]} />,
+      [eventsList],
+    ),
+    getRowKey = React.useCallback((index) => eventsList[index], [eventsList]),
+    renderEventList = React.useCallback(
+      ({ height, width }) => (
+        <List
+          className="List"
+          itemKey={getRowKey}
+          itemCount={eventsList.length}
+          itemSize={200}
+          width={width}
+          height={height}
+          children={renderEventItem}
+        />
+      ),
+      [],
+    ),
     classes = React.useMemo(() => [listStyles.ScheduleListWrapper, props.className].filter(Boolean).join(' '), [
       props.className,
     ]);
@@ -21,13 +39,14 @@ function ScheduleList(props: IScheduleList) {
   return (
     <section className={classes}>
       <ScheduleListHeader />
-      <section className={listStyles.ScheduleList} children={eventItems} />
+      <AutoSizer children={renderEventList} />
     </section>
   );
 }
 
 interface IListItem {
   eventId: Event['id'];
+  style: any;
 }
 
 function ListItem(props: IListItem) {
@@ -52,17 +71,25 @@ function ListItem(props: IListItem) {
     classes = React.useMemo(
       () => [listStyles.ScheduleListItem, eventId === openedEventId && listStyles.isOpened].filter(Boolean).join(' '),
       [eventId, openedEventId],
-    );
+    ),
+    containerStyle = React.useMemo(() => {
+      const verticalMargin = 8;
+      return {
+        ...props.style,
+        top: props.style.top + verticalMargin,
+        height: props.style.height - verticalMargin,
+      };
+    }, [props.style]);
 
   return (
-    <article className={classes} onClick={onItemClick}>
+    <article className={classes} onClick={onItemClick} style={containerStyle}>
       <header>
         <Typography.Title children={eventData.name} level={3} />
         <Tag color={EventTypeColor[eventData.type]}>{EventTypeToName[eventData.type] || eventData.type}</Tag>
       </header>
 
       <main>
-        <Typography.Text children={eventData.description} />
+        <Typography.Text children={eventData.description} className={listStyles.description} />
       </main>
 
       <footer>
