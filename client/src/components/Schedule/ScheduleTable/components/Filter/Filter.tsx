@@ -27,6 +27,7 @@ export function Filter({
   };
 
   const handleClickOutsideFilter = (event) => {
+    // @ts-ignore
     if (ref.current && !ref.current.contains(event.target)) {
       setIsFilterOpened(false);
       document.removeEventListener('click', handleClickOutsideFilter);
@@ -45,6 +46,7 @@ export function Filter({
             className={styles.checkbox}
             options={filterOptions}
             value={checkedColumns}
+            // @ts-ignore
             onChange={(checkedValues) => setCheckedColumns(checkedValues)}
           />
           <Button type={'primary'} size={'small'} onClick={toggleFilter}>

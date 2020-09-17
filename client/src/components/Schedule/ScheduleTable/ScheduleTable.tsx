@@ -104,6 +104,7 @@ export function ScheduleTable() {
             }
             return styles[record.type.split(' ').join('')];
           }}
+          // @ts-ignore
           columns={[
             {
               title: 'Start Date',
@@ -208,7 +209,7 @@ export function ScheduleTable() {
   );
 }
 
-const dateRenderer = (timeZone: string) => (value: string) =>
+export const dateRenderer = (timeZone: string) => (value: string) =>
   value ? moment(value, 'YYYY-MM-DD HH:mmZ').tz(timeZone).format('DD.MM.YYYY HH:mm') : '';
 
 const actionButtonsRenderer = (checker) => {

@@ -1,64 +1,66 @@
+import React from 'react';
 import { Calendar, Badge } from 'antd';
+import { Event } from 'services/event';
+import { ScheduleStore } from 'components/Schedule/store';
+import { dateRenderer } from 'components/Schedule/ScheduleTable/ScheduleTable';
 
 export function ScheduleCalendar() {
-  function getListData(value) {
-    let listData;
-    switch (value.date()) {
-      case 8:
-        listData = [
-          { type: 'warning', content: 'This is warning event.' },
-          { type: 'success', content: 'This is usual event.' },
-        ];
-        break;
-      case 10:
-        listData = [
-          { type: 'warning', content: 'This is warning event.' },
-          { type: 'success', content: 'This is usual event.' },
-          { type: 'error', content: 'This is error event.' },
-        ];
-        break;
-      case 15:
-        listData = [
-          { type: 'warning', content: 'This is warning event' },
-          { type: 'success', content: 'This is very long usual event。。....' },
-          { type: 'error', content: 'This is error event 1.' },
-          { type: 'error', content: 'This is error event 2.' },
-          { type: 'error', content: 'This is error event 3.' },
-          { type: 'error', content: 'This is error event 4.' },
-        ];
-        break;
-      default:
-    }
-    return listData || [];
-  }
+  const { timeZone } = ScheduleStore.useSelector(ScheduleStore.selectors.getUser),
+    eventsMap = ScheduleStore.useSelector(ScheduleStore.selectors.getEventsMap),
+    eventIdsByDate = React.useMemo(
+      () =>
+        (Object.values(eventsMap) as Array<Event>).reduce((acc, currentEvent) => {
+          const currentDate = dateRenderer(currentEvent.timeZone)(currentEvent.dateTime);
+          if (!(currentDate in acc)) acc[currentDate] = [];
+          acc[currentDate].push(currentEvent.id);
+          return acc;
+        }, {} as Record<string, Array<Event['id']>>),
+      [eventsMap],
+    );
 
   function dateCellRender(value) {
-    const listData = getListData(value);
+    const currentDate = dateRenderer(timeZone)(value),
+      currentEvents = eventIdsByDate[currentDate];
+
+    if (!currentEvents) return null;
+
     return (
-      <ul className="events">
-        {listData.map((item) => (
-          <li key={item.content}>
-            <Badge status={item.type} text={item.content} />
-          </li>
+      <section className="events">
+        {currentEvents.map((eventId) => (
+          <CalendarEvent eventId={eventId} key={eventId} />
         ))}
-      </ul>
+      </section>
     );
   }
 
-  function getMonthData(value) {
-    if (value.month() === 8) {
-      return 1394;
-    }
-  }
+  return <Calendar dateCellRender={dateCellRender} />;
+}
 
-  function monthCellRender(value) {
-    const num = getMonthData(value);
-    return num ? (
-      <div className="notes-month">
-        <section>{num}</section>
-        <span>Backlog number</span>
-      </div>
-    ) : null;
-  }
-  return <Calendar dateCellRender={dateCellRender} monthCellRender={monthCellRender} />;
+function CalendarEvent(props: { eventId: Event['id'] }) {
+  const { eventId } = props,
+    eventData = ScheduleStore.useSelector(ScheduleStore.selectors.getEvent({ eventId }));
+
+  const { dispatch } = React.useContext(ScheduleStore.context),
+    onClick = React.useCallback(() => {
+      ScheduleStore.API.detailViewSetOpened(dispatch)({
+        payload: {
+          openedId: eventId,
+        },
+      });
+    }, [eventId]);
+
+  const type = React.useMemo(() => {
+    switch (true) {
+      case eventData.deadLine:
+        return 'error';
+      default:
+        return 'success';
+    }
+  }, [eventData.deadLine]);
+
+  return (
+    <article onClick={onClick}>
+      <Badge status={type} text={eventData.name} />
+    </article>
+  );
 }
