@@ -38,7 +38,7 @@ export function ScheduleCalendar({ props }) {
       );
 
     return (
-      <section className="events">
+      <section style={{ backgroundColor: 'red' }} className="events">
         {isMentor && <Button children="+" type="primary" size="small" onClick={handleMouseClick} />}
         {currentEvents.map((eventId) => (
           <CalendarEvent eventId={eventId} key={eventId} eventDeadline={''} />
