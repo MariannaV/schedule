@@ -26,7 +26,7 @@ function converttoPDF() {
     const orientation = pdfWidth > pdfHeight ? 'l' : 'p';
     const pixelratio = 3.7 / window.devicePixelRatio;
     const pdf = new jsPDF(orientation, 'mm', [pdfWidth / pixelratio, pdfHeight / pixelratio]);
-    pdf.addImage(imgData, 'JPG', 0, 0);
+    pdf.addImage(imgData, 'JPG', 0, 0, pdfWidth / pixelratio, pdfHeight / pixelratio, undefined, undefined, 0);
     pdf.save(`RSFile.pdf`);
   });
 }
