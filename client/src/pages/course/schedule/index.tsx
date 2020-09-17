@@ -17,10 +17,10 @@ enum View {
 }
 
 const converttoPDF = () => {
-  const input = document.getElementById(`__next`);
-  html2canvas(input).then((canvas) => {
+  const myinput = document.getElementById(`__next`);
+  html2canvas(myinput).then((canvas) => {
     const pdfWidth = window.innerWidth;
-    const pdfHeight = input.offsetHeight;
+    const pdfHeight = myinput.offsetHeight;
     const imgData = canvas.toDataURL('image/jpeg', 0.5);
 
     const orientation = pdfWidth > pdfHeight ? 'l' : 'p';
@@ -89,8 +89,8 @@ const ScheduleHeader = React.memo((props: IScheduleHeader) => {
       <Menu.Item key="1" onClick={() => converttoPDF()}>
         to PDF format
       </Menu.Item>
-      <Menu.Item key="2" onClick={() => alert(`saving to XLS`)}>
-        to XLS format
+      <Menu.Item key="2" onClick={() => alert(`saving to TXT`)}>
+        to TXT format
       </Menu.Item>
     </Menu>
   );
