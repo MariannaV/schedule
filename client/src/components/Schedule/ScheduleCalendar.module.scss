@@ -1,0 +1,32 @@
+.field {
+  [class~='ant-radio-button-wrapper']:last-child {
+    display: none;
+  }
+}
+.field {
+  [class~='ant-btn-sm'] {
+    position: absolute;
+    top: 5px;
+    opacity: 0;
+  }
+  [class~='ant-picker-cell']:hover{
+    [class~='ant-btn-sm'] {
+      opacity: 1;
+    }
+  }
+}
+.field {
+  [class~='ant-badge-not-a-wrapper']:hover {
+    background: rgb(209 233 255);
+    border-radius: 2px;
+  }
+}
+
+.field {
+    @media only screen and (max-width: 480px){
+    [class~='.ant-picker-calendar-header .ant-picker-calendar-mode-switch > label'] {
+      width: 100%;
+    }
+  }
+}
+
