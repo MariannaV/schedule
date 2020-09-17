@@ -1,6 +1,8 @@
 import React from 'react';
 import { Row, Select, Switch, Menu, Dropdown } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 import { PageLayout } from 'components';
 import { FieldTimezone } from 'components/Forms/fields';
 import { ScheduleTable, ScheduleListWrapper, ScheduleCalendar } from 'components/Schedule';
@@ -13,6 +15,21 @@ enum View {
   list = 'List',
   calendar = 'Calendar',
 }
+
+const converttoPDF = () => {
+  const input = document.getElementById(`__next`);
+  html2canvas(input).then((canvas) => {
+    const pdfWidth = window.innerWidth;
+    const pdfHeight = input.offsetHeight;
+    const imgData = canvas.toDataURL('image/jpeg', 0.5);
+
+    const orientation = pdfWidth > pdfHeight ? 'l' : 'p';
+    const pixelratio = 3.7 / window.devicePixelRatio;
+    const pdf = new jsPDF(orientation, 'mm', [pdfWidth / pixelratio, pdfHeight / pixelratio]);
+    pdf.addImage(imgData, 'JPG', 0, 0);
+    pdf.save(`RSFile.pdf`);
+  });
+};
 
 function SchedulePage() {
   const [currentView, changeView] = React.useState<View>(View.table);
@@ -32,8 +49,10 @@ function SchedulePage() {
   return (
     <ScheduleStore.provider>
       <PageLayout title="Schedule" githubId={'props.session.githubId'} loading={false}>
-        <ScheduleHeader onChangeViewMode={changeView} />
-        <ScheduleView />
+        <div id="xxx">
+          <ScheduleHeader onChangeViewMode={changeView} />
+          <ScheduleView />
+        </div>
       </PageLayout>
       <FetcherCommonData />
     </ScheduleStore.provider>
@@ -67,7 +86,7 @@ const ScheduleHeader = React.memo((props: IScheduleHeader) => {
 
   const fileFormatsToSave = (
     <Menu>
-      <Menu.Item key="1" onClick={() => alert(`saving to PDF`)}>
+      <Menu.Item key="1" onClick={() => converttoPDF()}>
         to PDF format
       </Menu.Item>
       <Menu.Item key="2" onClick={() => alert(`saving to XLS`)}>
