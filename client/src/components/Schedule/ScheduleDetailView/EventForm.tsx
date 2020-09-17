@@ -160,7 +160,7 @@ function EventForm() {
         label="Feedback is allowed"
         name="commentsEnabled"
         type="switch"
-        children={<Switch defaultChecked={eventData.commentsEnabled} />}
+        children={<Switch defaultChecked={eventData?.commentsEnabled} />}
         isReadOnly={isReadOnly}
       />
 
