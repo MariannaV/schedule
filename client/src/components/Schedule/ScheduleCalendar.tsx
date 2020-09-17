@@ -8,7 +8,7 @@ import ScheduleStyles from './ScheduleCalendar.module.scss';
 export function ScheduleCalendar({ props }) {
   const { isReadOnly = false, className } = props,
     classes = React.useMemo(
-      () => [ScheduleStyles.field, isReadOnly && 'isReadOnly', className].filter(Boolean).join(' '),
+      () => [ScheduleStyles.calendar, isReadOnly && 'isReadOnly', className].filter(Boolean).join(' '),
       [className, isReadOnly],
     );
 
@@ -41,7 +41,7 @@ export function ScheduleCalendar({ props }) {
       <section className="events">
         {isMentor && <Button children="+" type="primary" size="small" onClick={handleMouseClick} />}
         {currentEvents.map((eventId) => (
-          <CalendarEvent eventId={eventId} key={eventId} />
+          <CalendarEvent eventId={eventId} key={eventId} eventDeadline={''} />
         ))}
       </section>
     );
@@ -51,14 +51,10 @@ export function ScheduleCalendar({ props }) {
     console.log('click');
   }
 
-  return (
-    <span>
-      <Calendar className={classes} dateCellRender={dateCellRender} />
-    </span>
-  );
+  return <Calendar className={classes} dateCellRender={dateCellRender} />;
 }
 
-function CalendarEvent(props: { eventId: Event['id'] }) {
+function CalendarEvent(props: { eventId: Event['id']; eventDeadline: Event['deadLine'] }) {
   const { eventId } = props,
     eventData = ScheduleStore.useSelector(ScheduleStore.selectors.getEvent({ eventId }));
 
