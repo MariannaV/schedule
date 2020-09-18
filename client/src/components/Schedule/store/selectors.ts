@@ -36,6 +36,9 @@ export const scheduleSelectors = {
   get getUserIsMentor() {
     return createSelector(this.getUserRole, (userRole) => userRole === NSchedule.UserRoles.MENTOR);
   },
+  get getUserPreferredScheduleView() {
+    return createSelector(this.getUser, (user) => user.scheduleView);
+  },
   get getDetailView() {
     return createSelector(
       (store: NSchedule.IStore) => store,

@@ -19,6 +19,7 @@ const initialState: NSchedule.IStore = {
   user: {
     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     role: NSchedule.UserRoles.MENTOR,
+    scheduleView: NSchedule.ScheduleView.table,
   },
 };
 
@@ -26,6 +27,7 @@ function reducer(store: NSchedule.IStore, action: NSchedule.IActions) {
   switch (action.type) {
     case NSchedule.ActionTypes.USER_ROLE_CHANGE:
     case NSchedule.ActionTypes.USER_TIMEZONE_CHANGE:
+    case NSchedule.ActionTypes.USER_SCHEDULE_VIEW_CHANGE:
       return { ...store, user: { ...store.user, ...action.payload } };
 
     case NSchedule.ActionTypes.EVENTS_FETCH_START:
@@ -88,8 +90,11 @@ export const API_Schedule = {
   userTimeZoneChange: (dispatch: Dispatch<NSchedule.IActions>) => (
     params: Omit<NSchedule.IUserTimeZoneChange, 'type'>,
   ) => dispatch({ type: NSchedule.ActionTypes.USER_TIMEZONE_CHANGE, ...params }),
-  eventsFetchStart: (dispatch: Dispatch<NSchedule.IActions>) => (params: Omit<NSchedule.IEventsFetchStart, 'type'>) =>
-    dispatch({ type: NSchedule.ActionTypes.EVENTS_FETCH_START, ...params }),
+  userScheduleViewChange: (dispatch: Dispatch<NSchedule.IActions>) => (
+    params: Omit<NSchedule.IUserScheduleViewChange, 'type'>,
+  ) => dispatch({ type: NSchedule.ActionTypes.USER_SCHEDULE_VIEW_CHANGE, ...params }),
+  eventsFetchStart: (dispatch: Dispatch<NSchedule.IActions>) => () =>
+    dispatch({ type: NSchedule.ActionTypes.EVENTS_FETCH_START }),
   eventsSet: (dispatch: Dispatch<NSchedule.IActions>) => (params: Omit<NSchedule.IEventsSet, 'type'>) =>
     dispatch({ type: NSchedule.ActionTypes.EVENTS_SET, ...params }),
   eventCreate: (dispatch: Dispatch<NSchedule.IActions>) => async (params: Omit<NSchedule.IEventCreate, 'type'>) => {

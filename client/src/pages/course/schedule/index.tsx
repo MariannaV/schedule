@@ -47,7 +47,8 @@ const ScheduleHeader = React.memo((props: IScheduleHeader) => {
   const { dispatch } = React.useContext(ScheduleStore.context),
     userRole = ScheduleStore.useSelector(ScheduleStore.selectors.getUserRole),
     isMentor = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsMentor),
-    timeZone = ScheduleStore.useSelector(ScheduleStore.selectors.getUserPreferredTimezone);
+    timeZone = ScheduleStore.useSelector(ScheduleStore.selectors.getUserPreferredTimezone),
+    scheduleView = ScheduleStore.useSelector(ScheduleStore.selectors.getUserPreferredScheduleView);
 
   const onToggleUserMode = React.useCallback(() => {
       API_Schedule.userRoleChange(dispatch)({
@@ -60,6 +61,13 @@ const ScheduleHeader = React.memo((props: IScheduleHeader) => {
       API_Schedule.userTimeZoneChange(dispatch)({
         payload: {
           timeZone,
+        },
+      });
+    }, []),
+    onChangeScheduleView = React.useCallback((scheduleView: NSchedule.IStore['user']['scheduleView']) => {
+      API_Schedule.userScheduleViewChange(dispatch)({
+        payload: {
+          scheduleView,
         },
       });
     }, []);
@@ -75,12 +83,12 @@ const ScheduleHeader = React.memo((props: IScheduleHeader) => {
         <Select
           style={{ width: 200 }}
           placeholder="Please Select View"
-          defaultValue={View.table}
-          onChange={props.onChangeViewMode}
+          defaultValue={scheduleView}
+          onChange={onChangeScheduleView}
         >
-          <Select.Option value={View.table}>Table</Select.Option>
-          <Select.Option value={View.list}>List</Select.Option>
-          <Select.Option value={View.calendar}>Calendar</Select.Option>
+          <Select.Option value={NSchedule.ScheduleView.table} children="Table" />
+          <Select.Option value={NSchedule.ScheduleView.list} children="List" />
+          <Select.Option value={NSchedule.ScheduleView.calendar} children="Calendar" />
         </Select>
       </Row>
       <Row justify="end" style={{ marginBottom: '10px' }}>
