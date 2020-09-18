@@ -4,7 +4,7 @@ import { Event } from 'services/event';
 import { ScheduleStore } from 'components/Schedule/store';
 import { dateRenderer } from 'components/Schedule/ScheduleTable';
 import ScheduleStyles from './ScheduleCalendar.module.scss';
-import './ScheduleCalendar.module.scss';
+import calendarStyles from './ScheduleCalendar.module.scss';
 
 export function ScheduleCalendar({ props }) {
   const { isReadOnly = false, className } = props,
@@ -49,11 +49,15 @@ export function ScheduleCalendar({ props }) {
         </section>
       );
 
+    console.log(calendarStyles);
+
     return (
-      <section className={`${currentTypes}`}>
+      <section>
         {isMentor && <Button children="+" type="primary" size="small" onClick={handleMouseClick} />}
         {currentEvents.map((eventId) => (
-          <CalendarEvent eventId={eventId} key={eventId} eventDeadline={''} />
+          <section className={calendarStyles[currentTypes]}>
+            <CalendarEvent eventId={eventId} key={eventId} />
+          </section>
         ))}
       </section>
     );
@@ -66,7 +70,7 @@ export function ScheduleCalendar({ props }) {
   return <Calendar className={classes} dateCellRender={dateCellRender} />;
 }
 
-function CalendarEvent(props: { eventId: Event['id']; eventDeadline: Event['deadLine'] }) {
+function CalendarEvent(props: { eventId: Event['id'] }) {
   const { eventId } = props,
     eventData = ScheduleStore.useSelector(ScheduleStore.selectors.getEvent({ eventId }));
 
