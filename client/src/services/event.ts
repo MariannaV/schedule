@@ -3,6 +3,7 @@ import axios from 'axios';
 import { ScheduleStore, API_Schedule } from 'components/Schedule/store';
 
 export interface Event {
+  deadLine: string;
   id: string;
   name: string;
   description: string;
@@ -13,6 +14,8 @@ export interface Event {
   dateTime: string;
   place: string;
   comment: string;
+  checker: string;
+  organizer: string;
 }
 
 export enum eventTypes {

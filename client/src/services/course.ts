@@ -36,9 +36,11 @@ export interface CourseTaskDetails extends CourseTask {
 export interface CourseEvent {
   id: number;
   event: Event;
+  checker: string;
   date?: string;
   time?: string;
   dateTime: string;
+  deadLine: string;
   place: string;
   comment: string;
   stageId: number;
