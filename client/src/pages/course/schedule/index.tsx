@@ -49,10 +49,8 @@ function SchedulePage() {
   return (
     <ScheduleStore.provider>
       <PageLayout title="Schedule" githubId={'props.session.githubId'} loading={false}>
-        <div id="xxx">
-          <ScheduleHeader onChangeViewMode={changeView} />
-          <ScheduleView />
-        </div>
+        <ScheduleHeader onChangeViewMode={changeView} />
+        <ScheduleView />
       </PageLayout>
       <FetcherCommonData />
     </ScheduleStore.provider>

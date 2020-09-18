@@ -16,7 +16,6 @@ export function ScheduleTable() {
 
   return (
     <Table
-      id="scheduleTableView"
       rowKey={(record) => record.id.toString()}
       pagination={false}
       size="small"
