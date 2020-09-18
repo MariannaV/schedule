@@ -42,8 +42,6 @@
     "sass": "1.26.10",
     "mapbox-gl": "1.12.0",
     "react-map-gl": "5.2.8",
-    "react-yandex-maps": "4.4.0",
-    "google-map-react": "2.1.3",
     "react-map-gl-geocoder": "2.1.2",
     "react-mapbox-gl-geocoder": "1.1.0",
     "reactstrap": "8.5.1"
