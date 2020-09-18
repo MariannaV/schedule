@@ -2,6 +2,7 @@ import React, { Dispatch } from 'react';
 import { EventService } from 'services/event';
 import { NSchedule } from './@types';
 import { scheduleSelectors } from './selectors';
+import { LocalStorage } from 'utils/localStorage';
 
 export { NSchedule };
 
@@ -126,10 +127,27 @@ export const API_Schedule = {
 
 const storeContext = React.createContext<NSchedule.IStoreContext>(null!);
 
+const storeKey = 'ScheduleStore';
+
 const StoreProvider: React.FC = (props) => {
   // @ts-ignore
-  const [store, dispatch] = React.useReducer(reducer, initialState),
+  const [store, dispatch] = React.useReducer(reducer, {
+      ...initialState,
+      ...JSON.parse(LocalStorage.getItem(storeKey) ?? '{}'),
+    }),
     contextValue = React.useMemo(() => ({ store, dispatch }), [store]);
+
+  React.useEffect(
+    function LocalStorageSync() {
+      const syncFields: Array<keyof NSchedule.IStore> = ['detailView', 'user'];
+      LocalStorage.setItem(
+        storeKey,
+        JSON.stringify(syncFields.reduce((acc, currentPart) => ({ ...acc, [currentPart]: store[currentPart] }), {})),
+      );
+    },
+    [store],
+  );
+
   return <storeContext.Provider value={contextValue} children={props.children} />;
 };
 

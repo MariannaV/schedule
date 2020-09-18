@@ -44,17 +44,18 @@ interface IScheduleHeader {
 }
 
 const ScheduleHeader = React.memo((props: IScheduleHeader) => {
-  const { store, dispatch } = React.useContext(ScheduleStore.context),
-    isMentor = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsMentor);
+  const { dispatch } = React.useContext(ScheduleStore.context),
+    userRole = ScheduleStore.useSelector(ScheduleStore.selectors.getUserRole),
+    isMentor = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsMentor),
+    timeZone = ScheduleStore.useSelector(ScheduleStore.selectors.getUserPreferredTimezone);
 
   const onToggleUserMode = React.useCallback(() => {
       API_Schedule.userRoleChange(dispatch)({
         payload: {
-          role:
-            store.user.role === NSchedule.UserRoles.MENTOR ? NSchedule.UserRoles.STUDENT : NSchedule.UserRoles.MENTOR,
+          role: userRole === NSchedule.UserRoles.MENTOR ? NSchedule.UserRoles.STUDENT : NSchedule.UserRoles.MENTOR,
         },
       });
-    }, [store.user.role]),
+    }, [userRole]),
     onChangeTimeZone = React.useCallback((timeZone: NSchedule.IStore['user']['timeZone']) => {
       API_Schedule.userTimeZoneChange(dispatch)({
         payload: {
@@ -68,7 +69,7 @@ const ScheduleHeader = React.memo((props: IScheduleHeader) => {
       <Row justify="space-between" style={{ marginBottom: 16 }}>
         <FieldTimezone
           style={{ width: 200, marginRight: '250px' }}
-          defaultValue={store.user.timeZone}
+          defaultValue={timeZone}
           onChange={onChangeTimeZone}
         />
         <Select
@@ -83,9 +84,10 @@ const ScheduleHeader = React.memo((props: IScheduleHeader) => {
         </Select>
       </Row>
       <Row justify="end" style={{ marginBottom: '10px' }}>
+        {console.log('@@', timeZone)}
         <Switch
-          checkedChildren="mentor"
           unCheckedChildren="student"
+          checkedChildren="mentor"
           defaultChecked={isMentor}
           onClick={onToggleUserMode}
         />
