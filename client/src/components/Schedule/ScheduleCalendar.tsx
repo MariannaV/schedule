@@ -1,8 +1,8 @@
 import React from 'react';
+import moment from 'moment-timezone';
 import { Calendar, Badge } from 'antd';
 import { Event } from 'services/event';
 import { ScheduleStore } from 'components/Schedule/store';
-import { dateRenderer } from 'components/Schedule/ScheduleTable';
 
 export function ScheduleCalendar() {
   const { timeZone } = ScheduleStore.useSelector(ScheduleStore.selectors.getUser),
@@ -64,3 +64,6 @@ function CalendarEvent(props: { eventId: Event['id'] }) {
     </article>
   );
 }
+
+const dateRenderer = (timeZone: string) => (value: string) =>
+  value ? moment(value, 'YYYY-MM-DD HH:mmZ').tz(timeZone).format('YYYY-MM-DD') : '';
