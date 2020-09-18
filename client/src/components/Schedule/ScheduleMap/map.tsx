@@ -38,10 +38,6 @@ class MapView extends PureComponent<{}, IMapbox> {
     };
   }
 
-  clickHandlerForPopup() {
-    this.state.showPopup ? this.setState({ showPopup: false }) : this.setState({ showPopup: true });
-  }
-
   componentDidMount() {
     navigator.geolocation.getCurrentPosition((position) => {
       this.setState(
@@ -59,7 +55,7 @@ class MapView extends PureComponent<{}, IMapbox> {
   }
 
   customMarker = ({ marker }) => {
-    let { showPopup } = this.state;
+    const { showPopup } = this.state;
     return (
       <Fragment>
         <Marker longitude={marker.longitude} latitude={marker.latitude}>
@@ -100,7 +96,7 @@ class MapView extends PureComponent<{}, IMapbox> {
   };
 
   add = () => {
-    let { tempMarker } = this.state;
+    const { tempMarker } = this.state;
 
     this.setState((prevState) => ({
       markers: [...prevState.markers, tempMarker],
@@ -109,7 +105,7 @@ class MapView extends PureComponent<{}, IMapbox> {
   };
 
   render() {
-    const { viewport, tempMarker, markers } = this.state;
+    const { viewport, tempMarker } = this.state;
     return (
       <Container fluid={true}>
         <Row>
@@ -149,12 +145,7 @@ class MapView extends PureComponent<{}, IMapbox> {
               )}
               {this.state.markers.map((marker) => {
                 console.log(marker);
-                return (
-                  // <Fragment>
-                  //   <CustomMarker key={`marker-${index}`} index={index} marker={marker} />
-                  // </Fragment>
-                  <Fragment>{this.customMarker({ marker })}</Fragment>
-                );
+                return <Fragment>{this.customMarker({ marker })}</Fragment>;
               })}
             </ReactMapGL>
           </Col>
