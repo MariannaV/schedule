@@ -18,9 +18,6 @@ const initialState: NSchedule.IStore = {
   user: {
     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     role: NSchedule.UserRoles.MENTOR,
-    get isMentor() {
-      return this.role === NSchedule.UserRoles.MENTOR;
-    },
     isActiveDates: true,
   },
 };
@@ -28,7 +25,8 @@ const initialState: NSchedule.IStore = {
 function reducer(store: NSchedule.IStore, action: NSchedule.IActions) {
   switch (action.type) {
     case NSchedule.ActionTypes.USER_ROLE_CHANGE:
-    case NSchedule.ActionTypes.USER_TIMEZONE:
+    case NSchedule.ActionTypes.USER_TIMEZONE_CHANGE:
+    case NSchedule.ActionTypes.IS_ACTIVE_DATES_SET:
       return { ...store, user: { ...store.user, ...action.payload } };
 
     case NSchedule.ActionTypes.EVENTS_FETCH_START:
@@ -47,9 +45,6 @@ function reducer(store: NSchedule.IStore, action: NSchedule.IActions) {
         ),
       };
     }
-
-    case NSchedule.ActionTypes.IS_ACTIVE_DATES_SET:
-      return { ...store, user: { ...store.user, isActiveDates: action.payload.isActiveDates } };
 
     case NSchedule.ActionTypes.EVENT_CREATE: {
       return {
@@ -88,12 +83,12 @@ function reducer(store: NSchedule.IStore, action: NSchedule.IActions) {
   }
 }
 
-export const API_Schedule = {
+const API_Schedule = {
   userRoleChange: (dispatch: Dispatch<NSchedule.IActions>) => (params: Omit<NSchedule.IUserRoleChange, 'type'>) =>
     dispatch({ type: NSchedule.ActionTypes.USER_ROLE_CHANGE, ...params }),
   userTimeZoneChange: (dispatch: Dispatch<NSchedule.IActions>) => (
     params: Omit<NSchedule.IUserTimeZoneChange, 'type'>,
-  ) => dispatch({ type: NSchedule.ActionTypes.USER_TIMEZONE, ...params }),
+  ) => dispatch({ type: NSchedule.ActionTypes.USER_TIMEZONE_CHANGE, ...params }),
   eventsFetchStart: (dispatch: Dispatch<NSchedule.IActions>) => (params: Omit<NSchedule.IEventsFetchStart, 'type'>) =>
     dispatch({ type: NSchedule.ActionTypes.EVENTS_FETCH_START, ...params }),
   eventsSet: (dispatch: Dispatch<NSchedule.IActions>) => (params: Omit<NSchedule.IEventsSet, 'type'>) =>

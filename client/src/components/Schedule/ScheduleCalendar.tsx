@@ -5,7 +5,7 @@ import { Event } from 'services/event';
 import { ScheduleStore } from 'components/Schedule/store';
 
 export function ScheduleCalendar() {
-  const { timeZone } = ScheduleStore.useSelector(ScheduleStore.selectors.getUser),
+  const timeZone = ScheduleStore.useSelector(ScheduleStore.selectors.getUserPreferredTimezone),
     eventsMap = ScheduleStore.useSelector(ScheduleStore.selectors.getEventsMap),
     eventIdsByDate = React.useMemo(
       () =>
