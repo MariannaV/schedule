@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Typography, Tag } from 'antd';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import { FixedSizeList as List } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { Event, EventTypeColor, EventTypeToName } from 'services/event';
@@ -93,20 +93,29 @@ function ListItem(props: IListItem) {
       </main>
 
       <footer>
-        <Typography.Text children={`Start: ${formatDate(eventData.dateTime)}`} className={listStyles.dateStart} />
+        <Typography.Text className={listStyles.dateStart}>
+          <span children="Start: " />
+          <Date date={eventData.dateTime} />
+        </Typography.Text>
         {eventData.deadLine && (
-          <Typography.Text
-            children={`Deadline: ${formatDate(eventData.deadLine)}`}
-            className={listStyles.dateDeadline}
-          />
+          <Typography.Text className={listStyles.dateDeadline}>
+            <span children="Deadline: " />
+            <Date date={eventData.deadLine} />
+          </Typography.Text>
         )}
       </footer>
     </article>
   );
+}
 
-  function formatDate(date) {
-    return moment(date, 'YYYY-MM-DD HH:mm').format('DD.MM.YYYY HH:mm');
-  }
+function Date(props: { date: string }) {
+  const timeZone = ScheduleStore.useSelector(ScheduleStore.selectors.getUserPreferredTimezone),
+    formattedDate = React.useMemo(
+      () => moment(props.date, 'YYYY-MM-DD HH:mmZ').tz(timeZone).format('YYYY-MM-DD HH:mm'),
+      [props.date, timeZone],
+    );
+
+  return <>{formattedDate}</>;
 }
 
 function ScheduleListHeader() {
