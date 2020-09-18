@@ -2,7 +2,7 @@ import React from 'react';
 import { Calendar, Badge } from 'antd';
 import { Event } from 'services/event';
 import { ScheduleStore } from 'components/Schedule/store';
-import { dateRenderer } from 'components/Schedule/ScheduleTable';
+import { dateRenderer } from 'components/Schedule/ScheduleTable/ScheduleTable';
 
 export function ScheduleCalendar() {
   const { timeZone } = ScheduleStore.useSelector(ScheduleStore.selectors.getUser),
