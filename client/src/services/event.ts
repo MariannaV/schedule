@@ -11,6 +11,8 @@ export interface Event {
   dateTime: string;
   place: string;
   comment: string;
+  checker: string;
+  organizer: string;
 }
 
 export enum eventTypes {

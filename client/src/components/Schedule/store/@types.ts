@@ -16,6 +16,7 @@ export namespace NSchedule {
       role: UserRoles;
       timeZone: string;
       scheduleView: ScheduleView;
+      isActiveDates: boolean;
     };
   }
 
@@ -50,7 +51,8 @@ export namespace NSchedule {
     | IEventCreate
     | IEventDelete
     | IDetailViewModeChange
-    | IDetailViewSetOpened;
+    | IDetailViewSetOpened
+    | IIsActiveDatesSet;
 
   export enum ActionTypes {
     USER_ROLE_CHANGE,
@@ -58,6 +60,7 @@ export namespace NSchedule {
     USER_SCHEDULE_VIEW_CHANGE,
     EVENTS_FETCH_START,
     EVENTS_SET,
+    IS_ACTIVE_DATES_SET,
     EVENT_CREATE,
     EVENT_DELETE,
     DETAIL_VIEW_MODE_CHANGE,
@@ -93,6 +96,13 @@ export namespace NSchedule {
     type: ActionTypes.EVENTS_SET;
     payload: {
       events: Array<Event>;
+    };
+  }
+
+  export interface IIsActiveDatesSet {
+    type: ActionTypes.IS_ACTIVE_DATES_SET;
+    payload: {
+      isActiveDates: boolean;
     };
   }
 

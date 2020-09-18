@@ -1,0 +1,108 @@
+@import '../../../styles/variables.scss';
+
+.btn {
+  margin-right: 10px;
+}
+
+.check {
+  background-color: $color-btn-check;
+  border-color: $color-btn-check;
+  &:hover {
+    background-color: $color-btn-check-hover;
+    border-color: $color-btn-check-hover;
+  }
+  &:active,  &:focus {
+    background-color: $color-btn-check-active;
+    border-color: $color-btn-check-active;
+  }
+}
+
+.submit {
+  background-color: $color-btn-submit;
+  border-color: $color-btn-submit;
+  &:hover {
+    background-color: $color-btn-submit-hover;
+    border-color: $color-btn-submit-hover;
+  }
+  &:active, &:focus {
+    &:hover {
+      background-color: $color-btn-submit-active;
+      border-color: $color-btn-submit-active;
+    }
+  }
+}
+
+.codejam, .codewars, .course, .task {
+  & td {
+    background-color: $color-task-background;
+  }
+  &:hover > td {
+    background-color: $color-task-background-hover !important;
+  }
+}
+
+.interview {
+  & td {
+    background-color: $color-interview-background;
+  }
+  &:hover > td {
+    background-color: $color-interview-background-hover !important;
+  }
+}
+
+.lecture, .video {
+  & td {
+    background-color: $color-lecture-background;
+  }
+  &:hover > td {
+    background-color: $color-lecture-background-hover !important;
+  }
+}
+
+.self-education {
+  & td {
+    background-color: $color-self-education-background;
+  }
+  &:hover > td {
+    background-color: $color-self-education-background-hover !important;
+  }
+}
+
+.test {
+  & td {
+    background-color: $color-test-background;
+  }
+  &:hover > td {
+    background-color: $color-test-background-hover !important;
+  }
+}
+
+.iconHide {
+  display: none;
+  justify-self: self-end;
+  cursor: pointer;
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.activeRow {
+  & td, td:hover {
+    background: $color-background-active !important;
+  }
+  & .iconHide {
+    display: inline-block;
+  }
+}
+
+.settings {
+  display: flex;
+  align-items: center;
+  & span {
+    cursor: pointer;
+  }
+}
+
+.iconShow {
+  margin-right: 5px;
+}

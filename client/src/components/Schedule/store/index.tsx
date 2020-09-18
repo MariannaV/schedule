@@ -22,6 +22,7 @@ const initialState: NSchedule.IStore = {
     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     role: NSchedule.UserRoles.MENTOR,
     scheduleView: NSchedule.ScheduleView.table,
+    isActiveDates: true,
   },
   //local storage works without Promise, so it gives some troubles
   ...JSON.parse(LocalStorage.getItem(storeKey) ?? '{}'),
@@ -32,6 +33,7 @@ function reducer(store: NSchedule.IStore, action: NSchedule.IActions) {
     case NSchedule.ActionTypes.USER_ROLE_CHANGE:
     case NSchedule.ActionTypes.USER_TIMEZONE_CHANGE:
     case NSchedule.ActionTypes.USER_SCHEDULE_VIEW_CHANGE:
+    case NSchedule.ActionTypes.IS_ACTIVE_DATES_SET:
       return { ...store, user: { ...store.user, ...action.payload } };
 
     case NSchedule.ActionTypes.EVENTS_FETCH_START:
@@ -88,7 +90,7 @@ function reducer(store: NSchedule.IStore, action: NSchedule.IActions) {
   }
 }
 
-export const API_Schedule = {
+const API_Schedule = {
   userRoleChange: (dispatch: Dispatch<NSchedule.IActions>) => (params: Omit<NSchedule.IUserRoleChange, 'type'>) =>
     dispatch({ type: NSchedule.ActionTypes.USER_ROLE_CHANGE, ...params }),
   userTimeZoneChange: (dispatch: Dispatch<NSchedule.IActions>) => (
@@ -101,6 +103,8 @@ export const API_Schedule = {
     dispatch({ type: NSchedule.ActionTypes.EVENTS_FETCH_START }),
   eventsSet: (dispatch: Dispatch<NSchedule.IActions>) => (params: Omit<NSchedule.IEventsSet, 'type'>) =>
     dispatch({ type: NSchedule.ActionTypes.EVENTS_SET, ...params }),
+  isActiveDatesSet: (dispatch: Dispatch<NSchedule.IActions>) => (params: Omit<NSchedule.IIsActiveDatesSet, 'type'>) =>
+    dispatch({ type: NSchedule.ActionTypes.IS_ACTIVE_DATES_SET, ...params }),
   eventCreate: (dispatch: Dispatch<NSchedule.IActions>) => async (params: Omit<NSchedule.IEventCreate, 'type'>) => {
     try {
       const { eventData } = params.payload;

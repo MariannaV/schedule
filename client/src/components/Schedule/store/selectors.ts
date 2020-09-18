@@ -39,6 +39,9 @@ export const scheduleSelectors = {
   get getUserPreferredScheduleView() {
     return createSelector(this.getUser, (user) => user.scheduleView);
   },
+  get getUserIsActiveDates() {
+    return createSelector(this.getUser, (user) => user.isActiveDates);
+  },
   get getDetailView() {
     return createSelector(
       (store: NSchedule.IStore) => store,
