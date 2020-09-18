@@ -31,6 +31,28 @@ function converttoPDF() {
   });
 }
 
+function downloadTxtFile(eventsMap) {
+  const element = document.createElement('a');
+  const contenttxt = Object.keys(eventsMap).map(
+    (key) =>
+      `
+    ${eventsMap[key].type}: ${eventsMap[key].name}\r
+    Date: ${eventsMap[key].dateTime} (timeZone: ${eventsMap[key].timeZone})\r
+    Place: ${eventsMap[key].place}\r
+    Description: ${eventsMap[key].description}\r
+    -------------------------------------------\r
+    `,
+  );
+  const file = new Blob(contenttxt, { type: 'text/plain' });
+  element.href = URL.createObjectURL(file);
+  element.download = 'RSFile.txt';
+  document.body.appendChild(element); // Required for this to work in FireFox
+  element.click();
+  // new form here
+  console.log(typeof eventsMap);
+  console.log(contenttxt);
+}
+
 function SchedulePage() {
   const [currentView, changeView] = React.useState<View>(View.table);
 
@@ -63,7 +85,8 @@ interface IScheduleHeader {
 
 const ScheduleHeader = React.memo((props: IScheduleHeader) => {
   const { store, dispatch } = React.useContext(ScheduleStore.context),
-    isMentor = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsMentor);
+    isMentor = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsMentor),
+    eventsMap = ScheduleStore.useSelector(ScheduleStore.selectors.getEventsMap);
 
   const onToggleUserMode = React.useCallback(() => {
       API_Schedule.userRoleChange(dispatch)({
@@ -87,7 +110,7 @@ const ScheduleHeader = React.memo((props: IScheduleHeader) => {
       <Menu.Item key="1" onClick={() => converttoPDF()}>
         to PDF format
       </Menu.Item>
-      <Menu.Item key="2" onClick={() => alert(`saving to TXT`)}>
+      <Menu.Item key="2" onClick={() => downloadTxtFile(eventsMap)}>
         to TXT format
       </Menu.Item>
     </Menu>
