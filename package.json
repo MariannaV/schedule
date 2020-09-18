@@ -39,7 +39,10 @@
   "optionalDependencies": {
     "husky": "4.2.5",
     "lint-staged": "10.2.11",
-    "netlify-cli": "2.59.0",
-    "npm-check-updates": "7.0.3"
+    "npm-check-updates": "7.0.3",
+    "netlify-cli": "2.59.0"
+  },
+  "dependencies": {
+    "sass": "^1.26.10"
   }
 }

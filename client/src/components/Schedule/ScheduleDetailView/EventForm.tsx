@@ -6,13 +6,9 @@ import { FormItem } from 'components/Forms/FormItem';
 import { NSchedule, ScheduleStore } from 'components/Schedule/store';
 import formStyles from './ScheduleDetailView.module.scss';
 
-interface IEventForm {
-  eventId?: Event['id'];
-  formData?: Event;
-}
-
-function EventForm(props: IEventForm) {
-  const { eventId, formData } = props;
+function EventForm() {
+  const eventId = ScheduleStore.useSelector(ScheduleStore.selectors.getDetailViewOpenedId),
+    eventData = ScheduleStore.useSelector(ScheduleStore.selectors.getEvent({ eventId }));
 
   const { dispatch } = React.useContext(ScheduleStore.context),
     isMentor = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsMentor),
@@ -47,10 +43,17 @@ function EventForm(props: IEventForm) {
     );
 
   React.useEffect(
-    function formResetting() {
-      if (!formData) form.resetFields();
+    function formReOpening() {
+      if (eventId) form.setFieldsValue(eventData);
     },
-    [formData],
+    [eventId],
+  );
+
+  React.useEffect(
+    function formResetting() {
+      if (formMode === NSchedule.FormModes.CREATE) form.resetFields();
+    },
+    [formMode],
   );
 
   React.useEffect(
@@ -69,7 +72,7 @@ function EventForm(props: IEventForm) {
     <Form
       name="eventForm"
       form={form}
-      initialValues={props.formData}
+      initialValues={eventData}
       className={formStyles.EventForm}
       layout="vertical"
       scrollToFirstError

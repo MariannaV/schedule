@@ -55,14 +55,23 @@ const ScheduleHeader = React.memo((props: IScheduleHeader) => {
         },
       });
     }, [store.user.role]),
-    onChangeTimeZone = React.useCallback(() => {
-      API_Schedule.userRoleChange(dispatch)({
+    onChangeTimeZone = React.useCallback(
+      (timeZone) => {
+        API_Schedule.userTimeZoneChange(dispatch)({
+          payload: {
+            timeZone,
+          },
+        });
+      },
+      [store.user.timeZone],
+    ),
+    onToggleActiveDates = React.useCallback(() => {
+      API_Schedule.isActiveDatesSet(dispatch)({
         payload: {
-          role:
-            store.user.role === NSchedule.UserRoles.MENTOR ? NSchedule.UserRoles.STUDENT : NSchedule.UserRoles.MENTOR,
+          isActiveDates: store.user.isActiveDates = !store.user.isActiveDates,
         },
       });
-    }, [store.user.role]);
+    }, [store.user.isActiveDates]);
 
   return (
     <>
@@ -83,7 +92,13 @@ const ScheduleHeader = React.memo((props: IScheduleHeader) => {
           <Select.Option value={View.calendar}>Calendar</Select.Option>
         </Select>
       </Row>
-      <Row justify="end" style={{ marginBottom: '10px' }}>
+      <Row justify="space-between" style={{ marginBottom: 10 }}>
+        <Switch
+          checkedChildren="Only active"
+          unCheckedChildren="All events"
+          defaultChecked={store.user.isActiveDates}
+          onClick={onToggleActiveDates}
+        />
         <Switch
           checkedChildren="mentor"
           unCheckedChildren="student"
