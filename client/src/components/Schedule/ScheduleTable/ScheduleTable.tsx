@@ -79,8 +79,7 @@ export function ScheduleTable() {
               },
             };
           }}
-          pagination={false}
-          size="small"
+          pagination={{ position: ['bottomRight'], showSizeChanger: true }}
           dataSource={
             isActiveDates
               ? tableData.filter(
