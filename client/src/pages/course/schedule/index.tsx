@@ -48,9 +48,6 @@ function downloadTxtFile(eventsMap) {
   element.download = 'RSFile.txt';
   document.body.appendChild(element); // Required for this to work in FireFox
   element.click();
-  // new form here
-  console.log(typeof eventsMap);
-  console.log(contenttxt);
 }
 
 function SchedulePage() {
