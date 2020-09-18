@@ -4,17 +4,7 @@ import { Event } from 'services/event';
 import { ScheduleStore } from 'components/Schedule/store';
 import { dateRenderer } from 'components/Schedule/ScheduleTable';
 import ScheduleStyles from './ScheduleCalendar.module.scss';
-
-const tagColors = {
-  codejam: 'green',
-  codewars: 'green',
-  course: 'green',
-  interview: 'volcano',
-  lecture: 'purple',
-  'self-education': 'gold',
-  task: 'green',
-  test: 'cyan',
-};
+import './ScheduleCalendar.module.scss';
 
 export function ScheduleCalendar({ props }) {
   const { isReadOnly = false, className } = props,
@@ -25,6 +15,16 @@ export function ScheduleCalendar({ props }) {
 
   const { timeZone } = ScheduleStore.useSelector(ScheduleStore.selectors.getUser),
     eventsMap = ScheduleStore.useSelector(ScheduleStore.selectors.getEventsMap),
+    eventTypesByDate = React.useMemo(
+      () =>
+        (Object.values(eventsMap) as Array<Event>).reduce((acc, currentEvent) => {
+          const currentType = dateRenderer(currentEvent.timeZone)(currentEvent.dateTime);
+          if (!(currentType in acc)) acc[currentType] = [];
+          acc[currentType].push(currentEvent.type);
+          return acc;
+        }, {} as Record<string, Array<Event['type']>>),
+      [eventsMap],
+    ),
     eventIdsByDate = React.useMemo(
       () =>
         (Object.values(eventsMap) as Array<Event>).reduce((acc, currentEvent) => {
@@ -40,6 +40,7 @@ export function ScheduleCalendar({ props }) {
     const currentDate = dateRenderer(timeZone)(value),
       isMentor = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsMentor),
       currentEvents = eventIdsByDate[currentDate];
+    const currentTypes = eventTypesByDate[currentDate];
 
     if (!currentEvents)
       return (
@@ -49,7 +50,7 @@ export function ScheduleCalendar({ props }) {
       );
 
     return (
-      <section style={{ backgroundColor: 'red' }} className="events">
+      <section className={`${currentTypes}`}>
         {isMentor && <Button children="+" type="primary" size="small" onClick={handleMouseClick} />}
         {currentEvents.map((eventId) => (
           <CalendarEvent eventId={eventId} key={eventId} eventDeadline={''} />

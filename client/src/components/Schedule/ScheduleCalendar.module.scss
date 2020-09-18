@@ -1,7 +1,7 @@
-@import '../../../styles/variables.scss';
+@import 'variables.scss';
 
-.btn {
-  margin-right: 10px;
+.course {
+  background-color: red !important;
 }
 
 .check {
@@ -33,7 +33,8 @@
 }
 
 .codejam, .codewars, .course, .task {
-  background-color: $color-task-background;
+  // background-color: $color-task-background;
+  background-color: red;
   & .ant-table-column-sort {
     background-color: $color-task-background;
   }
@@ -68,6 +69,14 @@
 }
 
 .calendar {
+  .codejam, .codewars, .course, .task {
+    // background-color: $color-task-background;
+    background-color: red;
+    & .ant-table-column-sort {
+      background-color: $color-task-background;
+    }
+  }
+
   [class~='ant-radio-button-wrapper']:last-child {
     display: none;
   }
