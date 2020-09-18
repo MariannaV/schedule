@@ -1,12 +1,12 @@
 import React from 'react';
-import { Form, Checkbox, Switch } from 'antd';
+import { Form, Checkbox, Switch, Tag } from 'antd';
 import moment from 'moment';
 import { FormItemProps } from 'antd/lib/form';
 import formItemStyles from './FormItem.module.scss';
 
 interface IFormItem extends FormItemProps {
   isReadOnly?: boolean;
-  type: 'input' | 'select' | 'time' | 'checkbox' | 'switch';
+  type: 'input' | 'select' | 'time' | 'checkbox' | 'switch' | 'files';
   name: string;
 }
 
@@ -28,7 +28,7 @@ export const FormItem: React.FC<IFormItem> = React.memo((props) => {
 
 interface IFieldView {
   type: IFormItem['type'];
-  value?: string;
+  value?: any;
 }
 
 function FieldView(props: IFieldView) {
@@ -45,14 +45,20 @@ function FieldView(props: IFieldView) {
         case 'switch':
           return <Switch disabled checked={!!value} />;
 
+        case 'files': {
+          const files = value?.fileList ?? value ?? Array.prototype;
+          return files.map((file) => <Tag children={file.name} />);
+        }
+
         default:
           return value;
       }
     }, [value, type]);
 
   React.useEffect(function hideEmptyField() {
-    const formItemNode = (ref.current as any).closest('.ant-form-item');
-    if (!fieldValue) formItemNode.classList.add('isEmpty');
+    const formItemNode = (ref.current as any).closest('.ant-form-item'),
+      isEmptyField = !fieldValue || (Array.isArray(fieldValue) && !fieldValue.length);
+    if (isEmptyField) formItemNode.classList.add('isEmpty');
     return () => formItemNode.classList.remove('isEmpty');
   }, []);
 

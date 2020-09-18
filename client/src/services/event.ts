@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import { UploadFile } from 'antd/lib/upload/interface';
 import { ScheduleStore, API_Schedule } from 'components/Schedule/store';
 import { IComments } from 'components/Comments';
 
@@ -15,6 +16,7 @@ export interface Event {
   place: string;
   commentsEnabled: boolean;
   comments: Array<IComments.Comment>;
+  attachments: Array<UploadFile>;
 }
 
 export enum eventTypes {

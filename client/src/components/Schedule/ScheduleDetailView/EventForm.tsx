@@ -1,5 +1,6 @@
 import React from 'react';
-import { Form, Input, Select, Switch, Button } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
+import { Form, Input, Select, Switch, Upload, Button } from 'antd';
 import { Event, eventTypes } from 'services/event';
 import { FieldTimezone } from 'components/Forms/fields';
 import { FormItem } from 'components/Forms/FormItem';
@@ -20,6 +21,12 @@ function EventForm() {
     [isSubmitting, setSubmitting] = React.useState<null | boolean>(null),
     onSubmit = React.useCallback(
       async (sendingData: Event) => {
+        sendingData = {
+          ...sendingData,
+          // @ts-ignore
+          attachments: sendingData.attachments.fileList,
+        };
+
         try {
           setSubmitting(true);
           if (isCreation) {
@@ -155,6 +162,12 @@ function EventForm() {
       </Input.Group>
 
       <FormItem label="Place" name="place" type="input" children={<Input />} isReadOnly={isReadOnly} />
+
+      <FormItem label="Attachments" name="attachments" type="files" isReadOnly={isReadOnly}>
+        <Upload multiple={true}>
+          <Button icon={<UploadOutlined />} children="Click to upload" />
+        </Upload>
+      </FormItem>
 
       <FormItem
         label="Feedback is allowed"
