@@ -5,6 +5,17 @@ import { ScheduleStore } from 'components/Schedule/store';
 import { dateRenderer } from 'components/Schedule/ScheduleTable';
 import ScheduleStyles from './ScheduleCalendar.module.scss';
 
+const tagColors = {
+  codejam: 'green',
+  codewars: 'green',
+  course: 'green',
+  interview: 'volcano',
+  lecture: 'purple',
+  'self-education': 'gold',
+  task: 'green',
+  test: 'cyan',
+};
+
 export function ScheduleCalendar({ props }) {
   const { isReadOnly = false, className } = props,
     classes = React.useMemo(
