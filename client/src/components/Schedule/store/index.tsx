@@ -6,6 +6,8 @@ import { LocalStorage } from 'utils/localStorage';
 
 export { NSchedule };
 
+const storeKey = 'ScheduleStore';
+
 const initialState: NSchedule.IStore = {
   events: {
     list: [],
@@ -21,6 +23,8 @@ const initialState: NSchedule.IStore = {
     role: NSchedule.UserRoles.MENTOR,
     scheduleView: NSchedule.ScheduleView.table,
   },
+  //local storage works without Promise, so it gives some troubles
+  ...JSON.parse(LocalStorage.getItem(storeKey) ?? '{}'),
 };
 
 function reducer(store: NSchedule.IStore, action: NSchedule.IActions) {
@@ -132,14 +136,9 @@ export const API_Schedule = {
 
 const storeContext = React.createContext<NSchedule.IStoreContext>(null!);
 
-const storeKey = 'ScheduleStore';
-
 const StoreProvider: React.FC = (props) => {
   // @ts-ignore
-  const [store, dispatch] = React.useReducer(reducer, {
-      ...initialState,
-      ...JSON.parse(LocalStorage.getItem(storeKey) ?? '{}'),
-    }),
+  const [store, dispatch] = React.useReducer(reducer, initialState),
     contextValue = React.useMemo(() => ({ store, dispatch }), [store]);
 
   React.useEffect(

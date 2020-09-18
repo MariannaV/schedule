@@ -1,6 +1,4 @@
-import React from 'react';
 import axios from 'axios';
-import { ScheduleStore, API_Schedule } from 'components/Schedule/store';
 
 export interface Event {
   id: string;
@@ -98,36 +96,7 @@ export class EventService {
   }
 }
 
-const hooks = {
-  useEventsData() {
-    const { store, dispatch } = React.useContext(ScheduleStore.context),
-      eventsData = store.events,
-      [eventsLoading, setLoading] = React.useState<null | boolean>(null);
-
-    React.useEffect(() => {
-      const isFirstFetching = !eventsData.list.length;
-      if (isFirstFetching && !eventsLoading) fetchEventsData();
-
-      async function fetchEventsData() {
-        setLoading(true);
-        try {
-          const events = await new EventService().getEvents();
-          API_Schedule.eventsSet(dispatch)({
-            payload: {
-              events,
-            },
-          });
-        } catch (error) {
-          console.error(error);
-        } finally {
-          setLoading(false);
-        }
-      }
-    }, [eventsData, eventsLoading]);
-
-    return React.useMemo(() => ({ eventsLoading, eventsData }), [eventsLoading, eventsData]);
-  },
-};
+const hooks = {};
 
 export const API_Events = {
   EventService,

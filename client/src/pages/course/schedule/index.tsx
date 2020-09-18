@@ -5,45 +5,39 @@ import { FieldTimezone } from 'components/Forms/fields';
 import { ScheduleTable, ScheduleListWrapper, ScheduleCalendar } from 'components/Schedule';
 import { NSchedule } from 'components/Schedule/store/@types';
 import { ScheduleStore, API_Schedule } from 'components/Schedule/store';
-import { API_Events } from 'services/event';
+import { EventService } from 'services/event';
 
-enum View {
-  table = 'Table',
-  list = 'List',
-  calendar = 'Calendar',
-}
+const SchedulePageWrapper = () => (
+  <ScheduleStore.provider>
+    <FetcherCommonData />
+    <SchedulePage />
+  </ScheduleStore.provider>
+);
 
 function SchedulePage() {
-  const [currentView, changeView] = React.useState<View>(View.table);
-
-  const ScheduleView = React.useCallback(() => {
-    switch (currentView) {
-      case View.list:
-        return <ScheduleListWrapper />;
-      case View.calendar:
-        return <ScheduleCalendar />;
-      case View.table:
-      default:
-        return <ScheduleTable />;
-    }
-  }, [currentView]);
-
+  const isLoading = ScheduleStore.useSelector(ScheduleStore.selectors.getEventsLoading);
   return (
-    <ScheduleStore.provider>
-      <PageLayout title="Schedule" githubId={'props.session.githubId'} loading={false}>
-        <ScheduleHeader onChangeViewMode={changeView} />
-        <ScheduleView />
-      </PageLayout>
-      <FetcherCommonData />
-    </ScheduleStore.provider>
+    <PageLayout title="Schedule" githubId={'props.session.githubId'} loading={isLoading}>
+      <ScheduleHeader />
+      <ScheduleView />
+    </PageLayout>
   );
 }
 
-interface IScheduleHeader {
-  onChangeViewMode: (nextView: View) => void;
-}
+const ScheduleView = React.memo(() => {
+  const scheduleView = ScheduleStore.useSelector(ScheduleStore.selectors.getUserPreferredScheduleView);
+  switch (scheduleView) {
+    case NSchedule.ScheduleView.list:
+      return <ScheduleListWrapper />;
+    case NSchedule.ScheduleView.calendar:
+      return <ScheduleCalendar />;
+    case NSchedule.ScheduleView.table:
+    default:
+      return <ScheduleTable />;
+  }
+});
 
-const ScheduleHeader = React.memo((props: IScheduleHeader) => {
+const ScheduleHeader = React.memo(() => {
   const { dispatch } = React.useContext(ScheduleStore.context),
     userRole = ScheduleStore.useSelector(ScheduleStore.selectors.getUserRole),
     isMentor = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsMentor),
@@ -92,7 +86,6 @@ const ScheduleHeader = React.memo((props: IScheduleHeader) => {
         </Select>
       </Row>
       <Row justify="end" style={{ marginBottom: '10px' }}>
-        {console.log('@@', timeZone)}
         <Switch
           unCheckedChildren="student"
           checkedChildren="mentor"
@@ -105,8 +98,27 @@ const ScheduleHeader = React.memo((props: IScheduleHeader) => {
 });
 
 function FetcherCommonData() {
-  API_Events.hooks.useEventsData();
+  const { dispatch } = React.useContext(ScheduleStore.context);
+
+  React.useEffect(function fetchData() {
+    fetchEventsData();
+
+    async function fetchEventsData() {
+      try {
+        API_Schedule.eventsFetchStart(dispatch)();
+        const events = await new EventService().getEvents();
+        API_Schedule.eventsSet(dispatch)({
+          payload: {
+            events,
+          },
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  }, []);
+
   return null;
 }
 
-export default SchedulePage;
+export default SchedulePageWrapper;
