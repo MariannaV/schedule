@@ -1,15 +1,13 @@
-import { QuestionCircleOutlined, YoutubeOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
-import { Table, Tag, Tooltip, Spin, Button } from 'antd';
-import { useRouter } from 'next/router';
-import { GithubUserLink } from 'components';
 import React from 'react';
-import { useState } from 'react';
 import moment from 'moment-timezone';
-import { API_Events, Event } from '../../../services/event';
-import { rowsFilter, defaultColumnsFilter } from './config';
+import { QuestionCircleOutlined, YoutubeOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
+import { Table, Tag, Tooltip, Button } from 'antd';
+import { useRouter } from 'next/router';
+import { Event } from 'services/event';
+import { GithubUserLink } from 'components';
+import { ScheduleStore } from 'components/Schedule/store';
 import { Filter } from './components/Filter/Filter';
-import { ScheduleStore } from '../store';
-
+import { rowsFilter, defaultColumnsFilter } from './config';
 import styles from './style.module.scss';
 
 const tagColors = {
@@ -32,26 +30,22 @@ function isRowDisabled(dateTime, deadLine) {
 }
 
 export function ScheduleTable() {
-  const { store } = React.useContext(ScheduleStore.context),
-    { timeZone, isActiveDates } = store.user;
-
-  const { eventsLoading, eventsData } = API_Events.hooks.useEventsData(),
+  const timeZone = ScheduleStore.useSelector(ScheduleStore.selectors.getUserPreferredTimezone),
+    isActiveDates = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsActiveDates),
+    eventsData = ScheduleStore.useSelector(ScheduleStore.selectors.getEvents),
     tableData = React.useMemo(() => eventsData.list.map((eventId) => eventsData.map[eventId]), [eventsData]);
-  console.log(tableData);
 
-  const [checkedColumns, setCheckedColumns] = useState(defaultColumnsFilter);
-  const [selectedRows, setSelectedRows] = useState([] as string[]);
-  const [hiddenRows, setHiddenRows] = useState([] as string[]);
+  const [checkedColumns, setCheckedColumns] = React.useState(defaultColumnsFilter);
+  const [selectedRows, setSelectedRows] = React.useState([] as string[]);
+  const [hiddenRows, setHiddenRows] = React.useState([] as string[]);
 
-  const hideRows = () => {
-    console.log('hide');
+  const hideRows = React.useCallback(() => {
     setHiddenRows([...selectedRows, ...hiddenRows]);
-    console.log(selectedRows, hiddenRows);
     setSelectedRows([]);
-  };
+  }, []);
 
   return (
-    <Spin spinning={!!eventsLoading}>
+    <>
       <div className={styles.settings}>
         <Filter
           checkedColumns={checkedColumns}
@@ -71,7 +65,6 @@ export function ScheduleTable() {
           onRow={(record) => {
             return {
               onClick: (e) => {
-                console.log(record);
                 if ((e.target as HTMLElement).closest('[data-icon="eye-invisible"]')) {
                   hideRows();
                   return;
@@ -205,7 +198,7 @@ export function ScheduleTable() {
           ].filter((column) => checkedColumns.includes(column.title))}
         />
       )}
-    </Spin>
+    </>
   );
 }
 

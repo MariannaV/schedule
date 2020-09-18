@@ -1,6 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-import { ScheduleStore, API_Schedule } from 'components/Schedule/store';
+import { ScheduleStore } from 'components/Schedule/store';
 
 export interface Event {
   deadLine: string;
@@ -114,7 +114,7 @@ const hooks = {
         setLoading(true);
         try {
           const events = await new EventService().getEvents();
-          API_Schedule.eventsSet(dispatch)({
+          ScheduleStore.API.eventsSet(dispatch)({
             payload: {
               events,
             },

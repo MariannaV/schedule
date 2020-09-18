@@ -7,7 +7,7 @@ import { PageLayout } from 'components';
 import { FieldTimezone } from 'components/Forms/fields';
 import { ScheduleTable, ScheduleListWrapper, ScheduleCalendar } from 'components/Schedule';
 import { NSchedule } from 'components/Schedule/store/@types';
-import { ScheduleStore, API_Schedule } from 'components/Schedule/store';
+import { ScheduleStore } from 'components/Schedule/store';
 import { API_Events } from 'services/event';
 
 enum View {
@@ -16,7 +16,7 @@ enum View {
   calendar = 'Calendar',
 }
 
-function converttoPDF() {
+function convertToPDF() {
   const myinput = document.getElementById(`__next`);
   if (!myinput) return;
   html2canvas(myinput).then((canvas) => {
@@ -86,7 +86,7 @@ const ScheduleHeader = React.memo((props: IScheduleHeader) => {
     eventsMap = ScheduleStore.useSelector(ScheduleStore.selectors.getEventsMap);
 
   const onToggleUserMode = React.useCallback(() => {
-      API_Schedule.userRoleChange(dispatch)({
+      ScheduleStore.API.userRoleChange(dispatch)({
         payload: {
           role:
             store.user.role === NSchedule.UserRoles.MENTOR ? NSchedule.UserRoles.STUDENT : NSchedule.UserRoles.MENTOR,
@@ -94,14 +94,14 @@ const ScheduleHeader = React.memo((props: IScheduleHeader) => {
       });
     }, [store.user.role]),
     onChangeTimeZone = React.useCallback((timeZone: NSchedule.IStore['user']['timeZone']) => {
-      API_Schedule.userTimeZoneChange(dispatch)({
+      ScheduleStore.API.userTimeZoneChange(dispatch)({
         payload: {
           timeZone,
         },
       });
     }, []),
     onToggleActiveDates = React.useCallback(() => {
-      API_Schedule.isActiveDatesSet(dispatch)({
+      ScheduleStore.API.isActiveDatesSet(dispatch)({
         payload: {
           isActiveDates: store.user.isActiveDates = !store.user.isActiveDates,
         },
@@ -110,10 +110,10 @@ const ScheduleHeader = React.memo((props: IScheduleHeader) => {
 
   const fileFormatsToSave = (
     <Menu>
-      <Menu.Item key="1" onClick={() => converttoPDF()}>
+      <Menu.Item key="pdf" onClick={convertToPDF}>
         to PDF format
       </Menu.Item>
-      <Menu.Item key="2" onClick={() => downloadTxtFile(eventsMap)}>
+      <Menu.Item key="txt" onClick={() => downloadTxtFile(eventsMap)}>
         to TXT format
       </Menu.Item>
     </Menu>

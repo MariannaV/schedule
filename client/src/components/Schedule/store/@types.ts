@@ -15,7 +15,6 @@ export namespace NSchedule {
     user: {
       role: UserRoles;
       timeZone: string;
-      isMentor: boolean;
       isActiveDates: boolean;
     };
   }
