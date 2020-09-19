@@ -1,14 +1,31 @@
+@import 'variables.scss';
+
 .ScheduleListWrapper {
 }
 
 .ScheduleList {
+  overflow: overlay;
+  &::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #666;
+    border-radius: 20px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #ddd;
+    border-radius: 20px;
+  }
+  
 }
 
 .ScheduleListHeader {
   display: grid;
   grid-template-columns: auto auto;
   justify-content: space-between;
-  align-items: center;
+  align-items: center;  
 }
 
 .ScheduleListHeaderTitle {
@@ -31,6 +48,51 @@
   padding: 1rem;
   border-radius: 5px;
   border: 1px solid #f0f0f0;
+  cursor: pointer;
+
+
+  .codejam, .codewars, .course, .task {
+    background-color: $color-task-background;
+    &:hover {
+      background: rgb(209 233 255);
+      border-radius: 2px;
+    }
+    & .ant-table-column-sort {
+      background-color: $color-task-background;
+    }
+  }
+  
+  .interview {
+    background-color: $color-interview-background;
+    &:hover {
+      background: rgb(209 233 255);
+      border-radius: 2px;
+    }
+  }
+  
+  .lecture {
+    background-color: $color-lecture-background;
+    &:hover {
+      background: rgb(209 233 255);
+      border-radius: 2px;
+    }
+  }
+  
+  .self-education {
+    background-color: $color-self-education-background;
+    &:hover {
+      background: rgb(209 233 255);
+      border-radius: 2px;
+    }
+  }
+  
+  .test {
+    background-color: $color-test-background;
+    &:hover {
+      background: rgb(209 233 255);
+      border-radius: 2px;
+    }
+  }
 
   & > header {
     display: flex;
@@ -69,5 +131,6 @@
 
   &.isOpened {
     border-color: lightskyblue;
+    background-color: #e6f7ff;
   }
 }
