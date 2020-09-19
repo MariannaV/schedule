@@ -1,4 +1,10 @@
-import { QuestionCircleOutlined, YoutubeOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
+import {
+  QuestionCircleOutlined,
+  YoutubeOutlined,
+  EyeOutlined,
+  EyeInvisibleOutlined,
+  ExclamationCircleTwoTone,
+} from '@ant-design/icons';
 import { Table, Tag, Tooltip, Spin, Button } from 'antd';
 import { useRouter } from 'next/router';
 import { GithubUserLink } from 'components';
@@ -23,9 +29,9 @@ const tagColors = {
   test: 'cyan',
   video: 'purple',
 };
+const startOfToday = moment().startOf('day');
 
 function isRowDisabled(dateTime, deadLine) {
-  const startOfToday = moment().startOf('day');
   return deadLine
     ? moment(dateTime).isBefore(startOfToday) && moment(deadLine).isBefore(startOfToday)
     : moment(dateTime).isBefore(startOfToday);
@@ -37,16 +43,13 @@ export function ScheduleTable() {
 
   const { eventsLoading, eventsData } = API_Events.hooks.useEventsData(),
     tableData = React.useMemo(() => eventsData.list.map((eventId) => eventsData.map[eventId]), [eventsData]);
-  console.log(tableData);
 
   const [checkedColumns, setCheckedColumns] = useState(defaultColumnsFilter);
   const [selectedRows, setSelectedRows] = useState([] as string[]);
   const [hiddenRows, setHiddenRows] = useState([] as string[]);
 
   const hideRows = () => {
-    console.log('hide');
     setHiddenRows([...selectedRows, ...hiddenRows]);
-    console.log(selectedRows, hiddenRows);
     setSelectedRows([]);
   };
 
@@ -71,7 +74,6 @@ export function ScheduleTable() {
           onRow={(record) => {
             return {
               onClick: (e) => {
-                console.log(record);
                 if ((e.target as HTMLElement).closest('[data-icon="eye-invisible"]')) {
                   hideRows();
                   return;
@@ -123,9 +125,32 @@ export function ScheduleTable() {
             },
             {
               title: 'DeadLine',
-              width: 180,
+              width: 225,
               dataIndex: 'deadLine',
-              render: dateRenderer(timeZone),
+              render: (value: string) => {
+                if (!value) return;
+                if (moment(value).isBefore(startOfToday)) {
+                  return dateRenderer(timeZone)(value);
+                }
+                let deadline = 'deadline';
+                if (moment(value).subtract(7, 'days').isBefore(startOfToday)) {
+                  deadline = 'deadline_coming';
+                }
+                if (moment(value).subtract(3, 'days').isBefore(startOfToday)) {
+                  deadline = 'deadline_close';
+                }
+                const warning = moment(value).subtract(1, 'days').isBefore(moment());
+                return (
+                  <div className={styles[deadline]}>
+                    <span>{dateRenderer(timeZone)(value)}</span>
+                    {warning && (
+                      <Tooltip title="Only one day left!">
+                        <ExclamationCircleTwoTone twoToneColor="#F5222D" style={{ fontSize: 22 }} />
+                      </Tooltip>
+                    )}
+                  </div>
+                );
+              },
               sorter: (a, b) => (a.deadLine > b.deadLine ? 1 : -1),
               sortDirections: ['ascend', 'descend', 'ascend'],
             },

@@ -106,3 +106,23 @@
 .iconShow {
   margin-right: 5px;
 }
+
+.deadline_close, .deadline_coming {
+  padding: 0 10px;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.deadline_close {
+  background-color: $color-deadline-close;
+}
+
+.deadline_coming {
+  background-color: $color-deadline-coming;
+}
