@@ -54,8 +54,8 @@ export function ScheduleCalendar({ props }) {
     return (
       <section>
         {isMentor && <Button children="+" type="primary" size="small" onClick={handleMouseClick} />}
-        {currentEvents.map((eventId) => (
-          <section className={calendarStyles[currentTypes]}>
+        {currentEvents.map((eventId, index) => (
+          <section className={calendarStyles[currentTypes[index]]}>
             <CalendarEvent eventId={eventId} key={eventId} />
           </section>
         ))}

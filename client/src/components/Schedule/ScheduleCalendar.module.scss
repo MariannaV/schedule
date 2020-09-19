@@ -1,36 +1,12 @@
 @import 'variables.scss';
 
 .calendar {
-  .check {
-    background-color: $color-btn-check;
-    border-color: $color-btn-check;
-    &:hover {
-      background-color: $color-btn-check-hover;
-      border-color: $color-btn-check-hover;
-    }
-    &:active,  &:focus {
-      background-color: $color-btn-check-active;
-      border-color: $color-btn-check-active;
-    }
-  }
-  
-  .submit {
-    background-color: $color-btn-submit;
-    border-color: $color-btn-submit;
-    &:hover {
-      background-color: $color-btn-submit-hover;
-      border-color: $color-btn-submit-hover;
-    }
-    &:active, &:focus {
-      &:hover {
-        background-color: $color-btn-submit-active;
-        border-color: $color-btn-submit-active;
-      }
-    }
-  }
-  
   .codejam, .codewars, .course, .task {
     background-color: $color-task-background;
+    &:hover {
+      background: rgb(209 233 255);
+      border-radius: 2px;
+    }
     & .ant-table-column-sort {
       background-color: $color-task-background;
     }
@@ -38,39 +14,40 @@
   
   .interview {
     background-color: $color-interview-background;
-    & .ant-table-column-sort {
-      background-color: $color-interview-background;
+    &:hover {
+      background: rgb(209 233 255);
+      border-radius: 2px;
     }
   }
   
   .lecture {
     background-color: $color-lecture-background;
-    & .ant-table-column-sort {
-      background-color: $color-lecture-background;
+    &:hover {
+      background: rgb(209 233 255);
+      border-radius: 2px;
     }
   }
   
   .self-education {
     background-color: $color-self-education-background;
-    & .ant-table-column-sort {
-      background-color: $color-self-education-background;
+    &:hover {
+      background: rgb(209 233 255);
+      border-radius: 2px;
     }
   }
   
   .test {
     background-color: $color-test-background;
-    & .ant-table-column-sort {
-      background-color: $color-test-background;
+    &:hover {
+      background: rgb(209 233 255);
+      border-radius: 2px;
     }
   }
 
   [class~='ant-radio-button-wrapper']:last-child {
     display: none;
   }
-  [class~='ant-badge-not-a-wrapper']:hover {
-    background: rgb(209 233 255);
-    border-radius: 2px;
-  }
+
   [class~='ant-btn-sm'] {
     position: absolute;
     top: 3px;
