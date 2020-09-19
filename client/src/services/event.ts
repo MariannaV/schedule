@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+// import { UploadFile } from 'antd';
 import { UploadFile } from 'antd/lib/upload/interface';
 import { ScheduleStore, API_Schedule } from 'components/Schedule/store';
 import { IComments } from 'components/Comments';

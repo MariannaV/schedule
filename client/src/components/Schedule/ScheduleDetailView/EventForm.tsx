@@ -1,6 +1,6 @@
 import React from 'react';
 import { UploadOutlined } from '@ant-design/icons';
-import { Form, Input, Select, Switch, Upload, Button } from 'antd';
+import { Form, Input, Select, Switch, Upload, Button, message } from 'antd';
 import { Event, eventTypes } from 'services/event';
 import { FieldTimezone } from 'components/Forms/fields';
 import { FormItem } from 'components/Forms/FormItem';
@@ -8,6 +8,24 @@ import { NSchedule, ScheduleStore } from 'components/Schedule/store';
 import formStyles from './ScheduleDetailView.module.scss';
 
 function EventForm() {
+  const props = {
+    name: 'file',
+    action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
+    headers: {
+      authorization: 'authorization-text',
+    },
+    onChange(info) {
+      if (info.file.status !== 'uploading') {
+        console.log(info.file, info.fileList);
+      }
+      if (info.file.status === 'done') {
+        message.success(`${info.file.name} file uploaded successfully`);
+      } else if (info.file.status === 'error') {
+        message.error(`${info.file.name} file upload failed.`);
+      }
+    },
+  };
+
   const eventId = ScheduleStore.useSelector(ScheduleStore.selectors.getDetailViewOpenedId),
     eventData = ScheduleStore.useSelector(ScheduleStore.selectors.getEvent({ eventId }));
 
@@ -164,7 +182,7 @@ function EventForm() {
       <FormItem label="Place" name="place" type="input" children={<Input />} isReadOnly={isReadOnly} />
 
       <FormItem label="Attachments" name="attachments" type="files" isReadOnly={isReadOnly}>
-        <Upload multiple={true}>
+        <Upload multiple={true} {...props}>
           <Button icon={<UploadOutlined />} children="Click to upload" />
         </Upload>
       </FormItem>
