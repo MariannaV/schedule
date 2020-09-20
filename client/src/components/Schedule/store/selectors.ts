@@ -30,8 +30,14 @@ export const scheduleSelectors = {
   get getUserPreferredTimezone() {
     return createSelector(this.getUser, (user) => user.timeZone);
   },
+  get getUserRole() {
+    return createSelector(this.getUser, (user) => user.role);
+  },
   get getUserIsMentor() {
-    return createSelector(this.getUser, (user) => user.role === NSchedule.UserRoles.MENTOR);
+    return createSelector(this.getUserRole, (userRole) => userRole === NSchedule.UserRoles.MENTOR);
+  },
+  get getUserPreferredScheduleView() {
+    return createSelector(this.getUser, (user) => user.scheduleView);
   },
   get getUserIsActiveDates() {
     return createSelector(this.getUser, (user) => user.isActiveDates);
