@@ -12,7 +12,10 @@ export interface Event {
   deadLine: string;
   type: eventTypes;
   timeZone: string;
-  dateTime: string;
+  dateCreation: string;
+  dateUpdate: string;
+  dateStart: string;
+  dateEnd: string;
   place: string;
   commentsEnabled: boolean;
   comments: Array<IComments.Comment>;

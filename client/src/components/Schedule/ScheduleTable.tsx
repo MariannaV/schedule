@@ -20,10 +20,10 @@ export function ScheduleTable() {
       pagination={false}
       size="small"
       dataSource={tableData}
-      rowClassName={(record) => (moment(record.dateTime).isBefore(startOfToday) ? 'rs-table-row-disabled' : '')}
+      rowClassName={(record) => (moment(record.dateStart).isBefore(startOfToday) ? 'rs-table-row-disabled' : '')}
       columns={[
-        { title: 'Date', width: 120, dataIndex: 'dateTime', render: dateRenderer(timeZone) },
-        { title: 'Time', width: 60, dataIndex: 'dateTime', render: timeRenderer(timeZone) },
+        { title: 'Date', width: 120, dataIndex: 'dateStart', render: dateRenderer(timeZone) },
+        { title: 'Time', width: 60, dataIndex: 'dateStart', render: timeRenderer(timeZone) },
         {
           title: 'Type',
           width: 100,
