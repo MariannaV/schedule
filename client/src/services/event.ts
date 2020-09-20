@@ -1,7 +1,5 @@
-import React from 'react';
 import axios from 'axios';
 import { UploadFile } from 'antd/lib/upload/interface';
-import { ScheduleStore, API_Schedule } from 'components/Schedule/store';
 import { IComments } from 'components/Comments';
 
 export interface Event {
@@ -17,6 +15,8 @@ export interface Event {
   dateStart: string;
   dateEnd: string;
   place: string;
+  checker: string;
+  organizer: string;
   commentsEnabled: boolean;
   comments: Array<IComments.Comment>;
   attachments: Array<UploadFile>;
@@ -111,36 +111,7 @@ export class EventService {
   }
 }
 
-const hooks = {
-  useEventsData() {
-    const { store, dispatch } = React.useContext(ScheduleStore.context),
-      eventsData = store.events,
-      [eventsLoading, setLoading] = React.useState<null | boolean>(null);
-
-    React.useEffect(() => {
-      const isFirstFetching = !eventsData.list.length;
-      if (isFirstFetching && !eventsLoading) fetchEventsData();
-
-      async function fetchEventsData() {
-        setLoading(true);
-        try {
-          const events = await new EventService().getEvents();
-          API_Schedule.eventsSet(dispatch)({
-            payload: {
-              events,
-            },
-          });
-        } catch (error) {
-          console.error(error);
-        } finally {
-          setLoading(false);
-        }
-      }
-    }, [eventsData, eventsLoading]);
-
-    return React.useMemo(() => ({ eventsLoading, eventsData }), [eventsLoading, eventsData]);
-  },
-};
+const hooks = {};
 
 export const API_Events = {
   EventService,

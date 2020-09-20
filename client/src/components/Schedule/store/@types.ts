@@ -16,6 +16,8 @@ export namespace NSchedule {
     user: {
       role: UserRoles;
       timeZone: string;
+      scheduleView: ScheduleView;
+      isActiveDates: boolean;
     };
   }
 
@@ -29,6 +31,12 @@ export namespace NSchedule {
     STUDENT = 'STUDENT',
   }
 
+  export enum ScheduleView {
+    table = 'Table',
+    list = 'List',
+    calendar = 'Calendar',
+  }
+
   export enum FormModes {
     CREATE,
     EDIT,
@@ -38,6 +46,7 @@ export namespace NSchedule {
   export type IActions =
     | IUserRoleChange
     | IUserTimeZoneChange
+    | IUserScheduleViewChange
     | IEventsFetchStart
     | IEventsSet
     | IEventCreate
@@ -45,13 +54,16 @@ export namespace NSchedule {
     | IEventDelete
     | IEventCommentCreate
     | IDetailViewModeChange
-    | IDetailViewSetOpened;
+    | IDetailViewSetOpened
+    | IIsActiveDatesSet;
 
   export enum ActionTypes {
     USER_ROLE_CHANGE,
-    USER_TIMEZONE,
+    USER_TIMEZONE_CHANGE,
+    USER_SCHEDULE_VIEW_CHANGE,
     EVENTS_FETCH_START,
     EVENTS_SET,
+    IS_ACTIVE_DATES_SET,
     EVENT_CREATE,
     EVENT_UPDATE,
     EVENT_DELETE,
@@ -68,9 +80,16 @@ export namespace NSchedule {
   }
 
   export interface IUserTimeZoneChange {
-    type: ActionTypes.USER_TIMEZONE;
+    type: ActionTypes.USER_TIMEZONE_CHANGE;
     payload: {
       timeZone: IStore['user']['timeZone'];
+    };
+  }
+
+  export interface IUserScheduleViewChange {
+    type: ActionTypes.USER_SCHEDULE_VIEW_CHANGE;
+    payload: {
+      scheduleView: IStore['user']['scheduleView'];
     };
   }
 
@@ -82,6 +101,13 @@ export namespace NSchedule {
     type: ActionTypes.EVENTS_SET;
     payload: {
       events: Array<Event>;
+    };
+  }
+
+  export interface IIsActiveDatesSet {
+    type: ActionTypes.IS_ACTIVE_DATES_SET;
+    payload: {
+      isActiveDates: boolean;
     };
   }
 
