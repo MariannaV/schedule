@@ -42,19 +42,10 @@ export function ScheduleCalendar({ props }) {
       currentEvents = eventIdsByDate[currentDate];
     const currentTypes = eventTypesByDate[currentDate];
 
-    if (!currentEvents)
-      return (
-        <section className="events">
-          {isMentor && <Button children="+" type="primary" size="small" onClick={handleMouseClick} />}
-        </section>
-      );
-
-    console.log(calendarStyles);
-
     return (
       <section>
         {isMentor && <Button children="+" type="primary" size="small" onClick={handleMouseClick} />}
-        {currentEvents.map((eventId, index) => (
+        {currentEvents?.map((eventId, index) => (
           <section className={calendarStyles[currentTypes[index]]}>
             <CalendarEvent eventId={eventId} key={eventId} />
           </section>
@@ -66,7 +57,6 @@ export function ScheduleCalendar({ props }) {
   function handleMouseClick() {
     console.log('click');
   }
-
   return <Calendar className={classes} dateCellRender={dateCellRender} />;
 }
 
