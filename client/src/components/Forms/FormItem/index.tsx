@@ -37,6 +37,7 @@ function FieldView(props: IFieldView) {
     fieldValue = React.useMemo(() => {
       switch (type) {
         case 'time':
+          //TODO: need to add selected timezone
           return moment(value).format('DD.MM.YYYY HH:mm');
 
         case 'checkbox':

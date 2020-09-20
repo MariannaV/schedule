@@ -83,7 +83,7 @@ export function ScheduleTable() {
           dataSource={
             isActiveDates
               ? tableData.filter(
-                  (data) => !isRowDisabled(data.dateTime, data.deadLine) && !hiddenRows.includes(data.id),
+                  (data) => !isRowDisabled(data.dateStart, data.dateEnd) && !hiddenRows.includes(data.id),
                 )
               : tableData.filter((data) => !hiddenRows.includes(data.id))
           }
@@ -91,7 +91,7 @@ export function ScheduleTable() {
             if (selectedRows.includes(record.id)) {
               return styles.activeRow;
             }
-            if (isRowDisabled(record.dateTime, record.deadLine)) {
+            if (isRowDisabled(record.dateStart, record.dateEnd)) {
               return 'rs-table-row-disabled';
             }
             return styles[record.type.split(' ').join('')];
@@ -101,10 +101,10 @@ export function ScheduleTable() {
             {
               title: 'Start Date',
               width: 180,
-              dataIndex: 'dateTime',
+              dataIndex: 'dateStart',
               render: dateRenderer(timeZone),
               defaultSortOrder: 'ascend',
-              sorter: (a, b) => (a.dateTime > b.dateTime ? 1 : -1),
+              sorter: (a, b) => (a.dateStart > b.dateStart ? 1 : -1),
               sortDirections: ['ascend', 'descend', 'ascend'],
             },
             {
@@ -116,9 +116,9 @@ export function ScheduleTable() {
             {
               title: 'DeadLine',
               width: 180,
-              dataIndex: 'deadLine',
+              dataIndex: 'dateEnd',
               render: dateRenderer(timeZone),
-              sorter: (a, b) => (a.deadLine > b.deadLine ? 1 : -1),
+              sorter: (a, b) => (a.dateEnd > b.dateEnd ? 1 : -1),
               sortDirections: ['ascend', 'descend', 'ascend'],
             },
             {
