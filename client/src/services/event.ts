@@ -23,10 +23,16 @@ export interface Event {
 }
 
 export enum eventTypes {
-  video = 'Video',
+  codejam = 'Codejam',
+  codewars = 'Codewars',
   course = 'Course',
+  interview = 'Interview',
+  lecture = 'Lecture',
   'self-education' = 'Self-education',
   task = 'Task',
+  test = 'Test',
+  video = 'Video',
+  meetup = 'Meetup',
 }
 
 export enum EventTypeColor {
