@@ -30,7 +30,7 @@ function EventComments() {
     [eventId, eventData, currentUser],
   );
 
-  if (!isReadOnly || !eventData.commentsEnabled) return null;
+  if (!isReadOnly || !eventData?.commentsEnabled) return null;
 
   return <Comments.Widget onCommentCreate={onCommentCreate} comments={eventData.comments} />;
 }

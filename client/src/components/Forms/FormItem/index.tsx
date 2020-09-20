@@ -4,7 +4,7 @@ import moment from 'moment';
 import { FormItemProps } from 'antd/lib/form';
 import formItemStyles from './FormItem.module.scss';
 
-interface IFormItem extends FormItemProps {
+export interface IFormItem extends FormItemProps {
   isReadOnly?: boolean;
   type: 'input' | 'select' | 'time' | 'checkbox' | 'switch' | 'files';
   name: string;
@@ -37,7 +37,7 @@ function FieldView(props: IFieldView) {
     fieldValue = React.useMemo(() => {
       switch (type) {
         case 'time':
-          return moment(value).format('LT');
+          return moment(value).format('DD.MM.YYYY HH:mm');
 
         case 'checkbox':
           return <Checkbox disabled checked={!!value} />;
@@ -47,7 +47,7 @@ function FieldView(props: IFieldView) {
 
         case 'files': {
           const files = value?.fileList ?? value ?? Array.prototype;
-          return files.map((file) => <Tag children={file.name} />);
+          return files.map((file) => <Tag children={file.name} key={`attachment-${file.uid}`} />);
         }
 
         default:

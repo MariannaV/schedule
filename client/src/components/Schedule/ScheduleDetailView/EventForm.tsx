@@ -307,15 +307,15 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
         </Upload>
       </FormItem>
 
-      <FormItem
-        label="Feedback is allowed"
-        name="commentsEnabled"
-        type="switch"
-        children={<Switch defaultChecked={eventData?.commentsEnabled} />}
-        isReadOnly={isReadOnly}
-      />
-
-      {!isReadOnly && <Button htmlType="submit" children={isCreation ? 'Create' : 'Update'} loading={!!isSubmitting} />}
+      {!isReadOnly && (
+        <FormItem
+          label="Feedback is allowed"
+          name="commentsEnabled"
+          type="switch"
+          children={<Switch defaultChecked={eventData?.commentsEnabled} />}
+          isReadOnly={isReadOnly}
+        />
+      )}
     </Form>
   );
 }
