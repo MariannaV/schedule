@@ -1,13 +1,44 @@
 import React from 'react';
 import { UploadOutlined } from '@ant-design/icons';
-import { Form, Input, Select, Switch, Upload, Button } from 'antd';
+import { Form, Input, Select, Switch, Upload, Button, Radio, DatePicker } from 'antd';
+import moment from 'moment';
 import { Event, eventTypes } from 'services/event';
 import { FieldTimezone } from 'components/Forms/fields';
-import { FormItem } from 'components/Forms/FormItem';
+import { FormItem, IFormItem } from 'components/Forms/FormItem';
 import { NSchedule, ScheduleStore } from 'components/Schedule/store';
 import formStyles from './ScheduleDetailView.module.scss';
 
-function EventForm() {
+const eventFormHelpers = {
+  formatTo: (sendingData: any) => {
+    return {
+      ...sendingData,
+      // @ts-ignore
+      attachments: sendingData?.attachments?.fileList,
+      [sendingData ? 'dateCreation' : 'dateUpdate']: moment(),
+      ...(sendingData.dateStartEnd && {
+        dateStart: sendingData.dateStartEnd[0],
+        dateEnd: sendingData.dateStartEnd[1],
+        dateStartEnd: undefined,
+      }),
+      ...(!sendingData.comments && { comments: [] }),
+    };
+  },
+  formatFrom: (eventData: Event) => {
+    return {
+      ...eventData,
+      dateStart: moment(eventData?.dateStart),
+      ...(eventData?.dateEnd && {
+        dateStart: undefined,
+        dateEnd: undefined,
+        dateStartEnd: [moment(eventData.dateStart), moment(eventData.dateEnd)],
+      }),
+    };
+  },
+};
+
+export const eventFormId = `eventFormId`;
+
+function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
   const eventId = ScheduleStore.useSelector(ScheduleStore.selectors.getDetailViewOpenedId),
     eventData = ScheduleStore.useSelector(ScheduleStore.selectors.getEvent({ eventId }));
 
@@ -22,18 +53,13 @@ function EventForm() {
     [eventType, setEventType] = React.useState<eventTypes>(eventData?.type),
     onSubmit = React.useCallback(
       async (sendingData: Event) => {
-        sendingData = {
-          ...sendingData,
-          // @ts-ignore
-          attachments: sendingData.attachments.fileList,
-        };
-
+        const newEventData = eventFormHelpers.formatTo({ ...sendingData, comments: eventData?.comments });
         try {
           setSubmitting(true);
           if (isCreation) {
             const { eventData } = await ScheduleStore.API.eventCreate(dispatch)({
               payload: {
-                eventData: sendingData,
+                eventData: newEventData,
               },
             });
             ScheduleStore.API.detailViewSetOpened(dispatch)({
@@ -45,7 +71,7 @@ function EventForm() {
             await ScheduleStore.API.eventUpdate(dispatch)({
               payload: {
                 eventId,
-                eventData: sendingData,
+                eventData: newEventData,
               },
             });
           }
@@ -60,24 +86,16 @@ function EventForm() {
           setSubmitting(false);
         }
       },
-      [eventId, isCreation],
+      [eventId, isCreation, eventData?.comments],
     );
 
   React.useEffect(
-    function formReOpening() {
-      if (eventId) {
-        form.resetFields();
-        form.setFieldsValue(eventData);
-      }
-    },
-    [eventId],
-  );
-
-  React.useEffect(
     function formResetting() {
-      if (formMode === NSchedule.FormModes.CREATE) form.resetFields();
+      form.resetFields();
+      setEventType(eventData?.type);
+      if (eventData) form.setFieldsValue(eventFormHelpers.formatFrom(eventData));
     },
-    [formMode],
+    [eventId, eventData, formMode],
   );
 
   React.useEffect(
@@ -186,6 +204,7 @@ function EventForm() {
 
   return (
     <Form
+      id={eventFormId}
       name="eventForm"
       form={form}
       initialValues={formInitialValues}

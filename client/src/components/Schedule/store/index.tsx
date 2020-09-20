@@ -146,8 +146,6 @@ export const API_Schedule = {
   eventUpdate: (dispatch: Dispatch<NSchedule.IActions>) => async (params: Omit<NSchedule.IEventUpdate, 'type'>) => {
     try {
       const { eventData, eventId } = params.payload;
-      //this line repeats in this file, this code needs only due to old data which created without 'comments' field
-      if (!('comments' in eventData)) eventData!.comments = [];
       const data = await new EventService().updateEvent(eventId, eventData);
       eventData.id = data.id;
       dispatch({
@@ -173,7 +171,6 @@ export const API_Schedule = {
   ) => {
     try {
       const { eventData, eventId, comment } = params.payload;
-      if (!('comments' in eventData)) eventData!.comments = [];
       eventData.comments.push(comment);
       await new EventService().updateEvent(eventId, eventData);
       dispatch({
