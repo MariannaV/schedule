@@ -1,6 +1,6 @@
 import React from 'react';
 import { UploadOutlined } from '@ant-design/icons';
-import { Form, Input, Select, Switch, Upload, Button, Radio, DatePicker } from 'antd';
+import { Form, Input, Select, Switch, Upload, Button, Radio, DatePicker, message } from 'antd';
 import moment from 'moment';
 import { Event, eventTypes } from 'services/event';
 import { FieldTimezone } from 'components/Forms/fields';
@@ -202,6 +202,27 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
     [],
   );
 
+  const attachmentsSettings = React.useMemo(
+    () => ({
+      name: 'file',
+      action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
+      headers: {
+        authorization: 'authorization-text',
+      },
+      onChange(info) {
+        if (info.file.status !== 'uploading') {
+          console.log(info.file, info.fileList);
+        }
+        if (info.file.status === 'done') {
+          message.success(`${info.file.name} file uploaded successfully`);
+        } else if (info.file.status === 'error') {
+          message.error(`${info.file.name} file upload failed.`);
+        }
+      },
+    }),
+    [],
+  );
+
   return (
     <Form
       id={eventFormId}
@@ -302,7 +323,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
       })()}
 
       <FormItem label="Attachments" name="attachments" type="files" isReadOnly={isReadOnly}>
-        <Upload multiple={true}>
+        <Upload multiple={true} {...attachmentsSettings}>
           <Button icon={<UploadOutlined />} children="Click to upload" />
         </Upload>
       </FormItem>
