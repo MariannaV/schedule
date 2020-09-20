@@ -7,16 +7,157 @@ import { PageLayout } from 'components';
 import { FieldTimezone } from 'components/Forms/fields';
 import { ScheduleTable, ScheduleListWrapper, ScheduleCalendar } from 'components/Schedule';
 import { NSchedule } from 'components/Schedule/store/@types';
-import { ScheduleStore, API_Schedule } from 'components/Schedule/store';
-import { API_Events } from 'services/event';
+import { ScheduleStore } from 'components/Schedule/store';
+import { EventService } from 'services/event';
 
-enum View {
-  table = 'Table',
-  list = 'List',
-  calendar = 'Calendar',
+const SchedulePageWrapper = () => (
+  <ScheduleStore.provider>
+    <FetcherCommonData />
+    <SchedulePage />
+  </ScheduleStore.provider>
+);
+
+function SchedulePage() {
+  const isLoading = ScheduleStore.useSelector(ScheduleStore.selectors.getEventsLoading);
+  return (
+    <PageLayout title="Schedule" githubId={'props.session.githubId'} loading={isLoading}>
+      {isLoading === false && (
+        <>
+          <ScheduleHeader />
+          <ScheduleView />
+        </>
+      )}
+    </PageLayout>
+  );
 }
 
-function converttoPDF() {
+const ScheduleView = React.memo(() => {
+  const scheduleView = ScheduleStore.useSelector(ScheduleStore.selectors.getUserPreferredScheduleView);
+  switch (scheduleView) {
+    case NSchedule.ScheduleView.list:
+      return <ScheduleListWrapper />;
+    case NSchedule.ScheduleView.calendar:
+      return <ScheduleCalendar />;
+    case NSchedule.ScheduleView.table:
+    default:
+      return <ScheduleTable />;
+  }
+});
+
+const ScheduleHeader = React.memo(() => {
+  const { dispatch } = React.useContext(ScheduleStore.context),
+    userRole = ScheduleStore.useSelector(ScheduleStore.selectors.getUserRole),
+    isMentor = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsMentor),
+    timeZone = ScheduleStore.useSelector(ScheduleStore.selectors.getUserPreferredTimezone),
+    scheduleView = ScheduleStore.useSelector(ScheduleStore.selectors.getUserPreferredScheduleView),
+    isActiveDates = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsActiveDates),
+    eventsMap = ScheduleStore.useSelector(ScheduleStore.selectors.getEventsMap);
+
+  const onToggleUserMode = React.useCallback(() => {
+      ScheduleStore.API.userRoleChange(dispatch)({
+        payload: {
+          role: userRole === NSchedule.UserRoles.MENTOR ? NSchedule.UserRoles.STUDENT : NSchedule.UserRoles.MENTOR,
+        },
+      });
+    }, [userRole]),
+    onChangeTimeZone = React.useCallback((timeZone: NSchedule.IStore['user']['timeZone']) => {
+      ScheduleStore.API.userTimeZoneChange(dispatch)({
+        payload: {
+          timeZone,
+        },
+      });
+    }, []),
+    onChangeScheduleView = React.useCallback((scheduleView: NSchedule.IStore['user']['scheduleView']) => {
+      ScheduleStore.API.userScheduleViewChange(dispatch)({
+        payload: {
+          scheduleView,
+        },
+      });
+    }, []),
+    onToggleActiveDates = React.useCallback(() => {
+      ScheduleStore.API.isActiveDatesSet(dispatch)({
+        payload: {
+          isActiveDates: !isActiveDates,
+        },
+      });
+    }, [isActiveDates]);
+
+  const fileFormatsToSave = (
+    <Menu>
+      <Menu.Item key="pdf" onClick={convertToPDF}>
+        to PDF format
+      </Menu.Item>
+      <Menu.Item key="txt" onClick={() => downloadTxtFile(eventsMap)}>
+        to TXT format
+      </Menu.Item>
+    </Menu>
+  );
+
+  return (
+    <>
+      <Row justify="space-between" style={{ marginBottom: 16 }}>
+        <FieldTimezone
+          style={{ width: 200, marginRight: '250px' }}
+          defaultValue={timeZone}
+          onChange={onChangeTimeZone}
+        />
+        <Dropdown.Button overlay={fileFormatsToSave} icon={<DownloadOutlined />}>
+          Download
+        </Dropdown.Button>
+        <Select
+          style={{ width: 200 }}
+          placeholder="Please Select View"
+          defaultValue={scheduleView}
+          onChange={onChangeScheduleView}
+        >
+          <Select.Option value={NSchedule.ScheduleView.table} children="Table" />
+          <Select.Option value={NSchedule.ScheduleView.list} children="List" />
+          <Select.Option value={NSchedule.ScheduleView.calendar} children="Calendar" />
+        </Select>
+      </Row>
+      <Row justify="space-between" style={{ marginBottom: 10 }}>
+        <Switch
+          checkedChildren="Only active"
+          unCheckedChildren="All events"
+          defaultChecked={isActiveDates}
+          onClick={onToggleActiveDates}
+        />
+        <Switch
+          unCheckedChildren="student"
+          checkedChildren="mentor"
+          defaultChecked={isMentor}
+          onClick={onToggleUserMode}
+        />
+      </Row>
+    </>
+  );
+});
+
+function FetcherCommonData() {
+  const { dispatch } = React.useContext(ScheduleStore.context);
+
+  React.useEffect(function fetchData() {
+    fetchEventsData();
+
+    async function fetchEventsData() {
+      try {
+        ScheduleStore.API.eventsFetchStart(dispatch)();
+        const events = await new EventService().getEvents();
+        ScheduleStore.API.eventsSet(dispatch)({
+          payload: {
+            events,
+          },
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  }, []);
+
+  return null;
+}
+
+function convertToPDF() {
   const myinput = document.getElementById(`__next`);
   if (!myinput) return;
   html2canvas(myinput).then((canvas) => {
@@ -50,121 +191,4 @@ function downloadTxtFile(eventsMap) {
   element.click();
 }
 
-function SchedulePage() {
-  const [currentView, changeView] = React.useState<View>(View.table);
-
-  const ScheduleView = React.useCallback(() => {
-    switch (currentView) {
-      case View.list:
-        return <ScheduleListWrapper />;
-      case View.calendar:
-        return <ScheduleCalendar />;
-      case View.table:
-      default:
-        return <ScheduleTable />;
-    }
-  }, [currentView]);
-
-  return (
-    <ScheduleStore.provider>
-      <PageLayout title="Schedule" githubId={'props.session.githubId'} loading={false}>
-        <ScheduleHeader onChangeViewMode={changeView} />
-        <ScheduleView />
-      </PageLayout>
-      <FetcherCommonData />
-    </ScheduleStore.provider>
-  );
-}
-
-interface IScheduleHeader {
-  onChangeViewMode: (nextView: View) => void;
-}
-
-const ScheduleHeader = React.memo((props: IScheduleHeader) => {
-  const { store, dispatch } = React.useContext(ScheduleStore.context),
-    isMentor = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsMentor),
-    eventsMap = ScheduleStore.useSelector(ScheduleStore.selectors.getEventsMap);
-
-  const onToggleUserMode = React.useCallback(() => {
-      API_Schedule.userRoleChange(dispatch)({
-        payload: {
-          role:
-            store.user.role === NSchedule.UserRoles.MENTOR ? NSchedule.UserRoles.STUDENT : NSchedule.UserRoles.MENTOR,
-        },
-      });
-    }, [store.user.role]),
-    onChangeTimeZone = React.useCallback(
-      (timeZone) => {
-        API_Schedule.userTimeZoneChange(dispatch)({
-          payload: {
-            timeZone,
-          },
-        });
-      },
-      [store.user.timeZone],
-    ),
-    onToggleActiveDates = React.useCallback(() => {
-      API_Schedule.isActiveDatesSet(dispatch)({
-        payload: {
-          isActiveDates: store.user.isActiveDates = !store.user.isActiveDates,
-        },
-      });
-    }, [store.user.isActiveDates]);
-
-  const fileFormatsToSave = (
-    <Menu>
-      <Menu.Item key="1" onClick={() => converttoPDF()}>
-        to PDF format
-      </Menu.Item>
-      <Menu.Item key="2" onClick={() => downloadTxtFile(eventsMap)}>
-        to TXT format
-      </Menu.Item>
-    </Menu>
-  );
-
-  return (
-    <>
-      <Row justify="space-between" style={{ marginBottom: 16 }}>
-        <FieldTimezone
-          style={{ width: 200, marginRight: '250px' }}
-          defaultValue={store.user.timeZone}
-          onChange={onChangeTimeZone}
-        />
-        <Dropdown.Button overlay={fileFormatsToSave} icon={<DownloadOutlined />}>
-          Download
-        </Dropdown.Button>
-        <Select
-          style={{ width: 200 }}
-          placeholder="Please Select View"
-          defaultValue={View.table}
-          onChange={props.onChangeViewMode}
-        >
-          <Select.Option value={View.table}>Table</Select.Option>
-          <Select.Option value={View.list}>List</Select.Option>
-          <Select.Option value={View.calendar}>Calendar</Select.Option>
-        </Select>
-      </Row>
-      <Row justify="space-between" style={{ marginBottom: 10 }}>
-        <Switch
-          checkedChildren="Only active"
-          unCheckedChildren="All events"
-          defaultChecked={store.user.isActiveDates}
-          onClick={onToggleActiveDates}
-        />
-        <Switch
-          checkedChildren="mentor"
-          unCheckedChildren="student"
-          defaultChecked={isMentor}
-          onClick={onToggleUserMode}
-        />
-      </Row>
-    </>
-  );
-});
-
-function FetcherCommonData() {
-  API_Events.hooks.useEventsData();
-  return null;
-}
-
-export default SchedulePage;
+export default SchedulePageWrapper;
