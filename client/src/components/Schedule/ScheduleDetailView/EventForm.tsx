@@ -55,7 +55,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
       async (sendingData: Event) => {
         const newEventData = eventFormHelpers.formatTo({ ...sendingData, comments: eventData?.comments });
         try {
-          setSubmitting(true);
+          props.setSubmitting(true);
           if (isCreation) {
             const { eventData } = await ScheduleStore.API.eventCreate(dispatch)({
               payload: {
@@ -83,7 +83,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
         } catch (error) {
           console.error(error);
         } finally {
-          setSubmitting(false);
+          props.setSubmitting(false);
         }
       },
       [eventId, isCreation, eventData?.comments],

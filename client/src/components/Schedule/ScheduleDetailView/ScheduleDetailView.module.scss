@@ -4,9 +4,15 @@
 
 .ScheduleDetailViewHeader {
   display: grid;
-  grid-template-columns: auto max-content;
+  grid-auto-flow: column;
+  grid-template-columns: 1fr;
+  grid-auto-columns: max-content;
+  grid-gap: 0.5rem;
   align-items: center;
 }
 
 .EventForm {
+}
+
+.EventFormSubmitButton {
 }
