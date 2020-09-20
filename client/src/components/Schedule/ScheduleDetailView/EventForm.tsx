@@ -51,6 +51,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
   const [form] = Form.useForm(),
     formInitialValues = React.useMemo(() => eventFormHelpers.formatFrom(eventData), [eventData]),
     [eventType, setEventType] = React.useState<eventTypes>(eventData?.type),
+    [attachmentfiles, setAttachmentFiles] = React.useState(eventData?.attachments),
     onSubmit = React.useCallback(
       async (sendingData: Event) => {
         const newEventData = eventFormHelpers.formatTo({ ...sendingData, comments: eventData?.comments });
@@ -202,26 +203,17 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
     [],
   );
 
-  const attachmentsSettings = React.useMemo(
-    () => ({
-      name: 'file',
-      action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
-      headers: {
-        authorization: 'authorization-text',
-      },
-      onChange(info) {
-        if (info.file.status !== 'uploading') {
-          console.log(info.file, info.fileList);
-        }
-        if (info.file.status === 'done') {
-          message.success(`${info.file.name} file uploaded successfully`);
-        } else if (info.file.status === 'error') {
-          message.error(`${info.file.name} file upload failed.`);
-        }
-      },
-    }),
-    [],
-  );
+  const updateAttachmentFileList = (info) => {
+    if (info.file.status !== 'uploading') {
+      console.log(info.file, info.fileList);
+    }
+    if (info.file.status === 'done') {
+      message.success(`${info.file.name} file uploaded successfully`);
+    } else if (info.file.status === 'error') {
+      message.error(`${info.file.name} file upload failed.`);
+    }
+    setAttachmentFiles(info.fileList);
+  };
 
   return (
     <Form
@@ -323,7 +315,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
       })()}
 
       <FormItem label="Attachments" name="attachments" type="files" isReadOnly={isReadOnly}>
-        <Upload multiple={true} {...attachmentsSettings}>
+        <Upload multiple={true} defaultFileList={attachmentfiles} onChange={updateAttachmentFileList}>
           <Button icon={<UploadOutlined />} children="Click to upload" />
         </Upload>
       </FormItem>
