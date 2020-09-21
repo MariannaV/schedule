@@ -14,20 +14,9 @@ import { GithubUserLink } from 'components';
 import { ScheduleStore } from 'components/Schedule/store';
 import { Filter } from './components/Filter/Filter';
 import { rowsFilter, defaultColumnsFilter } from './config';
+import { tagColors } from './config';
 import styles from './style.module.scss';
 
-const tagColors = {
-  codejam: 'green',
-  codewars: 'green',
-  course: 'green',
-  interview: 'volcano',
-  lecture: 'purple',
-  meetup: 'magenta',
-  'self-education': 'gold',
-  task: 'green',
-  test: 'cyan',
-  video: 'purple',
-};
 const startOfToday = moment().startOf('day');
 
 function isRowDisabled(dateTime, deadLine) {
@@ -101,7 +90,7 @@ export function ScheduleTable() {
             if (isRowDisabled(record.dateTime, record.deadLine)) {
               return 'rs-table-row-disabled';
             }
-            return styles[record.type.split(' ').join('')];
+            return styles[record.type.toLowerCase().split(' ').join('')];
           }}
           scroll={{ x: 1600 }}
           // @ts-ignore
@@ -161,15 +150,15 @@ export function ScheduleTable() {
               align: 'center',
               dataIndex: 'type' || '',
               render: (value: keyof typeof tagColors) => (
-                <Tag color={tagColors[value]} className={styles.tag}>
-                  {value}
+                <Tag color={tagColors[value.toLowerCase()]} className={styles.tag}>
+                  {value.toUpperCase()}
                 </Tag>
               ),
               sorter: (a, b) => (a.type > b.type ? 1 : -1),
               sortDirections: ['ascend', 'descend', 'ascend'],
               filters: rowsFilter,
               onFilter: (value: string | number | boolean, record: Event) =>
-                record.type.indexOf(value.toString()) === 0,
+                record.type.toLowerCase().indexOf(value.toString().toLowerCase()) === 0,
             },
             {
               title: 'Action',
@@ -197,6 +186,14 @@ export function ScheduleTable() {
               sortDirections: ['ascend', 'descend', 'ascend'],
             },
             {
+              title: 'Organizer',
+              width: 120,
+              dataIndex: 'organizer',
+              render: (value: string) => (value ? <GithubUserLink value={value} /> : ''),
+              sorter: (a, b) => (a.organizer > b.organizer ? 1 : -1),
+              sortDirections: ['ascend', 'descend', 'ascend'],
+            },
+            {
               title: 'Description URL',
               width: 200,
               dataIndex: 'descriptionUrl',
@@ -209,19 +206,10 @@ export function ScheduleTable() {
               },
             },
             {
-              title: 'Organizer',
-              width: 120,
-              dataIndex: 'organizer',
-              render: (value: string) => (value ? <GithubUserLink value={value} /> : ''),
-              sorter: (a, b) => (a.organizer > b.organizer ? 1 : -1),
-              sortDirections: ['ascend', 'descend', 'ascend'],
-            },
-            {
               title: 'Description',
               width: 250,
               dataIndex: 'description',
             },
-            { title: 'Comment', width: 180, dataIndex: 'comment' },
           ].filter((column) => checkedColumns.includes(column.title))}
         />
       )}

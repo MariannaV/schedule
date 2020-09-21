@@ -1,3 +1,16 @@
+export const tagColors = {
+  codejam: 'green',
+  codewars: 'green',
+  course: 'green',
+  interview: 'volcano',
+  lecture: 'purple',
+  meetup: 'magenta',
+  'self-education': 'gold',
+  task: 'green',
+  test: 'cyan',
+  video: 'purple',
+};
+
 export const defaultColumnsFilter = [
   'Start Date',
   'Name',
@@ -8,44 +21,47 @@ export const defaultColumnsFilter = [
   'Description URL',
   'Organizer',
   'Description',
-  'Comment',
 ];
 
 export const rowsFilter = [
   {
-    text: 'code jam',
-    value: 'code jam',
+    text: 'Code jam',
+    value: 'Code jam',
   },
   {
-    text: 'codewars',
-    value: 'codewars',
+    text: 'Codewars',
+    value: 'Codewars',
   },
   {
-    text: 'course',
-    value: 'course',
+    text: 'Course',
+    value: 'Course',
   },
   {
-    text: 'interview',
-    value: 'interview',
+    text: 'Interview',
+    value: 'Interview',
   },
   {
-    text: 'lecture',
-    value: 'lecture',
+    text: 'Lecture',
+    value: 'Lecture',
   },
   {
-    text: 'meetup',
-    value: 'meetup',
+    text: 'Meetup',
+    value: 'Meetup',
   },
   {
-    text: 'self-education',
-    value: 'self-education',
+    text: 'Self-education',
+    value: 'Self-education',
   },
   {
-    text: 'task',
-    value: 'task',
+    text: 'Task',
+    value: 'Task',
   },
   {
-    text: 'test',
-    value: 'test',
+    text: 'Test',
+    value: 'Test',
+  },
+  {
+    video: 'Video',
+    value: 'Video',
   },
 ];
