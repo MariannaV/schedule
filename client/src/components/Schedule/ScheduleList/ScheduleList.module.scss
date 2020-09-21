@@ -4,20 +4,8 @@
 }
 
 .ScheduleList {
-  overflow: overlay;
-  &::-webkit-scrollbar {
-    width: 10px;
-  }
+  
 
-  &::-webkit-scrollbar-thumb {
-    background: #666;
-    border-radius: 20px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: #ddd;
-    border-radius: 20px;
-  }
   
 }
 
