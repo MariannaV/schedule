@@ -4,6 +4,7 @@ import { Form, Input, Select, Switch, Upload, Button, Radio, DatePicker, message
 import moment from 'moment';
 import { Event, eventTypes } from 'services/event';
 import { FieldTimezone } from 'components/Forms/fields';
+import { FieldOrganizers } from 'components/Forms/fields/FieldOrganizers';
 import { FormItem, IFormItem } from 'components/Forms/FormItem';
 import { NSchedule, ScheduleStore } from 'components/Schedule/store';
 import formStyles from './ScheduleDetailView.module.scss';
@@ -152,6 +153,15 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
           isReadOnly={isReadOnly}
         />
       ),
+      organizers: ({ isReadOnly }) => (
+        <FormItem
+          label={'Organizers'}
+          type={'select'}
+          name={'organizers'}
+          isReadOnly={isReadOnly}
+          children={<FieldOrganizers mode="multiple" style={{ width: '300px' }} />}
+        />
+      ),
       dateTimeRange: ({ isReadOnly }) => {
         return !isReadOnly ? (
           <FormItem
@@ -275,6 +285,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
                 <fields.timeZone isReadOnly={isReadOnly} />
                 <fields.dateTime isReadOnly={isReadOnly} />
                 <fields.descriptionUrl isReadOnly={isReadOnly} />
+                <fields.organizers isReadOnly={isReadOnly} />
               </>
             );
 
@@ -309,6 +320,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
                 <fields.timeZone isReadOnly={isReadOnly} />
                 <fields.dateTime isReadOnly={isReadOnly} />
                 <fields.descriptionUrl isReadOnly={isReadOnly} />
+                <fields.organizers isReadOnly={isReadOnly} />
               </>
             );
         }
