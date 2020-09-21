@@ -95,12 +95,12 @@ function ListItem(props: IListItem) {
       <footer>
         <Typography.Text className={listStyles.dateStart}>
           <span children="Start: " />
-          <Date date={eventData.dateTime} />
+          <Date date={eventData.dateStart} />
         </Typography.Text>
-        {eventData.deadLine && (
+        {eventData.dateEnd && (
           <Typography.Text className={listStyles.dateDeadline}>
             <span children="Deadline: " />
-            <Date date={eventData.deadLine} />
+            <Date date={eventData.dateEnd} />
           </Typography.Text>
         )}
       </footer>
@@ -111,7 +111,7 @@ function ListItem(props: IListItem) {
 function Date(props: { date: string }) {
   const timeZone = ScheduleStore.useSelector(ScheduleStore.selectors.getUserPreferredTimezone),
     formattedDate = React.useMemo(
-      () => moment(props.date, 'YYYY-MM-DD HH:mmZ').tz(timeZone).format('YYYY-MM-DD HH:mm'),
+      () => moment(props.date, 'YYYY-MM-DD HH:mmZ').tz(timeZone).format('DD.MM.YYYY HH:mm'),
       [props.date, timeZone],
     );
 
