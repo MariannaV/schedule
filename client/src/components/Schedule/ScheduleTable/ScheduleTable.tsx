@@ -14,7 +14,7 @@ import { GithubUserLink } from 'components';
 import { ScheduleStore } from 'components/Schedule/store';
 import { Filter } from './components/Filter/Filter';
 import { rowsFilter, defaultColumnsFilter } from './config';
-import { tagColors } from './config';
+import { tagColors } from '../constants';
 import styles from './style.module.scss';
 
 const startOfToday = moment().startOf('day');
@@ -79,7 +79,7 @@ export function ScheduleTable() {
           dataSource={
             isActiveDates
               ? tableData.filter(
-                  (data) => !isRowDisabled(data.dateTime, data.deadLine) && !hiddenRows.includes(data.id),
+                  (data) => !isRowDisabled(data.dateStart, data.dateEnd) && !hiddenRows.includes(data.id),
                 )
               : tableData.filter((data) => !hiddenRows.includes(data.id))
           }
@@ -87,7 +87,7 @@ export function ScheduleTable() {
             if (selectedRows.includes(record.id)) {
               return styles.activeRow;
             }
-            if (isRowDisabled(record.dateTime, record.deadLine)) {
+            if (isRowDisabled(record.dateStart, record.dateEnd)) {
               return 'rs-table-row-disabled';
             }
             return styles[record.type.toLowerCase().split(' ').join('')];
@@ -99,10 +99,11 @@ export function ScheduleTable() {
               title: 'Start Date',
               width: 80,
               align: 'center',
-              dataIndex: 'dateTime',
+              dataIndex: 'dateStart',
+
               render: dateRenderer(timeZone),
               defaultSortOrder: 'ascend',
-              sorter: (a, b) => (a.dateTime > b.dateTime ? 1 : -1),
+              sorter: (a, b) => (a.dateStart > b.dateStart ? 1 : -1),
               sortDirections: ['ascend', 'descend', 'ascend'],
             },
             {
@@ -116,7 +117,7 @@ export function ScheduleTable() {
               title: 'DeadLine',
               width: 120,
               align: 'center',
-              dataIndex: 'deadLine',
+              dataIndex: 'dateEnd',
               render: (value: string) => {
                 if (!value) return;
                 if (moment(value).isBefore(startOfToday)) {
@@ -141,7 +142,7 @@ export function ScheduleTable() {
                   </div>
                 );
               },
-              sorter: (a, b) => (a.deadLine > b.deadLine ? 1 : -1),
+              sorter: (a, b) => (a.dateEnd > b.dateEnd ? 1 : -1),
               sortDirections: ['ascend', 'descend', 'ascend'],
             },
             {
@@ -151,7 +152,7 @@ export function ScheduleTable() {
               dataIndex: 'type' || '',
               render: (value: keyof typeof tagColors) => (
                 <Tag color={tagColors[value.toLowerCase()]} className={styles.tag}>
-                  {value.toUpperCase()}
+                  {value}
                 </Tag>
               ),
               sorter: (a, b) => (a.type > b.type ? 1 : -1),

@@ -3,7 +3,8 @@ import { Button, Typography, Tag } from 'antd';
 import moment from 'moment-timezone';
 import { FixedSizeList as List } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import { Event, EventTypeColor, EventTypeToName } from 'services/event';
+import { Event } from 'services/event';
+import { tagColors } from '../constants';
 import { NSchedule, ScheduleStore } from 'components/Schedule/store';
 import listStyles from './ScheduleList.module.scss';
 
@@ -85,7 +86,7 @@ function ListItem(props: IListItem) {
     <article className={classes} onClick={onItemClick} style={containerStyle}>
       <header>
         <Typography.Title children={eventData.name} level={3} />
-        <Tag color={EventTypeColor[eventData.type]}>{EventTypeToName[eventData.type] || eventData.type}</Tag>
+        <Tag color={tagColors[eventData.type.toLowerCase()]}>{eventData.type}</Tag>
       </header>
 
       <main>

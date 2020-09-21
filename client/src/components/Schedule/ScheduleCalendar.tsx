@@ -10,7 +10,7 @@ export function ScheduleCalendar() {
     eventIdsByDate = React.useMemo(
       () =>
         (Object.values(eventsMap) as Array<Event>).reduce((acc, currentEvent) => {
-          const currentDate = dateRenderer(currentEvent.timeZone)(currentEvent.dateTime);
+          const currentDate = dateRenderer(currentEvent.timeZone)(currentEvent.dateStart);
           if (!(currentDate in acc)) acc[currentDate] = [];
           acc[currentDate].push(currentEvent.id);
           return acc;
