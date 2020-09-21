@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { UploadFile } from 'antd/lib/upload/interface';
+import { IComments } from 'components/Comments';
 
 export interface Event {
   id: string;
@@ -8,18 +10,29 @@ export interface Event {
   deadLine: string;
   type: eventTypes;
   timeZone: string;
-  dateTime: string;
+  dateCreation: string;
+  dateUpdate: string;
+  dateStart: string;
+  dateEnd: string;
   place: string;
-  comment: string;
   checker: string;
   organizer: string;
+  commentsEnabled: boolean;
+  comments: Array<IComments.Comment>;
+  attachments: Array<UploadFile>;
 }
 
 export enum eventTypes {
-  video = 'Video',
+  codejam = 'Codejam',
+  codewars = 'Codewars',
   course = 'Course',
+  interview = 'Interview',
+  lecture = 'Lecture',
   'self-education' = 'Self-education',
   task = 'Task',
+  test = 'Test',
+  video = 'Video',
+  meetup = 'Meetup',
 }
 
 export enum EventTypeColor {
@@ -83,18 +96,18 @@ export class EventService {
   }
 
   async updateEvent(eventId: string, data: Partial<Event>) {
-    const result = await axios.put<{ data: Event }>(`${this.baseUrl}/event/${eventId}`, data);
-    return result.data.data;
+    const result = await axios.put<Event>(`${this.baseUrl}/event/${eventId}`, data);
+    return result.data;
   }
 
   async createEvent(data: Partial<Event>) {
-    const result = await axios.post<{ data: Event }>(`${this.baseUrl}/event/`, data);
+    const result = await axios.post<Event>(`${this.baseUrl}/event/`, data);
     return result.data;
   }
 
   async deleteEvent(eventId: string) {
-    const result = await axios.delete<{ data: Event }>(`${this.baseUrl}/event/${eventId}`);
-    return result.data.data;
+    const result = await axios.delete<Event>(`${this.baseUrl}/event/${eventId}`);
+    return result.data;
   }
 }
 

@@ -8,9 +8,15 @@
 .ScheduleList {
   grid-row: 1 / -1;
   grid-column: 1 / 9;
+  @media (max-width: 767px) {
+    grid-column: 1 / 18;
+  }
 }
 
 .ScheduleView {
   grid-row: 1 / -1;
   grid-column: 9 / -1;
+  @media (max-width: 767px) {
+    display: none;
+  }
 }

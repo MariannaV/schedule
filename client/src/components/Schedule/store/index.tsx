@@ -67,6 +67,22 @@ function reducer(store: NSchedule.IStore, action: NSchedule.IActions) {
       };
     }
 
+    case NSchedule.ActionTypes.EVENT_UPDATE: {
+      return {
+        ...store,
+        events: {
+          ...store.events,
+          map: {
+            ...store.events.map,
+            [action.payload.eventData.id]: {
+              ...store.events.map[action.payload.eventData.id],
+              ...action.payload.eventData,
+            },
+          },
+        },
+      };
+    }
+
     case NSchedule.ActionTypes.EVENT_DELETE: {
       return {
         ...store,
@@ -76,6 +92,22 @@ function reducer(store: NSchedule.IStore, action: NSchedule.IActions) {
           map: {
             ...store.events.map,
             [action.payload.eventId]: undefined,
+          },
+        },
+      };
+    }
+
+    case NSchedule.ActionTypes.EVENT_COMMENT_CREATE: {
+      return {
+        ...store,
+        events: {
+          ...store.events,
+          map: {
+            ...store.events.map,
+            [action.payload.eventData.id]: {
+              ...store.events.map[action.payload.eventData.id],
+              comments: [...store.events.map[action.payload.eventData.id].comments],
+            },
           },
         },
       };
@@ -108,7 +140,10 @@ const API_Schedule = {
   eventCreate: (dispatch: Dispatch<NSchedule.IActions>) => async (params: Omit<NSchedule.IEventCreate, 'type'>) => {
     try {
       const { eventData } = params.payload;
-      const { data } = await new EventService().createEvent(eventData);
+      const data = await new EventService().createEvent({
+        ...eventData,
+        comments: [],
+      });
       eventData.id = data.id;
       dispatch({
         type: NSchedule.ActionTypes.EVENT_CREATE,
@@ -122,12 +157,44 @@ const API_Schedule = {
       throw Error('eventCreate went wrong');
     }
   },
+  eventUpdate: (dispatch: Dispatch<NSchedule.IActions>) => async (params: Omit<NSchedule.IEventUpdate, 'type'>) => {
+    try {
+      const { eventData, eventId } = params.payload;
+      const data = await new EventService().updateEvent(eventId, eventData);
+      eventData.id = data.id;
+      dispatch({
+        type: NSchedule.ActionTypes.EVENT_UPDATE,
+        payload: { eventId, eventData },
+      });
+      return { eventData };
+    } catch (error) {
+      console.error(error);
+      throw Error('eventUpdate went wrong');
+    }
+  },
   eventDelete: (dispatch: Dispatch<NSchedule.IActions>) => async (params: Omit<NSchedule.IEventDelete, 'type'>) => {
     try {
       await new EventService().deleteEvent(params.payload.eventId);
       dispatch({ type: NSchedule.ActionTypes.EVENT_DELETE, ...params });
     } catch (error) {
       console.error(error);
+    }
+  },
+  eventCommentCreate: (dispatch: Dispatch<NSchedule.IActions>) => async (
+    params: Omit<NSchedule.IEventCommentCreate, 'type'>,
+  ) => {
+    try {
+      const { eventData, eventId, comment } = params.payload;
+      eventData.comments.push(comment);
+      await new EventService().updateEvent(eventId, eventData);
+      dispatch({
+        type: NSchedule.ActionTypes.EVENT_COMMENT_CREATE,
+        payload: { eventId, comment, eventData },
+      });
+      return { eventData };
+    } catch (error) {
+      console.error(error);
+      throw Error('eventCommentCreate went wrong');
     }
   },
   detailViewModeChange: (dispatch: Dispatch<NSchedule.IActions>) => (
