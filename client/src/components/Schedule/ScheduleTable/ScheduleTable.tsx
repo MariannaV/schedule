@@ -22,6 +22,7 @@ const tagColors = {
   course: 'green',
   interview: 'volcano',
   lecture: 'purple',
+  meetup: 'magenta',
   'self-education': 'gold',
   task: 'green',
   test: 'cyan',
@@ -45,10 +46,10 @@ export function ScheduleTable() {
   const [selectedRows, setSelectedRows] = React.useState([] as string[]);
   const [hiddenRows, setHiddenRows] = React.useState([] as string[]);
 
-  const hideRows = React.useCallback(() => {
+  const hideRows = () => {
     setHiddenRows([...selectedRows, ...hiddenRows]);
     setSelectedRows([]);
-  }, []);
+  };
 
   return (
     <>
@@ -102,11 +103,13 @@ export function ScheduleTable() {
             }
             return styles[record.type.split(' ').join('')];
           }}
+          scroll={{ x: 1600 }}
           // @ts-ignore
           columns={[
             {
               title: 'Start Date',
-              width: 180,
+              width: 80,
+              align: 'center',
               dataIndex: 'dateTime',
               render: dateRenderer(timeZone),
               defaultSortOrder: 'ascend',
@@ -115,20 +118,22 @@ export function ScheduleTable() {
             },
             {
               title: 'Name',
+              width: 185,
               dataIndex: 'name',
               sorter: (a, b) => (a.name > b.name ? 1 : -1),
               sortDirections: ['ascend', 'descend', 'ascend'],
             },
             {
               title: 'DeadLine',
-              width: 225,
+              width: 120,
+              align: 'center',
               dataIndex: 'deadLine',
               render: (value: string) => {
                 if (!value) return;
                 if (moment(value).isBefore(startOfToday)) {
                   return dateRenderer(timeZone)(value);
                 }
-                let deadline = 'deadline';
+                let deadline;
                 if (moment(value).subtract(7, 'days').isBefore(startOfToday)) {
                   deadline = 'deadline_coming';
                 }
@@ -141,7 +146,7 @@ export function ScheduleTable() {
                     <span>{dateRenderer(timeZone)(value)}</span>
                     {warning && (
                       <Tooltip title="Only one day left!">
-                        <ExclamationCircleTwoTone twoToneColor="#f5222d" style={{ fontSize: 22 }} />
+                        <ExclamationCircleTwoTone twoToneColor="#f5222d" style={{ fontSize: 22, marginLeft: 5 }} />
                       </Tooltip>
                     )}
                   </div>
@@ -152,9 +157,14 @@ export function ScheduleTable() {
             },
             {
               title: 'Type',
-              width: 100,
+              width: 120,
+              align: 'center',
               dataIndex: 'type' || '',
-              render: (value: keyof typeof tagColors) => <Tag color={tagColors[value]}>{value}</Tag>,
+              render: (value: keyof typeof tagColors) => (
+                <Tag color={tagColors[value]} className={styles.tag}>
+                  {value}
+                </Tag>
+              ),
               sorter: (a, b) => (a.type > b.type ? 1 : -1),
               sortDirections: ['ascend', 'descend', 'ascend'],
               filters: rowsFilter,
@@ -163,12 +173,13 @@ export function ScheduleTable() {
             },
             {
               title: 'Action',
-              width: 325,
+              width: 300,
               dataIndex: 'checker',
               render: (value: string) => (value ? actionButtonsRenderer(value) : actionButtonsRenderer('')),
             },
             {
               title: 'Place',
+              width: 130,
               dataIndex: 'place',
               render: (value: string) => {
                 return value === 'Youtube Live' ? (
@@ -187,6 +198,7 @@ export function ScheduleTable() {
             },
             {
               title: 'Description URL',
+              width: 200,
               dataIndex: 'descriptionUrl',
               render: (value: string) => {
                 return (
@@ -197,21 +209,8 @@ export function ScheduleTable() {
               },
             },
             {
-              title: 'Broadcast URL',
-              width: 140,
-              dataIndex: 'broadcastUrl',
-              render: (url: string) =>
-                url ? (
-                  <a target="_blank" href={url}>
-                    Link
-                  </a>
-                ) : (
-                  ''
-                ),
-            },
-            {
               title: 'Organizer',
-              width: 140,
+              width: 120,
               dataIndex: 'organizer',
               render: (value: string) => (value ? <GithubUserLink value={value} /> : ''),
               sorter: (a, b) => (a.organizer > b.organizer ? 1 : -1),
@@ -219,10 +218,10 @@ export function ScheduleTable() {
             },
             {
               title: 'Description',
-              width: 300,
+              width: 250,
               dataIndex: 'description',
             },
-            { title: 'Comment', width: 300, dataIndex: 'comment' },
+            { title: 'Comment', width: 180, dataIndex: 'comment' },
           ].filter((column) => checkedColumns.includes(column.title))}
         />
       )}

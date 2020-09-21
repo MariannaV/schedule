@@ -6,7 +6,6 @@ export const defaultColumnsFilter = [
   'Action',
   'Place',
   'Description URL',
-  'Broadcast URL',
   'Organizer',
   'Description',
   'Comment',
@@ -32,6 +31,10 @@ export const rowsFilter = [
   {
     text: 'lecture',
     value: 'lecture',
+  },
+  {
+    text: 'meetup',
+    value: 'meetup',
   },
   {
     text: 'self-education',

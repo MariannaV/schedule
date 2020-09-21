@@ -1,7 +1,8 @@
 @import '../../../styles/variables.scss';
 
 .btn {
-  margin-right: 10px;
+  margin-right: 1px;
+  padding: 4px 5px;
 }
 
 .check {
@@ -59,6 +60,15 @@
   }
 }
 
+.meetup {
+  & td {
+    background-color: $color-meetup-background;
+  }
+  &:hover > td {
+    background-color: $color-meetup-background-hover !important;
+  }
+}
+
 .self-education {
   & td {
     background-color: $color-self-education-background;
@@ -78,6 +88,7 @@
 }
 
 .iconHide {
+  margin-left: 15px;
   display: none;
   justify-self: self-end;
   cursor: pointer;
@@ -108,15 +119,20 @@
 }
 
 .deadline_close, .deadline_coming {
-  padding: 0 10px;
+  padding: 0 5px;
   position: absolute;
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
+}
+
+.deadline {
+  display: flex;
+  align-items: b;
 }
 
 .deadline_close {
@@ -125,4 +141,8 @@
 
 .deadline_coming {
   background-color: $color-deadline-coming;
+}
+
+.tag {
+  margin: 0;
 }
