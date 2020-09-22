@@ -16,3 +16,38 @@
 
 .EventFormSubmitButton {
 }
+
+.ScheduleDetailViewModal {
+  &[class~='ant-modal'] {
+    top: 0;
+    min-width: 100vw;
+    height: 100vh;
+    padding-bottom: 0;
+    margin: 0;
+  }
+
+  [class~='ant-modal-content'] {
+    border-radius: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  [class~='ant-modal-header'],
+  [class~='ant-modal-body'] {
+    padding: 0.5rem 1rem;
+  }
+
+  [class~='ant-modal-header'] {
+    position: sticky;
+    top: 0;
+    left: 0;
+    background-color: white;
+    z-index: 1;
+    padding-right: 3rem;
+  }
+
+  [class~='ant-modal-close'] {
+    position: fixed;
+    z-index: 2;
+  }
+}
