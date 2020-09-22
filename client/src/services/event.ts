@@ -7,7 +7,6 @@ export interface Event {
   name: string;
   description: string;
   descriptionUrl: string;
-  deadLine: string;
   type: eventTypes;
   timeZone: string;
   dateCreation: string;
@@ -16,6 +15,7 @@ export interface Event {
   dateEnd: string;
   place: string;
   checker: string;
+  'online/offline': string;
   organizer: string;
   commentsEnabled: boolean;
   comments: Array<IComments.Comment>;
@@ -23,16 +23,16 @@ export interface Event {
 }
 
 export enum eventTypes {
-  codejam = 'Codejam',
+  codejam = 'Code jam',
   codewars = 'Codewars',
   course = 'Course',
   interview = 'Interview',
   lecture = 'Lecture',
+  meetup = 'Meetup',
   'self-education' = 'Self-education',
   task = 'Task',
   test = 'Test',
   video = 'Video',
-  meetup = 'Meetup',
 }
 
 export enum EventTypeColor {
