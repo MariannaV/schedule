@@ -6,8 +6,11 @@
 }
 
 .ScheduleList {
+  margin-bottom: 20px;
   grid-row: 1 / -1;
   grid-column: 1 / 9;
+
+  // scroll-margin-left: 20px;
   ::-webkit-scrollbar-track
   {
     -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.09);
