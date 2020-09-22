@@ -1,8 +1,12 @@
 import React from 'react';
+import moment from 'moment-timezone';
 import { Button, Calendar, Badge } from 'antd';
 import { Event } from 'services/event';
 import { ScheduleStore } from 'components/Schedule/store';
-import { dateRenderer } from 'components/Schedule/ScheduleTable';
+import {
+  ScheduleDetailViewModal,
+  IScheduleDetailViewModal,
+} from 'components/Schedule/ScheduleDetailView/ScheduleDetailViewModal';
 import ScheduleStyles from './ScheduleCalendar.module.scss';
 import calendarStyles from './ScheduleCalendar.module.scss';
 
@@ -13,12 +17,12 @@ export function ScheduleCalendar({ props }) {
       [className, isReadOnly],
     );
 
-  const { timeZone } = ScheduleStore.useSelector(ScheduleStore.selectors.getUser),
+  const timeZone = ScheduleStore.useSelector(ScheduleStore.selectors.getUserPreferredTimezone),
     eventsMap = ScheduleStore.useSelector(ScheduleStore.selectors.getEventsMap),
     eventTypesByDate = React.useMemo(
       () =>
         (Object.values(eventsMap) as Array<Event>).reduce((acc, currentEvent) => {
-          const currentType = dateRenderer(currentEvent.timeZone)(currentEvent.dateTime);
+          const currentType = dateRenderer(currentEvent.timeZone)(currentEvent.dateStart);
           if (!(currentType in acc)) acc[currentType] = [];
           acc[currentType].push(currentEvent.type);
           return acc;
@@ -28,13 +32,17 @@ export function ScheduleCalendar({ props }) {
     eventIdsByDate = React.useMemo(
       () =>
         (Object.values(eventsMap) as Array<Event>).reduce((acc, currentEvent) => {
-          const currentDate = dateRenderer(currentEvent.timeZone)(currentEvent.dateTime);
+          const currentDate = dateRenderer(currentEvent.timeZone)(currentEvent.dateStart);
           if (!(currentDate in acc)) acc[currentDate] = [];
           acc[currentDate].push(currentEvent.id);
           return acc;
         }, {} as Record<string, Array<Event['id']>>),
       [eventsMap],
     );
+
+  const [isVisibleDetailViewModal, setVisibleDetailViewModal] = React.useState<IScheduleDetailViewModal['isVisible']>(
+    null,
+  );
 
   function dateCellRender(value) {
     const currentDate = dateRenderer(timeZone)(value),
@@ -44,24 +52,30 @@ export function ScheduleCalendar({ props }) {
 
     return (
       <section>
-        {isMentor && <Button children="+" type="primary" size="small" onClick={handleMouseClick} />}
+        {isMentor && <Button children="+" type="primary" size="small" />}
         {currentEvents?.map((eventId, index) => (
-          <section className={calendarStyles[currentTypes[index]]}>
-            <CalendarEvent eventId={eventId} key={eventId} />
+          <section className={calendarStyles[currentTypes[index].toLowerCase()]}>
+            <CalendarEvent eventId={eventId} key={eventId} changeVisibility={setVisibleDetailViewModal} />
           </section>
         ))}
       </section>
     );
   }
 
-  function handleMouseClick() {
-    console.log('click');
-  }
-  return <Calendar className={classes} dateCellRender={dateCellRender} />;
+  return (
+    <>
+      <Calendar className={classes} dateCellRender={dateCellRender} />
+      <ScheduleDetailViewModal isVisible={isVisibleDetailViewModal} changeVisibility={setVisibleDetailViewModal} />
+    </>
+  );
 }
 
-function CalendarEvent(props: { eventId: Event['id'] }) {
-  const { eventId } = props,
+interface ICalendarEvent extends Pick<IScheduleDetailViewModal, 'changeVisibility'> {
+  eventId: Event['id'];
+}
+
+function CalendarEvent(props: ICalendarEvent) {
+  const { eventId, changeVisibility } = props,
     eventData = ScheduleStore.useSelector(ScheduleStore.selectors.getEvent({ eventId }));
 
   const { dispatch } = React.useContext(ScheduleStore.context),
@@ -71,6 +85,7 @@ function CalendarEvent(props: { eventId: Event['id'] }) {
           openedId: eventId,
         },
       });
+      changeVisibility(true);
     }, [eventId]);
 
   const type = React.useMemo(() => {
@@ -88,3 +103,6 @@ function CalendarEvent(props: { eventId: Event['id'] }) {
     </article>
   );
 }
+
+const dateRenderer = (timeZone: string) => (value: string) =>
+  value ? moment(value, 'YYYY-MM-DD HH:mmZ').tz(timeZone).format('YYYY-MM-DD') : '';

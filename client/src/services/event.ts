@@ -1,26 +1,80 @@
-import React from 'react';
 import axios from 'axios';
-import { ScheduleStore, API_Schedule } from 'components/Schedule/store';
+import { UploadFile } from 'antd/lib/upload/interface';
+import { IComments } from 'components/Comments';
 
 export interface Event {
   id: string;
   name: string;
   description: string;
   descriptionUrl: string;
-  deadLine: string;
   type: eventTypes;
   timeZone: string;
-  dateTime: string;
+  dateCreation: string;
+  dateUpdate: string;
+  dateStart: string;
+  dateEnd: string;
   place: string;
-  comment: string;
+  checker: string;
+  'online/offline': string;
+  organizer: string;
+  commentsEnabled: boolean;
+  comments: Array<IComments.Comment>;
+  attachments: Array<UploadFile>;
 }
 
 export enum eventTypes {
-  video = 'Video',
+  codejam = 'Code jam',
+  codewars = 'Codewars',
   course = 'Course',
+  interview = 'Interview',
+  lecture = 'Lecture',
+  meetup = 'Meetup',
   'self-education' = 'Self-education',
   task = 'Task',
+  test = 'Test',
+  video = 'Video',
 }
+
+export enum EventTypeColor {
+  deadline = 'red',
+  test = '#63ab91',
+  jstask = 'green',
+  htmltask = 'green',
+  htmlcssacademy = 'green',
+  externaltask = 'green',
+  codewars = 'green',
+  codejam = 'green',
+  newtask = 'green',
+  lecture = 'blue',
+  lecture_online = 'blue',
+  lecture_offline = 'blue',
+  lecture_mixed = 'blue',
+  lecture_self_study = 'blue',
+  info = '#ff7b00',
+  warmup = '#63ab91',
+  meetup = '#bde04a',
+  workshop = '#bde04a',
+  interview = '#63ab91',
+}
+
+export const EventTypeToName: Record<string, string> = {
+  lecture_online: 'online lecture',
+  lecture_offline: 'offline lecture',
+  lecture_mixed: 'mixed lecture',
+  lecture_self_study: 'self study',
+  warmup: 'warm-up',
+  jstask: 'js task',
+  kotlintask: 'kotlin task',
+  objctask: 'objc task',
+  htmltask: 'html task',
+  codejam: 'code jam',
+  externaltask: 'external task',
+  htmlcssacademy: 'html/css academy',
+  codewars: 'codewars',
+  // TODO: Left hardcoded (codewars:stage1|codewars:stage2) configs only for backward compatibility. Delete them in the future.
+  'codewars:stage1': 'codewars',
+  'codewars:stage2': 'codewars',
+};
 
 export class EventService {
   private baseUrl: string;
@@ -42,51 +96,22 @@ export class EventService {
   }
 
   async updateEvent(eventId: string, data: Partial<Event>) {
-    const result = await axios.put<{ data: Event }>(`${this.baseUrl}/event/${eventId}`, data);
-    return result.data.data;
+    const result = await axios.put<Event>(`${this.baseUrl}/event/${eventId}`, data);
+    return result.data;
   }
 
   async createEvent(data: Partial<Event>) {
-    const result = await axios.post<{ data: Event }>(`${this.baseUrl}/event/`, data);
+    const result = await axios.post<Event>(`${this.baseUrl}/event/`, data);
     return result.data;
   }
 
   async deleteEvent(eventId: string) {
-    const result = await axios.delete<{ data: Event }>(`${this.baseUrl}/event/${eventId}`);
-    return result.data.data;
+    const result = await axios.delete<Event>(`${this.baseUrl}/event/${eventId}`);
+    return result.data;
   }
 }
 
-const hooks = {
-  useEventsData() {
-    const { store, dispatch } = React.useContext(ScheduleStore.context),
-      eventsData = store.events,
-      [eventsLoading, setLoading] = React.useState<null | boolean>(null);
-
-    React.useEffect(() => {
-      const isFirstFetching = !eventsData.list.length;
-      if (isFirstFetching && !eventsLoading) fetchEventsData();
-
-      async function fetchEventsData() {
-        setLoading(true);
-        try {
-          const events = await new EventService().getEvents();
-          API_Schedule.eventsSet(dispatch)({
-            payload: {
-              events,
-            },
-          });
-        } catch (error) {
-          console.error(error);
-        } finally {
-          setLoading(false);
-        }
-      }
-    }, [eventsData, eventsLoading]);
-
-    return React.useMemo(() => ({ eventsLoading, eventsData }), [eventsLoading, eventsData]);
-  },
-};
+const hooks = {};
 
 export const API_Events = {
   EventService,

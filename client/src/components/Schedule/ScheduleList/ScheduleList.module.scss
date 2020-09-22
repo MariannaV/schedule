@@ -1,3 +1,6 @@
+.ScheduleListWrapper {
+}
+
 .ScheduleList {
 }
 
@@ -19,5 +22,60 @@
     display: block;
     color: gray;
     font-size: 0.7em;
+  }
+}
+
+.ScheduleListItem {
+  display: grid;
+  grid-gap: 1rem;
+  padding: 1rem;
+  border-radius: 5px;
+  border: 1px solid #f0f0f0;
+
+  & > header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    & > h3 {
+      margin: 0;
+    }
+  }
+  & > main {
+    .description {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+    }
+  }
+
+  & > main {
+    .description {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+      overflow: hidden;
+    }
+  }
+
+  & > footer {
+    display: grid;
+    align-items: center;
+    grid-auto-flow: column;
+    justify-content: space-between;
+    grid-gap: 0.5rem;
+  }
+
+  .dateStart {
+    color: green;
+  }
+
+  .dateDeadline {
+    color: red;
+  }
+
+  &.isOpened {
+    border-color: lightskyblue;
   }
 }
