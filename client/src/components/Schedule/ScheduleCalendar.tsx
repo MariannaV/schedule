@@ -3,6 +3,10 @@ import moment from 'moment-timezone';
 import { Calendar, Badge } from 'antd';
 import { Event } from 'services/event';
 import { ScheduleStore } from 'components/Schedule/store';
+import {
+  ScheduleDetailViewModal,
+  IScheduleDetailViewModal,
+} from 'components/Schedule/ScheduleDetailView/ScheduleDetailViewModal';
 
 export function ScheduleCalendar() {
   const timeZone = ScheduleStore.useSelector(ScheduleStore.selectors.getUserPreferredTimezone),
@@ -18,6 +22,10 @@ export function ScheduleCalendar() {
       [eventsMap],
     );
 
+  const [isVisibleDetailViewModal, setVisibleDetailViewModal] = React.useState<IScheduleDetailViewModal['isVisible']>(
+    null,
+  );
+
   function dateCellRender(value) {
     const currentDate = dateRenderer(timeZone)(value),
       currentEvents = eventIdsByDate[currentDate];
@@ -27,17 +35,26 @@ export function ScheduleCalendar() {
     return (
       <section className="events">
         {currentEvents.map((eventId) => (
-          <CalendarEvent eventId={eventId} key={eventId} />
+          <CalendarEvent eventId={eventId} changeVisibility={setVisibleDetailViewModal} key={eventId} />
         ))}
       </section>
     );
   }
 
-  return <Calendar dateCellRender={dateCellRender} />;
+  return (
+    <>
+      <Calendar dateCellRender={dateCellRender} />
+      <ScheduleDetailViewModal isVisible={isVisibleDetailViewModal} changeVisibility={setVisibleDetailViewModal} />
+    </>
+  );
 }
 
-function CalendarEvent(props: { eventId: Event['id'] }) {
-  const { eventId } = props,
+interface ICalendarEvent extends Pick<IScheduleDetailViewModal, 'changeVisibility'> {
+  eventId: Event['id'];
+}
+
+function CalendarEvent(props: ICalendarEvent) {
+  const { eventId, changeVisibility } = props,
     eventData = ScheduleStore.useSelector(ScheduleStore.selectors.getEvent({ eventId }));
 
   const { dispatch } = React.useContext(ScheduleStore.context),
@@ -47,6 +64,7 @@ function CalendarEvent(props: { eventId: Event['id'] }) {
           openedId: eventId,
         },
       });
+      changeVisibility(true);
     }, [eventId]);
 
   const type = React.useMemo(() => {
