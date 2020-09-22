@@ -84,15 +84,13 @@ function reducer(store: NSchedule.IStore, action: NSchedule.IActions) {
     }
 
     case NSchedule.ActionTypes.EVENT_DELETE: {
+      const { [action.payload.eventId]: deletedEvent, ...newEventsMap } = store.events.map;
       return {
         ...store,
         events: {
           ...store.events,
           list: store.events.list.filter((eventId) => eventId !== action.payload.eventId),
-          map: {
-            ...store.events.map,
-            [action.payload.eventId]: undefined,
-          },
+          map: newEventsMap,
         },
       };
     }
