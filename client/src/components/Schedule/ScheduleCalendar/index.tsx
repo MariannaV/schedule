@@ -40,16 +40,19 @@ export function ScheduleCalendar() {
   function dateCellRender(value) {
     const currentDate = dateRenderer(timeZone)(value),
       isMentor = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsMentor),
-      currentEvents = eventIdsByDate[currentDate];
-    const currentTypes = eventTypesByDate[currentDate];
+      currentEvents = eventIdsByDate[currentDate],
+      currentTypes = eventTypesByDate[currentDate];
 
     return (
       <section>
         {isMentor && <Button children="+" type="primary" size="small" />}
         {currentEvents?.map((eventId, index) => (
-          <section className={calendarStyles[currentTypes[index].toLowerCase()]}>
-            <CalendarEvent eventId={eventId} key={eventId} changeVisibility={setVisibleDetailViewModal} />
-          </section>
+          <CalendarEvent
+            eventId={eventId}
+            className={calendarStyles[currentTypes[index].toLowerCase()]}
+            changeVisibility={setVisibleDetailViewModal}
+            key={eventId}
+          />
         ))}
       </section>
     );
@@ -65,6 +68,7 @@ export function ScheduleCalendar() {
 
 interface ICalendarEvent extends Pick<IScheduleDetailViewModal, 'changeVisibility'> {
   eventId: Event['id'];
+  className?: string;
 }
 
 function CalendarEvent(props: ICalendarEvent) {
@@ -91,7 +95,7 @@ function CalendarEvent(props: ICalendarEvent) {
   }, [eventData.deadLine]);
 
   return (
-    <article onClick={onClick}>
+    <article onClick={onClick} className={props.className}>
       <Badge status={type} text={eventData.name} />
     </article>
   );
