@@ -7,7 +7,6 @@ import {
   ScheduleDetailViewModal,
   IScheduleDetailViewModal,
 } from 'components/Schedule/ScheduleDetailView/ScheduleDetailViewModal';
-import ScheduleStyles from './ScheduleCalendar.module.scss';
 import calendarStyles from './ScheduleCalendar.module.scss';
 
 export function ScheduleCalendar() {
