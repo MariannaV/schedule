@@ -165,7 +165,7 @@ export function ScheduleTable() {
               title: 'Action',
               width: 300,
               dataIndex: 'checker',
-              render: (value: string) => (value ? actionButtonsRenderer(value) : actionButtonsRenderer('')),
+              render: (value: string, eventData: Event) => actionButtonsRenderer(value ?? '', eventData),
             },
             {
               title: 'Place',
@@ -221,15 +221,27 @@ export function ScheduleTable() {
 export const dateRenderer = (timeZone: string) => (value: string) =>
   value ? moment(value, 'YYYY-MM-DD HH:mmZ').tz(timeZone).format('DD.MM.YYYY HH:mm') : '';
 
-const actionButtonsRenderer = (checker) => {
+const actionButtonsRenderer = (checker, eventData: Event) => {
   const router = useRouter();
+  console.log('@@', eventData.id);
+  const ButtonDetails = React.useMemo(
+    () => (
+      <Button
+        type={'primary'}
+        className={styles.btn}
+        children="Details"
+        href={`/course/schedule/event/${eventData.id}`}
+        target="_blank"
+      />
+    ),
+    [eventData.id],
+  );
+
   switch (checker) {
     case 'crossCheck':
       return (
         <>
-          <Button type={'primary'} className={styles.btn}>
-            Details
-          </Button>
+          {ButtonDetails}
           <Button
             type={'primary'}
             className={`${styles.btn} ${styles.submit}`}
@@ -250,9 +262,7 @@ const actionButtonsRenderer = (checker) => {
     case 'auto-test':
       return (
         <>
-          <Button type={'primary'} className={styles.btn}>
-            Details
-          </Button>
+          {ButtonDetails}
           <Button
             type={'primary'}
             className={`${styles.btn} ${styles.check}`}
@@ -266,9 +276,7 @@ const actionButtonsRenderer = (checker) => {
     default:
       return (
         <>
-          <Button type={'primary'} className={styles.btn}>
-            Details
-          </Button>
+          {ButtonDetails}
           <EyeInvisibleOutlined className={styles.iconHide} />
         </>
       );
