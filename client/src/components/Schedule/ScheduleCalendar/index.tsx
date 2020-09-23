@@ -10,13 +10,7 @@ import {
 import ScheduleStyles from './ScheduleCalendar.module.scss';
 import calendarStyles from './ScheduleCalendar.module.scss';
 
-export function ScheduleCalendar({ props }) {
-  const { isReadOnly = false, className } = props,
-    classes = React.useMemo(
-      () => [ScheduleStyles.calendar, isReadOnly && 'isReadOnly', className].filter(Boolean).join(' '),
-      [className, isReadOnly],
-    );
-
+export function ScheduleCalendar() {
   const timeZone = ScheduleStore.useSelector(ScheduleStore.selectors.getUserPreferredTimezone),
     eventsMap = ScheduleStore.useSelector(ScheduleStore.selectors.getEventsMap),
     eventTypesByDate = React.useMemo(
@@ -64,7 +58,7 @@ export function ScheduleCalendar({ props }) {
 
   return (
     <>
-      <Calendar className={classes} dateCellRender={dateCellRender} />
+      <Calendar className={calendarStyles.calendar} dateCellRender={dateCellRender} />
       <ScheduleDetailViewModal isVisible={isVisibleDetailViewModal} changeVisibility={setVisibleDetailViewModal} />
     </>
   );

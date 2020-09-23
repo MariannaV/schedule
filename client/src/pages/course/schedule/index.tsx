@@ -37,7 +37,7 @@ const ScheduleView = React.memo(() => {
     case NSchedule.ScheduleView.list:
       return <ScheduleListWrapper />;
     case NSchedule.ScheduleView.calendar:
-      return <ScheduleCalendar props="any" />;
+      return <ScheduleCalendar />;
     case NSchedule.ScheduleView.table:
     default:
       return <ScheduleTable />;
