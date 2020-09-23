@@ -1,14 +1,17 @@
-@import 'variables.scss';
+@import '../../../styles/variables.scss';
 
 .calendar {
-  .codejam, .codewars, .course, .task {
+  .codejam,
+  .codewars,
+  .course,
+  .task {
     background-color: $color-task-background;
     &:hover {
       background: rgb(209 233 255);
       border-radius: 2px;
     }
   }
-  
+
   .interview {
     background-color: $color-interview-background;
     &:hover {
@@ -16,7 +19,7 @@
       border-radius: 2px;
     }
   }
-  
+
   .lecture {
     background-color: $color-lecture-background;
     &:hover {
@@ -24,7 +27,7 @@
       border-radius: 2px;
     }
   }
-  
+
   .self-education {
     background-color: $color-self-education-background;
     &:hover {
@@ -32,7 +35,7 @@
       border-radius: 2px;
     }
   }
-  
+
   .test {
     background-color: $color-test-background;
     &:hover {
@@ -50,15 +53,14 @@
     top: 3px;
     filter: opacity(0);
   }
-  [class~='ant-picker-cell']:hover{
+  [class~='ant-picker-cell']:hover {
     [class~='ant-btn-sm'] {
       filter: opacity(1);
     }
   }
-  @media only screen and (max-width: 480px){
-    [class~='ant-picker-calendar-header'] [class~='ant-picker-calendar-mode-switch'] > label { 
-    width: 100%;
+  @media only screen and (max-width: 480px) {
+    [class~='ant-picker-calendar-header'] [class~='ant-picker-calendar-mode-switch'] > label {
+      width: 100%;
+    }
   }
 }
-}
-
