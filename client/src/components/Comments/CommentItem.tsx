@@ -26,7 +26,6 @@ function CommentItem(props: IComments.Item) {
 
   return (
     <Form
-      name="commentForm"
       form={form}
       initialValues={comment}
       layout="vertical"
