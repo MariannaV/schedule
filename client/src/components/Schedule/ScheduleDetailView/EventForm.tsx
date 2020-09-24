@@ -5,6 +5,7 @@ import moment from 'moment';
 import { Event, eventTypes } from 'services/event';
 import { FieldTimezone } from 'components/Forms/fields';
 import { FieldOrganizers } from 'components/Forms/fields/FieldOrganizers';
+import { MapView } from 'components/Schedule/ScheduleMap/map';
 import { FormItem, IFormItem } from 'components/Forms/FormItem';
 import { NSchedule, ScheduleStore } from 'components/Schedule/store';
 import formStyles from './ScheduleDetailView.module.scss';
@@ -52,7 +53,8 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
   const [form] = Form.useForm(),
     formInitialValues = React.useMemo(() => eventFormHelpers.formatFrom(eventData), [eventData]),
     [eventType, setEventType] = React.useState<eventTypes>(eventData?.type),
-    [attachmentfiles, setAttachmentFiles] = React.useState(eventData?.attachments),
+    [attachmentFiles, setAttachmentFiles] = React.useState(eventData?.attachments),
+    [isOnline, changePlaceType] = React.useState(eventData?.['online/offline']),
     onSubmit = React.useCallback(
       async (sendingData: Event) => {
         const newEventData = eventFormHelpers.formatTo({ ...sendingData, comments: eventData?.comments });
@@ -192,20 +194,22 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
         );
       },
       place: ({ isReadOnly }) => (
-        <FormItem label="Place" name="place" type="input" children={<Input />} isReadOnly={isReadOnly} />
+        <FormItem
+          label="Place"
+          name="places"
+          type="map"
+          children={<MapView markers={eventData?.places} />}
+          rules={[{ required: true }]}
+          isReadOnly={isReadOnly}
+        />
       ),
       onlineOffline: ({ isReadOnly }) => (
         <FormItem
-          label="Online or offline"
+          label="Is online?"
           name="online/offline"
-          type="checkbox" //radio
+          type="switch"
           rules={[{ required: true }]}
-          children={
-            <Radio.Group>
-              <Radio value="Offline" children="Offline" checked />
-              <Radio value="Online" children="Online" />
-            </Radio.Group>
-          }
+          children={<Switch defaultChecked onChange={changePlaceType} />}
           isReadOnly={isReadOnly}
         />
       ),
@@ -303,7 +307,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
               <>
                 <fields.description isReadOnly={isReadOnly} />
                 <fields.onlineOffline isReadOnly={isReadOnly} />
-                <fields.place isReadOnly={isReadOnly} />
+                {!isOnline && <fields.place isReadOnly={isReadOnly} />}
                 <fields.timeZone isReadOnly={isReadOnly} />
                 <fields.dateTimeRange isReadOnly={isReadOnly} />
                 <fields.descriptionUrl isReadOnly={isReadOnly} />
@@ -316,7 +320,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
               <>
                 <fields.description isReadOnly={isReadOnly} />
                 <fields.onlineOffline isReadOnly={isReadOnly} />
-                <fields.place isReadOnly={isReadOnly} />
+                {!isOnline && <fields.place isReadOnly={isReadOnly} />}
                 <fields.timeZone isReadOnly={isReadOnly} />
                 <fields.dateTime isReadOnly={isReadOnly} />
                 <fields.descriptionUrl isReadOnly={isReadOnly} />
@@ -327,7 +331,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
       })()}
 
       <FormItem label="Attachments" name="attachments" type="files" isReadOnly={isReadOnly}>
-        <Upload multiple={true} defaultFileList={attachmentfiles} onChange={updateAttachmentFileList}>
+        <Upload multiple={true} defaultFileList={attachmentFiles} onChange={updateAttachmentFileList}>
           <Button icon={<UploadOutlined />} children="Click to upload" />
         </Upload>
       </FormItem>
