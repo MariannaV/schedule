@@ -6,43 +6,49 @@ export const defaultColumnsFilter = [
   'Action',
   'Place',
   'Description URL',
-  'Broadcast URL',
   'Organizer',
   'Description',
-  'Comment',
 ];
 
 export const rowsFilter = [
   {
-    text: 'code jam',
-    value: 'code jam',
+    text: 'Code jam',
+    value: 'Code jam',
   },
   {
-    text: 'codewars',
-    value: 'codewars',
+    text: 'Codewars',
+    value: 'Codewars',
   },
   {
-    text: 'course',
-    value: 'course',
+    text: 'Course',
+    value: 'Course',
   },
   {
-    text: 'interview',
-    value: 'interview',
+    text: 'Interview',
+    value: 'Interview',
   },
   {
-    text: 'lecture',
-    value: 'lecture',
+    text: 'Lecture',
+    value: 'Lecture',
   },
   {
-    text: 'self-education',
-    value: 'self-education',
+    text: 'Meetup',
+    value: 'Meetup',
   },
   {
-    text: 'task',
-    value: 'task',
+    text: 'Self-education',
+    value: 'Self-education',
   },
   {
-    text: 'test',
-    value: 'test',
+    text: 'Task',
+    value: 'Task',
+  },
+  {
+    text: 'Test',
+    value: 'Test',
+  },
+  {
+    video: 'Video',
+    value: 'Video',
   },
 ];

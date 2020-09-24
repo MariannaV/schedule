@@ -1,57 +1,47 @@
-import { QuestionCircleOutlined, YoutubeOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
-import { Table, Tag, Tooltip, Spin, Button } from 'antd';
-import { useRouter } from 'next/router';
-import { GithubUserLink } from 'components';
 import React from 'react';
-import { useState } from 'react';
 import moment from 'moment-timezone';
-import { API_Events, Event } from '../../../services/event';
-import { rowsFilter, defaultColumnsFilter } from './config';
+import {
+  QuestionCircleOutlined,
+  YoutubeOutlined,
+  EyeOutlined,
+  EyeInvisibleOutlined,
+  ExclamationCircleTwoTone,
+} from '@ant-design/icons';
+import { Table, Tag, Tooltip, Button } from 'antd';
+import { useRouter } from 'next/router';
+import { Event } from 'services/event';
+import { GithubUserLink } from 'components';
+import { ScheduleStore } from 'components/Schedule/store';
 import { Filter } from './components/Filter/Filter';
-import { ScheduleStore } from '../store';
-
+import { rowsFilter, defaultColumnsFilter } from './config';
+import { tagColors } from '../constants';
 import styles from './style.module.scss';
 
-const tagColors = {
-  codejam: 'green',
-  codewars: 'green',
-  course: 'green',
-  interview: 'volcano',
-  lecture: 'purple',
-  'self-education': 'gold',
-  task: 'green',
-  test: 'cyan',
-  video: 'purple',
-};
+const startOfToday = moment().startOf('day');
 
 function isRowDisabled(dateTime, deadLine) {
-  const startOfToday = moment().startOf('day');
   return deadLine
     ? moment(dateTime).isBefore(startOfToday) && moment(deadLine).isBefore(startOfToday)
     : moment(dateTime).isBefore(startOfToday);
 }
 
 export function ScheduleTable() {
-  const { store } = React.useContext(ScheduleStore.context),
-    { timeZone, isActiveDates } = store.user;
-
-  const { eventsLoading, eventsData } = API_Events.hooks.useEventsData(),
+  const timeZone = ScheduleStore.useSelector(ScheduleStore.selectors.getUserPreferredTimezone),
+    isActiveDates = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsActiveDates),
+    eventsData = ScheduleStore.useSelector(ScheduleStore.selectors.getEvents),
     tableData = React.useMemo(() => eventsData.list.map((eventId) => eventsData.map[eventId]), [eventsData]);
-  console.log(tableData);
 
-  const [checkedColumns, setCheckedColumns] = useState(defaultColumnsFilter);
-  const [selectedRows, setSelectedRows] = useState([] as string[]);
-  const [hiddenRows, setHiddenRows] = useState([] as string[]);
+  const [checkedColumns, setCheckedColumns] = React.useState(defaultColumnsFilter);
+  const [selectedRows, setSelectedRows] = React.useState([] as string[]);
+  const [hiddenRows, setHiddenRows] = React.useState([] as string[]);
 
   const hideRows = () => {
-    console.log('hide');
     setHiddenRows([...selectedRows, ...hiddenRows]);
-    console.log(selectedRows, hiddenRows);
     setSelectedRows([]);
   };
 
   return (
-    <Spin spinning={!!eventsLoading}>
+    <>
       <div className={styles.settings}>
         <Filter
           checkedColumns={checkedColumns}
@@ -71,7 +61,6 @@ export function ScheduleTable() {
           onRow={(record) => {
             return {
               onClick: (e) => {
-                console.log(record);
                 if ((e.target as HTMLElement).closest('[data-icon="eye-invisible"]')) {
                   hideRows();
                   return;
@@ -86,12 +75,11 @@ export function ScheduleTable() {
               },
             };
           }}
-          pagination={false}
-          size="small"
+          pagination={{ position: ['bottomRight'], showSizeChanger: true }}
           dataSource={
             isActiveDates
               ? tableData.filter(
-                  (data) => !isRowDisabled(data.dateTime, data.deadLine) && !hiddenRows.includes(data.id),
+                  (data) => !isRowDisabled(data.dateStart, data.dateEnd) && !hiddenRows.includes(data.id),
                 )
               : tableData.filter((data) => !hiddenRows.includes(data.id))
           }
@@ -99,55 +87,89 @@ export function ScheduleTable() {
             if (selectedRows.includes(record.id)) {
               return styles.activeRow;
             }
-            if (isRowDisabled(record.dateTime, record.deadLine)) {
+            if (isRowDisabled(record.dateStart, record.dateEnd)) {
               return 'rs-table-row-disabled';
             }
-            return styles[record.type.split(' ').join('')];
+            return styles[record.type.toLowerCase().split(' ').join('')];
           }}
+          scroll={{ x: 1600 }}
           // @ts-ignore
           columns={[
             {
               title: 'Start Date',
-              width: 180,
-              dataIndex: 'dateTime',
+              width: 80,
+              align: 'center',
+              dataIndex: 'dateStart',
+
               render: dateRenderer(timeZone),
               defaultSortOrder: 'ascend',
-              sorter: (a, b) => (a.dateTime > b.dateTime ? 1 : -1),
+              sorter: (a, b) => (a.dateStart > b.dateStart ? 1 : -1),
               sortDirections: ['ascend', 'descend', 'ascend'],
             },
             {
               title: 'Name',
+              width: 185,
               dataIndex: 'name',
               sorter: (a, b) => (a.name > b.name ? 1 : -1),
               sortDirections: ['ascend', 'descend', 'ascend'],
             },
             {
               title: 'DeadLine',
-              width: 180,
-              dataIndex: 'deadLine',
-              render: dateRenderer(timeZone),
-              sorter: (a, b) => (a.deadLine > b.deadLine ? 1 : -1),
+              width: 120,
+              align: 'center',
+              dataIndex: 'dateEnd',
+              render: (value: string) => {
+                if (!value) return;
+                if (moment(value).isBefore(startOfToday)) {
+                  return dateRenderer(timeZone)(value);
+                }
+                let deadline;
+                if (moment(value).subtract(7, 'days').isBefore(startOfToday)) {
+                  deadline = 'deadline_coming';
+                }
+                if (moment(value).subtract(3, 'days').isBefore(startOfToday)) {
+                  deadline = 'deadline_close';
+                }
+                const warning = moment(value).subtract(1, 'days').isBefore(moment());
+                return (
+                  <div className={styles[deadline]}>
+                    <span>{dateRenderer(timeZone)(value)}</span>
+                    {warning && (
+                      <Tooltip title="Only one day left!">
+                        <ExclamationCircleTwoTone twoToneColor="#f5222d" style={{ fontSize: 22, marginLeft: 5 }} />
+                      </Tooltip>
+                    )}
+                  </div>
+                );
+              },
+              sorter: (a, b) => (a.dateEnd > b.dateEnd ? 1 : -1),
               sortDirections: ['ascend', 'descend', 'ascend'],
             },
             {
               title: 'Type',
-              width: 100,
+              width: 120,
+              align: 'center',
               dataIndex: 'type' || '',
-              render: (value: keyof typeof tagColors) => <Tag color={tagColors[value]}>{value}</Tag>,
+              render: (value: keyof typeof tagColors) => (
+                <Tag color={tagColors[value.toLowerCase()]} className={styles.tag}>
+                  {value}
+                </Tag>
+              ),
               sorter: (a, b) => (a.type > b.type ? 1 : -1),
               sortDirections: ['ascend', 'descend', 'ascend'],
               filters: rowsFilter,
               onFilter: (value: string | number | boolean, record: Event) =>
-                record.type.indexOf(value.toString()) === 0,
+                record.type.toLowerCase().indexOf(value.toString().toLowerCase()) === 0,
             },
             {
               title: 'Action',
-              width: 325,
+              width: 300,
               dataIndex: 'checker',
-              render: (value: string) => (value ? actionButtonsRenderer(value) : actionButtonsRenderer('')),
+              render: (value: string, eventData: Event) => actionButtonsRenderer(value ?? '', eventData),
             },
             {
               title: 'Place',
+              width: 130,
               dataIndex: 'place',
               render: (value: string) => {
                 return value === 'Youtube Live' ? (
@@ -165,7 +187,16 @@ export function ScheduleTable() {
               sortDirections: ['ascend', 'descend', 'ascend'],
             },
             {
+              title: 'Organizer',
+              width: 120,
+              dataIndex: 'organizer',
+              render: (value: string) => (value ? <GithubUserLink value={value} /> : ''),
+              sorter: (a, b) => (a.organizer > b.organizer ? 1 : -1),
+              sortDirections: ['ascend', 'descend', 'ascend'],
+            },
+            {
               title: 'Description URL',
+              width: 200,
               dataIndex: 'descriptionUrl',
               render: (value: string) => {
                 return (
@@ -176,51 +207,40 @@ export function ScheduleTable() {
               },
             },
             {
-              title: 'Broadcast URL',
-              width: 140,
-              dataIndex: 'broadcastUrl',
-              render: (url: string) =>
-                url ? (
-                  <a target="_blank" href={url}>
-                    Link
-                  </a>
-                ) : (
-                  ''
-                ),
-            },
-            {
-              title: 'Organizer',
-              width: 140,
-              dataIndex: 'organizer',
-              render: (value: string) => (value ? <GithubUserLink value={value} /> : ''),
-              sorter: (a, b) => (a.organizer > b.organizer ? 1 : -1),
-              sortDirections: ['ascend', 'descend', 'ascend'],
-            },
-            {
               title: 'Description',
-              width: 300,
+              width: 250,
               dataIndex: 'description',
             },
-            { title: 'Comment', width: 300, dataIndex: 'comment' },
           ].filter((column) => checkedColumns.includes(column.title))}
         />
       )}
-    </Spin>
+    </>
   );
 }
 
 export const dateRenderer = (timeZone: string) => (value: string) =>
   value ? moment(value, 'YYYY-MM-DD HH:mmZ').tz(timeZone).format('DD.MM.YYYY HH:mm') : '';
 
-const actionButtonsRenderer = (checker) => {
+const actionButtonsRenderer = (checker, eventData: Event) => {
   const router = useRouter();
+  const ButtonDetails = React.useMemo(
+    () => (
+      <Button
+        type={'primary'}
+        className={styles.btn}
+        children="Details"
+        href={`/course/schedule/event/${eventData.id}`}
+        target="_blank"
+      />
+    ),
+    [eventData.id],
+  );
+
   switch (checker) {
     case 'crossCheck':
       return (
         <>
-          <Button type={'primary'} className={styles.btn}>
-            Details
-          </Button>
+          {ButtonDetails}
           <Button
             type={'primary'}
             className={`${styles.btn} ${styles.submit}`}
@@ -241,9 +261,7 @@ const actionButtonsRenderer = (checker) => {
     case 'auto-test':
       return (
         <>
-          <Button type={'primary'} className={styles.btn}>
-            Details
-          </Button>
+          {ButtonDetails}
           <Button
             type={'primary'}
             className={`${styles.btn} ${styles.check}`}
@@ -257,9 +275,7 @@ const actionButtonsRenderer = (checker) => {
     default:
       return (
         <>
-          <Button type={'primary'} className={styles.btn}>
-            Details
-          </Button>
+          {ButtonDetails}
           <EyeInvisibleOutlined className={styles.iconHide} />
         </>
       );

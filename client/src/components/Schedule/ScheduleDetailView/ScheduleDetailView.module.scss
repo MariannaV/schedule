@@ -4,9 +4,63 @@
 
 .ScheduleDetailViewHeader {
   display: grid;
-  grid-template-columns: auto max-content;
+  grid-auto-flow: column;
+  grid-template-columns: 1fr;
+  grid-auto-columns: max-content;
+  grid-gap: 0.5rem;
   align-items: center;
 }
 
 .EventForm {
+}
+
+.EventFormSubmitButton {
+}
+
+.ScheduleDetailViewModal {
+  &[class~='ant-modal'] {
+    top: 0;
+    min-width: 100vw;
+    height: 100vh;
+    padding-bottom: 0;
+    margin: 0;
+  }
+
+  [class~='ant-modal-content'] {
+    --maxModalWidth: 900px;
+    border-radius: 0;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 0 calc((100% - var(--maxModalWidth)) / 2);
+  }
+
+  [class~='ant-modal-header'],
+  [class~='ant-modal-body'] {
+    padding: 0.5rem 1rem;
+  }
+
+  [class~='ant-modal-header'] {
+    position: sticky;
+    top: 0;
+    left: 0;
+    background-color: white;
+    z-index: 1;
+    padding-right: 3rem;
+  }
+
+  [class~='ant-modal-close'] {
+    position: fixed;
+    z-index: 2;
+  }
+
+  [class~='ant-modal-body'] {
+    @media (min-width: 1024px) {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      grid-gap: 1rem;
+    }
+  }
+}
+
+.viewMode {
 }

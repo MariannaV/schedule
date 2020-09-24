@@ -2,14 +2,21 @@
   display: grid;
   grid-template-columns: repeat(16, 1fr);
   column-gap: 16px;
+  height: calc(100vh - 56px - 2 * 16px - 100px); //temp solution for vertical grow
 }
 
 .ScheduleList {
   grid-row: 1 / -1;
   grid-column: 1 / 9;
+  @media (max-width: 767px) {
+    grid-column: 1 / 18;
+  }
 }
 
 .ScheduleView {
   grid-row: 1 / -1;
   grid-column: 9 / -1;
+  @media (max-width: 767px) {
+    display: none;
+  }
 }

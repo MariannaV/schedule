@@ -1,7 +1,10 @@
 import React from 'react';
 import { Button, Typography, Tag } from 'antd';
-import moment from 'moment';
-import { Event, EventTypeColor, EventTypeToName } from 'services/event';
+import moment from 'moment-timezone';
+import { FixedSizeList as List } from 'react-window';
+import AutoSizer from 'react-virtualized-auto-sizer';
+import { Event } from 'services/event';
+import { tagColors } from '../constants';
 import { NSchedule, ScheduleStore } from 'components/Schedule/store';
 import listStyles from './ScheduleList.module.scss';
 
@@ -11,9 +14,25 @@ interface IScheduleList {
 
 function ScheduleList(props: IScheduleList) {
   const eventsList = ScheduleStore.useSelector(ScheduleStore.selectors.getEventsList),
-    eventItems = React.useMemo(() => eventsList.map((eventId) => <ListItem eventId={eventId} key={eventId} />), [
-      eventsList,
-    ]),
+    renderEventItem = React.useCallback(
+      ({ index, ...rest }: any) => <ListItem {...rest} eventId={eventsList[index]} />,
+      [eventsList],
+    ),
+    getRowKey = React.useCallback((index) => eventsList[index], [eventsList]),
+    renderEventList = React.useCallback(
+      ({ height, width }) => (
+        <List
+          className="List"
+          itemKey={getRowKey}
+          itemCount={eventsList.length}
+          itemSize={200}
+          width={width}
+          height={height}
+          children={renderEventItem}
+        />
+      ),
+      [],
+    ),
     classes = React.useMemo(() => [listStyles.ScheduleListWrapper, props.className].filter(Boolean).join(' '), [
       props.className,
     ]);
@@ -21,13 +40,14 @@ function ScheduleList(props: IScheduleList) {
   return (
     <section className={classes}>
       <ScheduleListHeader />
-      <section className={listStyles.ScheduleList} children={eventItems} />
+      <AutoSizer children={renderEventList} />
     </section>
   );
 }
 
 interface IListItem {
   eventId: Event['id'];
+  style: any;
 }
 
 function ListItem(props: IListItem) {
@@ -52,34 +72,51 @@ function ListItem(props: IListItem) {
     classes = React.useMemo(
       () => [listStyles.ScheduleListItem, eventId === openedEventId && listStyles.isOpened].filter(Boolean).join(' '),
       [eventId, openedEventId],
-    );
+    ),
+    containerStyle = React.useMemo(() => {
+      const verticalMargin = 8;
+      return {
+        ...props.style,
+        top: props.style.top + verticalMargin,
+        height: props.style.height - verticalMargin,
+      };
+    }, [props.style]);
 
   return (
-    <article className={classes} onClick={onItemClick}>
+    <article className={classes} onClick={onItemClick} style={containerStyle}>
       <header>
         <Typography.Title children={eventData.name} level={3} />
-        <Tag color={EventTypeColor[eventData.type]}>{EventTypeToName[eventData.type] || eventData.type}</Tag>
+        <Tag color={tagColors[eventData.type.toLowerCase()]}>{eventData.type}</Tag>
       </header>
 
       <main>
-        <Typography.Text children={eventData.description} />
+        <Typography.Text children={eventData.description} className={listStyles.description} />
       </main>
 
       <footer>
-        <Typography.Text children={`Start: ${formatDate(eventData.dateTime)}`} className={listStyles.dateStart} />
-        {eventData.deadLine && (
-          <Typography.Text
-            children={`Deadline: ${formatDate(eventData.deadLine)}`}
-            className={listStyles.dateDeadline}
-          />
+        <Typography.Text className={listStyles.dateStart}>
+          <span children="Start: " />
+          <Date date={eventData.dateStart} />
+        </Typography.Text>
+        {eventData.dateEnd && (
+          <Typography.Text className={listStyles.dateDeadline}>
+            <span children="Deadline: " />
+            <Date date={eventData.dateEnd} />
+          </Typography.Text>
         )}
       </footer>
     </article>
   );
+}
 
-  function formatDate(date) {
-    return moment(date, 'YYYY-MM-DD HH:mm').format('DD.MM.YYYY HH:mm');
-  }
+function Date(props: { date: string }) {
+  const timeZone = ScheduleStore.useSelector(ScheduleStore.selectors.getUserPreferredTimezone),
+    formattedDate = React.useMemo(
+      () => moment(props.date, 'YYYY-MM-DD HH:mmZ').tz(timeZone).format('DD.MM.YYYY HH:mm'),
+      [props.date, timeZone],
+    );
+
+  return <>{formattedDate}</>;
 }
 
 function ScheduleListHeader() {
