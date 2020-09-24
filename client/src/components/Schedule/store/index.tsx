@@ -53,6 +53,40 @@ function reducer(store: NSchedule.IStore, action: NSchedule.IActions) {
       };
     }
 
+    case NSchedule.ActionTypes.EVENT_FETCH: {
+      const { eventId } = action.payload;
+      return {
+        ...store,
+        events: {
+          ...store.events,
+          map: {
+            ...store.events.map,
+            [eventId]: {
+              ...store.events.map[eventId],
+              loading: true,
+            },
+          },
+        },
+      };
+    }
+
+    case NSchedule.ActionTypes.EVENT_FETCH_SUCCESSFUL: {
+      const { eventData } = action.payload;
+      return {
+        ...store,
+        events: {
+          ...store.events,
+          map: {
+            ...store.events.map,
+            [eventData.id]: {
+              ...eventData,
+              loading: false,
+            },
+          },
+        },
+      };
+    }
+
     case NSchedule.ActionTypes.EVENT_CREATE: {
       return {
         ...store,
@@ -135,6 +169,28 @@ const API_Schedule = {
     dispatch({ type: NSchedule.ActionTypes.EVENTS_SET, ...params }),
   isActiveDatesSet: (dispatch: Dispatch<NSchedule.IActions>) => (params: Omit<NSchedule.IIsActiveDatesSet, 'type'>) =>
     dispatch({ type: NSchedule.ActionTypes.IS_ACTIVE_DATES_SET, ...params }),
+  eventFetch: (dispatch: Dispatch<NSchedule.IActions>) => async (params: Omit<NSchedule.IEventFetch, 'type'>) => {
+    try {
+      const { eventId } = params.payload;
+
+      dispatch({
+        type: NSchedule.ActionTypes.EVENT_FETCH,
+        payload: {
+          eventId,
+        },
+      });
+
+      dispatch({
+        type: NSchedule.ActionTypes.EVENT_FETCH_SUCCESSFUL,
+        payload: {
+          eventData: await new EventService().getEvent(eventId),
+        },
+      });
+    } catch (error) {
+      console.error(error);
+      throw Error('eventFetch went wrong');
+    }
+  },
   eventCreate: (dispatch: Dispatch<NSchedule.IActions>) => async (params: Omit<NSchedule.IEventCreate, 'type'>) => {
     try {
       const { eventData } = params.payload;
