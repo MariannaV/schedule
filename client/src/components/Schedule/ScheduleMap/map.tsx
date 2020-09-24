@@ -1,8 +1,20 @@
-import React, { Fragment, PureComponent } from 'react';
+import React from 'react';
 import ReactMapGL, { Marker, Popup } from 'react-map-gl';
 import Geocoder from 'react-mapbox-gl-geocoder';
-import { Container, Col, Row, Button } from 'reactstrap';
+import { Button } from 'antd';
 import mapStyles from './map.module.scss';
+
+export interface IPlace {
+  name: string;
+  longitude: number;
+  latitude: number;
+}
+
+interface IMapView {
+  onChange?: (value: Array<IPlace>) => void;
+  isReadOnly?: boolean;
+  markers?: Array<IPlace>;
+}
 
 interface IMapbox {
   className?: string;
@@ -12,7 +24,7 @@ interface IMapbox {
     zoom: number;
   };
   tempMarker: any;
-  markers: Array<string>;
+  markers: Array<IPlace>;
   showPopup: boolean;
 }
 
@@ -23,23 +35,30 @@ const mapStyle = {
 
 const mapboxApiKey = 'pk.eyJ1Ijoic3lrcHluIiwiYSI6ImNrYXYwY3dmZjBnaXkyeW85cHVtdGpscDcifQ.B3dSl78hadCTrpKcPc06kQ';
 
-class MapView extends PureComponent<{}, IMapbox> {
+class MapView extends React.PureComponent<IMapView, IMapbox> {
   constructor(props) {
     super(props);
     this.state = {
       viewport: {
-        latitude: 53.9,
-        longitude: 27.56667,
+        ...(props.markers?.length
+          ? {
+              latitude: props.markers[0].latitude,
+              longitude: props.markers[0].longitude,
+            }
+          : {
+              latitude: 53.9,
+              longitude: 27.56667,
+            }),
         zoom: 10,
       },
       tempMarker: null,
-      markers: [],
+      markers: props.markers ?? Array.prototype,
       showPopup: true,
     };
   }
 
   componentDidMount() {
-    navigator.geolocation.getCurrentPosition((position) => {
+    navigator.geolocation.getCurrentPosition((position) =>
       this.setState(
         (state) =>
           ({
@@ -50,41 +69,31 @@ class MapView extends PureComponent<{}, IMapbox> {
               zoom: 10,
             },
           } as IMapbox),
-      );
-    });
+      ),
+    );
   }
 
-  customMarker = ({ marker }) => {
-    const { showPopup } = this.state;
-    return (
-      <Fragment>
-        <Marker longitude={marker.longitude} latitude={marker.latitude}>
-          <div>
-            <span>
-              <img
-                src="https://image.flaticon.com/icons/png/512/8/8168.png"
-                className={[mapStyles.mapIcon].filter(Boolean).join(' ')}
-              ></img>
-            </span>
-          </div>
-        </Marker>
-        {showPopup ? (
-          <Popup
-            latitude={marker.latitude}
-            longitude={marker.longitude}
-            dynamicPosition={false}
-            closeButton={false}
-            tipSize={5}
-            anchor="top"
-          >
-            <div>{marker.name}</div>
-          </Popup>
-        ) : null}
-      </Fragment>
-    );
-  };
+  customMarker = ({ marker }) => (
+    <>
+      <Marker longitude={marker.longitude} latitude={marker.latitude}>
+        <img src="https://image.flaticon.com/icons/png/512/8/8168.png" className={mapStyles.mapIcon} alt="marker" />
+      </Marker>
+      {this.state.showPopup && (
+        <Popup
+          latitude={marker.latitude}
+          longitude={marker.longitude}
+          dynamicPosition={false}
+          closeButton={false}
+          tipSize={5}
+          anchor="top"
+        >
+          <div>{marker.name}</div>
+        </Popup>
+      )}
+    </>
+  );
 
-  onSelected = (viewport, item) => {
+  onSelected = (viewport, item) =>
     this.setState({
       viewport,
       tempMarker: {
@@ -93,28 +102,23 @@ class MapView extends PureComponent<{}, IMapbox> {
         latitude: item.center[1],
       },
     });
-  };
 
   add = () => {
     const { tempMarker } = this.state;
-
-    this.setState((prevState) => ({
-      markers: [...prevState.markers, tempMarker],
-      tempMarker: null,
-    }));
+    this.setState(
+      (prevState) => ({ markers: [...prevState.markers, tempMarker], tempMarker: null }),
+      () => this.props.onChange?.(this.state.markers),
+    );
   };
 
   render() {
-    const { viewport, tempMarker } = this.state;
+    const { isReadOnly } = this.props,
+      { viewport, tempMarker } = this.state;
+
     return (
-      <Container fluid={true}>
-        <Row>
-          <Col>
-            <h2>Event Map</h2>
-          </Col>
-        </Row>
-        <Row className="py-4">
-          <Col xs={2}>
+      <section>
+        {!isReadOnly && (
+          <header>
             <Geocoder
               mapboxApiAccessToken={mapboxApiKey}
               onSelected={this.onSelected}
@@ -122,37 +126,27 @@ class MapView extends PureComponent<{}, IMapbox> {
               hideOnSelect={true}
               value=""
             />
-          </Col>
-          <Col>
-            <Button color="primary" onClick={this.add}>
-              Add New Mark
-            </Button>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <ReactMapGL
-              mapboxApiAccessToken={mapboxApiKey}
-              mapStyle="mapbox://styles/mapbox/streets-v11"
-              {...viewport}
-              {...mapStyle}
-              onViewportChange={(viewport) => this.setState({ viewport })}
-            >
-              {tempMarker && (
-                <Marker longitude={tempMarker.longitude} latitude={tempMarker.latitude}>
-                  <div className="marker temporary-marker"></div>
-                </Marker>
-              )}
-              {this.state.markers.map((marker) => {
-                console.log(marker);
-                return <Fragment>{this.customMarker({ marker })}</Fragment>;
-              })}
-            </ReactMapGL>
-          </Col>
-        </Row>
-      </Container>
+            <Button color="primary" onClick={this.add} children="Add New Mark" />
+          </header>
+        )}
+
+        <ReactMapGL
+          mapboxApiAccessToken={mapboxApiKey}
+          mapStyle="mapbox://styles/mapbox/streets-v11"
+          {...viewport}
+          {...mapStyle}
+          onViewportChange={(viewport) => this.setState({ viewport })}
+        >
+          {tempMarker && (
+            <Marker longitude={tempMarker.longitude} latitude={tempMarker.latitude}>
+              <div className="marker temporary-marker" />
+            </Marker>
+          )}
+          {this.state.markers.map((marker) => this.customMarker({ marker }))}
+        </ReactMapGL>
+      </section>
     );
   }
 }
 
-export default MapView;
+export { MapView };
