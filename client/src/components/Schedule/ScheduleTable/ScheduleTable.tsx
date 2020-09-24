@@ -223,7 +223,6 @@ export const dateRenderer = (timeZone: string) => (value: string) =>
 
 const actionButtonsRenderer = (checker, eventData: Event) => {
   const router = useRouter();
-  console.log('@@', eventData.id);
   const ButtonDetails = React.useMemo(
     () => (
       <Button
