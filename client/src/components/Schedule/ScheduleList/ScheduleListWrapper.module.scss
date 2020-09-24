@@ -9,8 +9,11 @@
   margin-bottom: 20px;
   grid-row: 1 / -1;
   grid-column: 1 / 9;
-
   // scroll-margin-left: 20px;
+  @media (max-width: 767px) {
+    grid-column: 1 / 18;
+  }
+
   ::-webkit-scrollbar-track
   {
     -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.09);
@@ -35,4 +38,7 @@
 .ScheduleView {
   grid-row: 1 / -1;
   grid-column: 9 / -1;
+  @media (max-width: 767px) {
+    display: none;
+  }
 }

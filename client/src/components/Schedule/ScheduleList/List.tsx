@@ -3,7 +3,8 @@ import { Button, Typography, Tag } from 'antd';
 import moment from 'moment-timezone';
 import { FixedSizeList as List } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import { Event, EventTypeColor, EventTypeToName } from 'services/event';
+import { Event } from 'services/event';
+import { tagColors } from '../constants';
 import { NSchedule, ScheduleStore } from 'components/Schedule/store';
 import listStyles from './ScheduleList.module.scss';
 
@@ -85,9 +86,10 @@ function ListItem(props: IListItem) {
     <article className={classes} onClick={onItemClick} style={containerStyle}>
       <header>
         <Typography.Title children={eventData.name} level={3} />
-        <Tag className={listStyles[eventData.type]} color={EventTypeColor[eventData.type]}>
-          {EventTypeToName[eventData.type] || eventData.type}
-        </Tag>
+        {/* <Tag className={listStyles[eventData.type]} color={tagColors[eventData.type.toLowerCase()]}>
+          {tagColors[eventData.type.toLowerCase()] || eventData.type}
+        </Tag> */}
+        <Tag color={tagColors[eventData.type.toLowerCase()]}>{eventData.type}</Tag>
       </header>
 
       <main>
@@ -97,12 +99,12 @@ function ListItem(props: IListItem) {
       <footer>
         <Typography.Text className={listStyles.dateStart}>
           <span children="Start: " />
-          <Date date={eventData.dateTime} />
+          <Date date={eventData.dateStart} />
         </Typography.Text>
-        {eventData.deadLine && (
+        {eventData.dateEnd && (
           <Typography.Text className={listStyles.dateDeadline}>
             <span children="Deadline: " />
-            <Date date={eventData.deadLine} />
+            <Date date={eventData.dateEnd} />
           </Typography.Text>
         )}
       </footer>
@@ -113,7 +115,7 @@ function ListItem(props: IListItem) {
 function Date(props: { date: string }) {
   const timeZone = ScheduleStore.useSelector(ScheduleStore.selectors.getUserPreferredTimezone),
     formattedDate = React.useMemo(
-      () => moment(props.date, 'YYYY-MM-DD HH:mmZ').tz(timeZone).format('YYYY-MM-DD HH:mm'),
+      () => moment(props.date, 'YYYY-MM-DD HH:mmZ').tz(timeZone).format('DD.MM.YYYY HH:mm'),
       [props.date, timeZone],
     );
 

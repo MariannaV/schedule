@@ -1,6 +1,12 @@
 import React from 'react';
 import moment from 'moment-timezone';
-import { QuestionCircleOutlined, YoutubeOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
+import {
+  QuestionCircleOutlined,
+  YoutubeOutlined,
+  EyeOutlined,
+  EyeInvisibleOutlined,
+  ExclamationCircleTwoTone,
+} from '@ant-design/icons';
 import { Table, Tag, Tooltip, Button } from 'antd';
 import { useRouter } from 'next/router';
 import { Event } from 'services/event';
@@ -8,22 +14,12 @@ import { GithubUserLink } from 'components';
 import { ScheduleStore } from 'components/Schedule/store';
 import { Filter } from './components/Filter/Filter';
 import { rowsFilter, defaultColumnsFilter } from './config';
+import { tagColors } from '../constants';
 import styles from './style.module.scss';
 
-const tagColors = {
-  codejam: 'green',
-  codewars: 'green',
-  course: 'green',
-  interview: 'volcano',
-  lecture: 'purple',
-  'self-education': 'gold',
-  task: 'green',
-  test: 'cyan',
-  video: 'purple',
-};
+const startOfToday = moment().startOf('day');
 
 function isRowDisabled(dateTime, deadLine) {
-  const startOfToday = moment().startOf('day');
   return deadLine
     ? moment(dateTime).isBefore(startOfToday) && moment(deadLine).isBefore(startOfToday)
     : moment(dateTime).isBefore(startOfToday);
@@ -39,10 +35,10 @@ export function ScheduleTable() {
   const [selectedRows, setSelectedRows] = React.useState([] as string[]);
   const [hiddenRows, setHiddenRows] = React.useState([] as string[]);
 
-  const hideRows = React.useCallback(() => {
+  const hideRows = () => {
     setHiddenRows([...selectedRows, ...hiddenRows]);
     setSelectedRows([]);
-  }, []);
+  };
 
   return (
     <>
@@ -83,7 +79,7 @@ export function ScheduleTable() {
           dataSource={
             isActiveDates
               ? tableData.filter(
-                  (data) => !isRowDisabled(data.dateTime, data.deadLine) && !hiddenRows.includes(data.id),
+                  (data) => !isRowDisabled(data.dateStart, data.dateEnd) && !hiddenRows.includes(data.id),
                 )
               : tableData.filter((data) => !hiddenRows.includes(data.id))
           }
@@ -91,55 +87,89 @@ export function ScheduleTable() {
             if (selectedRows.includes(record.id)) {
               return styles.activeRow;
             }
-            if (isRowDisabled(record.dateTime, record.deadLine)) {
+            if (isRowDisabled(record.dateStart, record.dateEnd)) {
               return 'rs-table-row-disabled';
             }
-            return styles[record.type.split(' ').join('')];
+            return styles[record.type.toLowerCase().split(' ').join('')];
           }}
+          scroll={{ x: 1600 }}
           // @ts-ignore
           columns={[
             {
               title: 'Start Date',
-              width: 180,
-              dataIndex: 'dateTime',
+              width: 80,
+              align: 'center',
+              dataIndex: 'dateStart',
+
               render: dateRenderer(timeZone),
               defaultSortOrder: 'ascend',
-              sorter: (a, b) => (a.dateTime > b.dateTime ? 1 : -1),
+              sorter: (a, b) => (a.dateStart > b.dateStart ? 1 : -1),
               sortDirections: ['ascend', 'descend', 'ascend'],
             },
             {
               title: 'Name',
+              width: 185,
               dataIndex: 'name',
               sorter: (a, b) => (a.name > b.name ? 1 : -1),
               sortDirections: ['ascend', 'descend', 'ascend'],
             },
             {
               title: 'DeadLine',
-              width: 180,
-              dataIndex: 'deadLine',
-              render: dateRenderer(timeZone),
-              sorter: (a, b) => (a.deadLine > b.deadLine ? 1 : -1),
+              width: 120,
+              align: 'center',
+              dataIndex: 'dateEnd',
+              render: (value: string) => {
+                if (!value) return;
+                if (moment(value).isBefore(startOfToday)) {
+                  return dateRenderer(timeZone)(value);
+                }
+                let deadline;
+                if (moment(value).subtract(7, 'days').isBefore(startOfToday)) {
+                  deadline = 'deadline_coming';
+                }
+                if (moment(value).subtract(3, 'days').isBefore(startOfToday)) {
+                  deadline = 'deadline_close';
+                }
+                const warning = moment(value).subtract(1, 'days').isBefore(moment());
+                return (
+                  <div className={styles[deadline]}>
+                    <span>{dateRenderer(timeZone)(value)}</span>
+                    {warning && (
+                      <Tooltip title="Only one day left!">
+                        <ExclamationCircleTwoTone twoToneColor="#f5222d" style={{ fontSize: 22, marginLeft: 5 }} />
+                      </Tooltip>
+                    )}
+                  </div>
+                );
+              },
+              sorter: (a, b) => (a.dateEnd > b.dateEnd ? 1 : -1),
               sortDirections: ['ascend', 'descend', 'ascend'],
             },
             {
               title: 'Type',
-              width: 100,
+              width: 120,
+              align: 'center',
               dataIndex: 'type' || '',
-              render: (value: keyof typeof tagColors) => <Tag color={tagColors[value]}>{value}</Tag>,
+              render: (value: keyof typeof tagColors) => (
+                <Tag color={tagColors[value.toLowerCase()]} className={styles.tag}>
+                  {value}
+                </Tag>
+              ),
               sorter: (a, b) => (a.type > b.type ? 1 : -1),
               sortDirections: ['ascend', 'descend', 'ascend'],
               filters: rowsFilter,
               onFilter: (value: string | number | boolean, record: Event) =>
-                record.type.indexOf(value.toString()) === 0,
+                record.type.toLowerCase().indexOf(value.toString().toLowerCase()) === 0,
             },
             {
               title: 'Action',
-              width: 325,
+              width: 300,
               dataIndex: 'checker',
               render: (value: string) => (value ? actionButtonsRenderer(value) : actionButtonsRenderer('')),
             },
             {
               title: 'Place',
+              width: 130,
               dataIndex: 'place',
               render: (value: string) => {
                 return value === 'Youtube Live' ? (
@@ -157,7 +187,16 @@ export function ScheduleTable() {
               sortDirections: ['ascend', 'descend', 'ascend'],
             },
             {
+              title: 'Organizer',
+              width: 120,
+              dataIndex: 'organizer',
+              render: (value: string) => (value ? <GithubUserLink value={value} /> : ''),
+              sorter: (a, b) => (a.organizer > b.organizer ? 1 : -1),
+              sortDirections: ['ascend', 'descend', 'ascend'],
+            },
+            {
               title: 'Description URL',
+              width: 200,
               dataIndex: 'descriptionUrl',
               render: (value: string) => {
                 return (
@@ -168,32 +207,10 @@ export function ScheduleTable() {
               },
             },
             {
-              title: 'Broadcast URL',
-              width: 140,
-              dataIndex: 'broadcastUrl',
-              render: (url: string) =>
-                url ? (
-                  <a target="_blank" href={url}>
-                    Link
-                  </a>
-                ) : (
-                  ''
-                ),
-            },
-            {
-              title: 'Organizer',
-              width: 140,
-              dataIndex: 'organizer',
-              render: (value: string) => (value ? <GithubUserLink value={value} /> : ''),
-              sorter: (a, b) => (a.organizer > b.organizer ? 1 : -1),
-              sortDirections: ['ascend', 'descend', 'ascend'],
-            },
-            {
               title: 'Description',
-              width: 300,
+              width: 250,
               dataIndex: 'description',
             },
-            { title: 'Comment', width: 300, dataIndex: 'comment' },
           ].filter((column) => checkedColumns.includes(column.title))}
         />
       )}
