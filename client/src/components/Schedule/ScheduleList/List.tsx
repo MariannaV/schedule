@@ -86,9 +86,6 @@ function ListItem(props: IListItem) {
     <article className={classes} onClick={onItemClick} style={containerStyle}>
       <header>
         <Typography.Title children={eventData.name} level={3} />
-        {/* <Tag className={listStyles[eventData.type]} color={tagColors[eventData.type.toLowerCase()]}>
-          {tagColors[eventData.type.toLowerCase()] || eventData.type}
-        </Tag> */}
         <Tag color={tagColors[eventData.type.toLowerCase()]}>{eventData.type}</Tag>
       </header>
 

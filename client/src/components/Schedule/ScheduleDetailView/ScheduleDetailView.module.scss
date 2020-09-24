@@ -1,5 +1,5 @@
 .ScheduleDetailView {
-  position: relative;
+
 }
 
 .ScheduleDetailViewHeader {
@@ -9,6 +9,8 @@
   grid-auto-columns: max-content;
   grid-gap: 0.5rem;
   align-items: center;
+  position: relative;
+
 }
 
 .EventForm {
@@ -17,7 +19,14 @@
 .EventFormSubmitButton {
 }
 
+
+
 .ScheduleDetailViewModal {
+  [class~='ant-tag'] {
+    border: none;
+    background: none;
+  } 
+
   &[class~='ant-modal'] {
     top: 0;
     min-width: 100vw;
@@ -63,4 +72,32 @@
 }
 
 .viewMode {
+  [class~='ant-tag'] {
+    margin-bottom: 26px;
+    // border: 1px;
+    // background: auto;
+  }
+  .fieldName{
+    [class~='ant-form-item-label'] {
+      display: none;
+    }
+    [class~='ant-form-item-control'] {
+      font-weight: bold;
+      font-size: 1.6em;
+    }
+  }
+  .fieldType{
+    margin-bottom: 0px;
+    [class~='ant-form-item-label'] {
+      display: none;
+    }
+  }
+  .fieldLink{
+    [class~='ant-form-item-control'] {
+      color: blue;
+      text-decoration: underline;
+    }
+  }
+
+  
 }

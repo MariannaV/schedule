@@ -1,6 +1,6 @@
 import React from 'react';
 import { UploadOutlined } from '@ant-design/icons';
-import { Form, Input, Select, Switch, Upload, Button, Radio, DatePicker, message } from 'antd';
+import { Tag, Form, Input, Select, Switch, Upload, Button, Radio, DatePicker, message } from 'antd';
 import moment from 'moment';
 import { Event, eventTypes } from 'services/event';
 import { FieldTimezone } from 'components/Forms/fields';
@@ -8,6 +8,7 @@ import { FieldOrganizers } from 'components/Forms/fields/FieldOrganizers';
 import { FormItem, IFormItem } from 'components/Forms/FormItem';
 import { NSchedule, ScheduleStore } from 'components/Schedule/store';
 import formStyles from './ScheduleDetailView.module.scss';
+import { tagColors } from '../constants';
 
 const eventFormHelpers = {
   formatTo: (sendingData: any) => {
@@ -131,6 +132,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
           type="input"
           children={<Input />}
           isReadOnly={isReadOnly}
+          className={formStyles.fieldLink}
         />
       ),
       timeZone: ({ isReadOnly }) => (
@@ -146,6 +148,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
       dateTime: ({ isReadOnly }) => (
         <FormItem
           label="Start time"
+          style={{ color: 'green' }}
           name="dateStart"
           rules={[{ required: true, message: 'Please select event time!' }]}
           type="time"
@@ -176,6 +179,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
           <>
             <FormItem
               label="Start time"
+              style={{ color: 'green' }}
               name="dateStart"
               type="time"
               children={<DatePicker showTime />}
@@ -183,6 +187,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
             />
             <FormItem
               label="Deadline time"
+              style={{ color: 'red' }}
               name="dateEnd"
               type="time"
               children={<DatePicker showTime />}
@@ -244,23 +249,27 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
         type="input"
         children={<Input />}
         isReadOnly={isReadOnly}
+        className={formStyles.fieldName}
       />
-
-      <FormItem
-        label="Event type"
-        name="type"
-        rules={[{ required: true, message: 'Please select event type!' }]}
-        type="select"
-        children={
-          <Select
-            onSelect={setEventType as any}
-            children={Object.entries({ ...eventTypes }).map(([key, value]) => (
-              <Select.Option value={value} children={value} key={key} />
-            ))}
-          />
-        }
-        isReadOnly={isReadOnly}
-      />
+      <Tag color={tagColors[eventData.type.toLowerCase()]}>
+        <FormItem
+          style={{ color: `${tagColors[eventData.type.toLowerCase()]}` }}
+          label="Event type"
+          name="type"
+          rules={[{ required: true, message: 'Please select event type!' }]}
+          type="select"
+          children={
+            <Select
+              onSelect={setEventType as any}
+              children={Object.entries({ ...eventTypes }).map(([key, value]) => (
+                <Select.Option value={value} children={value} key={key} />
+              ))}
+            />
+          }
+          isReadOnly={isReadOnly}
+          className={formStyles.fieldType}
+        />
+      </Tag>
 
       {(() => {
         switch (eventType) {
@@ -339,6 +348,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
           type="switch"
           children={<Switch defaultChecked={eventData?.commentsEnabled} />}
           isReadOnly={isReadOnly}
+          className={formStyles.fieldComment}
         />
       )}
     </Form>
