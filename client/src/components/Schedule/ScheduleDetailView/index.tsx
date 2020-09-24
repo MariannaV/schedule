@@ -1,4 +1,5 @@
 import React from 'react';
+import { NSchedule, ScheduleStore } from 'components/Schedule/store';
 import viewStyles from './ScheduleDetailView.module.scss';
 import { ScheduleDetailViewHeader } from './ScheduleDetailViewHeader';
 import { EventForm } from './EventForm';
@@ -9,9 +10,13 @@ interface IScheduleDetailView {
 }
 
 export const ScheduleDetailView: React.FC<IScheduleDetailView> = React.memo((props) => {
-  const classes = React.useMemo(() => [viewStyles.ScheduleDetailView, props.className].filter(Boolean).join(' '), [
-      props.className,
-    ]),
+  const formMode = ScheduleStore.useSelector(ScheduleStore.selectors.getDetailViewMode),
+    isReadOnly = formMode === NSchedule.FormModes.VIEW,
+    classes = React.useMemo(
+      () =>
+        [viewStyles.ScheduleDetailView, isReadOnly && viewStyles.viewMode, props.className].filter(Boolean).join(' '),
+      [props.className, isReadOnly],
+    ),
     [isSubmitting, setSubmitting] = React.useState<null | boolean>(null);
 
   return (
