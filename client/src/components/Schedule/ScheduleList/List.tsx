@@ -30,7 +30,7 @@ function ScheduleList(props: IScheduleList) {
           children={renderEventItem}
         />
       ),
-      [],
+      [eventsList, renderEventItem],
     ),
     classes = React.useMemo(() => [listStyles.ScheduleListWrapper, props.className].filter(Boolean).join(' '), [
       props.className,
