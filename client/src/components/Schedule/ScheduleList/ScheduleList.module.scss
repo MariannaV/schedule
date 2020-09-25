@@ -1,17 +1,10 @@
-@import 'variables.scss';
-
-.ScheduleListWrapper {
-}
-
-.ScheduleList {
-
-}
+@import '../../../styles/variables.scss';
 
 .ScheduleListHeader {
   display: grid;
   grid-template-columns: auto auto;
   justify-content: space-between;
-  align-items: center;  
+  align-items: center;
 }
 
 .ScheduleListHeaderTitle {
@@ -35,10 +28,12 @@
   border-radius: 5px;
   border: 1px solid #f0f0f0;
   cursor: pointer;
-  width: 98% !important;
+  max-width: calc(100% - 1rem);
 
-
-  .codejam, .codewars, .course, .task {
+  .codejam,
+  .codewars,
+  .course,
+  .task {
     background-color: $color-task-background;
     &:hover {
       background: rgb(209 233 255);
@@ -48,7 +43,7 @@
       background-color: $color-task-background;
     }
   }
-  
+
   .interview {
     background-color: $color-interview-background;
     &:hover {
@@ -56,7 +51,7 @@
       border-radius: 2px;
     }
   }
-  
+
   .lecture {
     background-color: $color-lecture-background;
     &:hover {
@@ -64,7 +59,7 @@
       border-radius: 2px;
     }
   }
-  
+
   .self-education {
     background-color: $color-self-education-background;
     &:hover {
@@ -72,7 +67,7 @@
       border-radius: 2px;
     }
   }
-  
+
   .test {
     background-color: $color-test-background;
     &:hover {
@@ -90,20 +85,12 @@
       margin: 0;
     }
   }
-  & > main {
-    .description {
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 2;
-      overflow: hidden;
-    }
-  }
 
   & > main {
     .description {
       display: -webkit-box;
       -webkit-box-orient: vertical;
-      -webkit-line-clamp: 3;
+      -webkit-line-clamp: 2;
       overflow: hidden;
     }
   }

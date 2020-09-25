@@ -1,5 +1,4 @@
 .ScheduleDetailView {
-
 }
 
 .ScheduleDetailViewHeader {
@@ -10,7 +9,6 @@
   grid-gap: 0.5rem;
   align-items: center;
   position: relative;
-
 }
 
 .EventForm {
@@ -18,8 +16,6 @@
 
 .EventFormSubmitButton {
 }
-
-
 
 .ScheduleDetailViewModal {
   &[class~='ant-modal'] {
@@ -67,7 +63,7 @@
 }
 
 .viewMode {
-  .fieldName{
+  .fieldName {
     [class~='ant-form-item-label'] {
       display: none;
     }
@@ -76,12 +72,14 @@
       font-size: 1.6em;
     }
   }
-  .fieldType{
-    // margin-bottom: 0px;
+
+  .fieldType {
+    color: var(--eventTypeColor, black);
+
     [class~='ant-form-item-label'] {
       display: none;
     }
-    [class~='ant-form-item-control-input-content'] > p  {
+    [class~='ant-form-item-control-input-content'] > p {
       padding: 2px;
       width: 120px;
       text-align: center;
@@ -91,12 +89,19 @@
       border-radius: 2px;
     }
   }
-  .fieldLink{
-    [class~='ant-form-item-control']{
+
+  .fieldLink {
+    [class~='ant-form-item-control'] {
       color: blue;
       text-decoration: underline;
     }
   }
 
-  
+  .fieldDateStart {
+    color: green;
+  }
+
+  .fieldDateEnd {
+    color: red;
+  }
 }

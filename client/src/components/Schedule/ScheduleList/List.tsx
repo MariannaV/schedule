@@ -22,7 +22,6 @@ function ScheduleList(props: IScheduleList) {
     renderEventList = React.useCallback(
       ({ height, width }) => (
         <List
-          className="List"
           itemKey={getRowKey}
           itemCount={eventsList.length}
           itemSize={200}

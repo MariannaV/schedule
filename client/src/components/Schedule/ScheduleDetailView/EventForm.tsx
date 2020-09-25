@@ -148,12 +148,12 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
       dateTime: ({ isReadOnly }) => (
         <FormItem
           label="Start time"
-          style={{ color: 'green' }}
           name="dateStart"
           rules={[{ required: true, message: 'Please select event time!' }]}
           type="time"
           children={<DatePicker showTime />}
           isReadOnly={isReadOnly}
+          className={formStyles.fieldDateStart}
         />
       ),
       organizers: ({ isReadOnly }) => (
@@ -179,19 +179,19 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
           <>
             <FormItem
               label="Start time"
-              style={{ color: 'green' }}
               name="dateStart"
               type="time"
               children={<DatePicker showTime />}
               isReadOnly={isReadOnly}
+              className={formStyles.fieldDateStart}
             />
             <FormItem
               label="Deadline time"
-              style={{ color: 'red' }}
               name="dateEnd"
               type="time"
               children={<DatePicker showTime />}
               isReadOnly={isReadOnly}
+              className={formStyles.fieldDateEnd}
             />
           </>
         );
@@ -252,7 +252,6 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
         className={formStyles.fieldName}
       />
       <FormItem
-        style={eventData ? { color: `${tagColors[eventData.type.toLowerCase()]}` } : { color: `black` }}
         label="Event type"
         name="type"
         rules={[{ required: true, message: 'Please select event type!' }]}
@@ -267,6 +266,9 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
         }
         isReadOnly={isReadOnly}
         className={formStyles.fieldType}
+        style={{
+          ['--eventTypeColor' as any]: tagColors[eventData?.type.toLowerCase()],
+        }}
       />
       {(() => {
         switch (eventType) {
