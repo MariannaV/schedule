@@ -8,6 +8,7 @@ export interface IFormItem extends FormItemProps {
   isReadOnly?: boolean;
   type: 'input' | 'select' | 'time' | 'checkbox' | 'switch' | 'files';
   name: string;
+  style?: React.CSSProperties;
 }
 
 export const FormItem: React.FC<IFormItem> = React.memo((props) => {

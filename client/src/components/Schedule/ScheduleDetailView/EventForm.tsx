@@ -8,6 +8,7 @@ import { FieldOrganizers } from 'components/Forms/fields/FieldOrganizers';
 import { FormItem, IFormItem } from 'components/Forms/FormItem';
 import { NSchedule, ScheduleStore } from 'components/Schedule/store';
 import formStyles from './ScheduleDetailView.module.scss';
+import { tagColors } from '../constants';
 
 const eventFormHelpers = {
   formatTo: (sendingData: any) => {
@@ -122,6 +123,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
           type="input"
           children={<Input />}
           isReadOnly={isReadOnly}
+          className={formStyles.fieldDescription}
         />
       ),
       descriptionUrl: ({ isReadOnly }) => (
@@ -131,6 +133,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
           type="input"
           children={<Input />}
           isReadOnly={isReadOnly}
+          className={formStyles.fieldLink}
         />
       ),
       timeZone: ({ isReadOnly }) => (
@@ -151,6 +154,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
           type="time"
           children={<DatePicker showTime />}
           isReadOnly={isReadOnly}
+          className={formStyles.fieldDateStart}
         />
       ),
       organizers: ({ isReadOnly }) => (
@@ -180,6 +184,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
               type="time"
               children={<DatePicker showTime />}
               isReadOnly={isReadOnly}
+              className={formStyles.fieldDateStart}
             />
             <FormItem
               label="Deadline time"
@@ -187,6 +192,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
               type="time"
               children={<DatePicker showTime />}
               isReadOnly={isReadOnly}
+              className={formStyles.fieldDateEnd}
             />
           </>
         );
@@ -244,8 +250,8 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
         type="input"
         children={<Input />}
         isReadOnly={isReadOnly}
+        className={formStyles.fieldName}
       />
-
       <FormItem
         label="Event type"
         name="type"
@@ -260,8 +266,11 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
           />
         }
         isReadOnly={isReadOnly}
+        className={formStyles.fieldType}
+        style={{
+          ['--eventTypeColor' as any]: tagColors[eventData?.type.toLowerCase()],
+        }}
       />
-
       {(() => {
         switch (eventType) {
           case eventTypes.codejam:
@@ -339,6 +348,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
           type="switch"
           children={<Switch defaultChecked={eventData?.commentsEnabled} />}
           isReadOnly={isReadOnly}
+          className={formStyles.fieldComment}
         />
       )}
     </Form>

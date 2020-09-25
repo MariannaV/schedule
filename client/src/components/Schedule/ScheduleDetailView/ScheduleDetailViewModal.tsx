@@ -1,5 +1,6 @@
 import React from 'react';
 import { Modal } from 'antd';
+import { NSchedule, ScheduleStore } from 'components/Schedule/store';
 import viewStyles from './ScheduleDetailView.module.scss';
 import { ScheduleDetailViewHeader } from './ScheduleDetailViewHeader';
 import { EventForm } from './EventForm';
@@ -14,6 +15,13 @@ export function ScheduleDetailViewModal(props: IScheduleDetailViewModal) {
   const { isVisible, changeVisibility } = props,
     onCancel = React.useCallback(() => changeVisibility(false), []);
 
+  const formMode = ScheduleStore.useSelector(ScheduleStore.selectors.getDetailViewMode),
+    isReadOnly = formMode === NSchedule.FormModes.VIEW,
+    classes = React.useMemo(
+      () => [viewStyles.ScheduleDetailViewModal, isReadOnly && viewStyles.viewMode].filter(Boolean).join(' '),
+      [isReadOnly],
+    );
+
   const [isSubmitting, setSubmitting] = React.useState<null | boolean>(null);
   return (
     <Modal
@@ -21,7 +29,7 @@ export function ScheduleDetailViewModal(props: IScheduleDetailViewModal) {
       visible={!!isVisible}
       onCancel={onCancel}
       footer={null}
-      className={viewStyles.ScheduleDetailViewModal}
+      className={classes}
     >
       <EventForm setSubmitting={setSubmitting} />
       <EventComments />
