@@ -3,10 +3,11 @@ import { Form, Checkbox, Switch, Tag } from 'antd';
 import moment from 'moment';
 import { FormItemProps } from 'antd/lib/form';
 import formItemStyles from './FormItem.module.scss';
+import { MapView } from 'components/Schedule/ScheduleMap/map';
 
 export interface IFormItem extends FormItemProps {
   isReadOnly?: boolean;
-  type: 'input' | 'select' | 'time' | 'checkbox' | 'switch' | 'files';
+  type: 'input' | 'select' | 'time' | 'checkbox' | 'switch' | 'files' | 'map';
   name: string;
   style?: React.CSSProperties;
 }
@@ -51,6 +52,9 @@ function FieldView(props: IFieldView) {
           const files = value?.fileList ?? value ?? Array.prototype;
           return files.map((file) => <Tag children={file.name} key={`attachment-${file.uid}`} />);
         }
+
+        case 'map':
+          return <MapView isReadOnly markers={value} />;
 
         default:
           return value;
