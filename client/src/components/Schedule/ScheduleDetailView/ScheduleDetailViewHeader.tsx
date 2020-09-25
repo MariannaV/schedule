@@ -57,7 +57,7 @@ export function ScheduleDetailViewHeader(props: { isSubmitting: null | boolean }
   return (
     <header className={viewStyles.ScheduleDetailViewHeader}>
       <Typography.Title children="Event" data-id={openedItem ?? 'new'} level={3} />
-      {!isCreationMode && isMentor && <Dropdown.Button overlay={menu} />}
+      {!isCreationMode && isMentor && <Dropdown.Button overlay={menu} className={formStyles.dropdownButton} />}
       {!isViewMode && <ButtonSubmit isSubmitting={props.isSubmitting} />}
     </header>
   );
