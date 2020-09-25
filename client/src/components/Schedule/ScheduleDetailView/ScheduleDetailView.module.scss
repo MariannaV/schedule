@@ -90,6 +90,10 @@
     }
   }
 
+  .fieldDescription {
+    white-space: pre-line;
+  }
+
   .fieldLink {
     [class~='ant-form-item-control'] {
       color: blue;
