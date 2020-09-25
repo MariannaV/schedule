@@ -252,7 +252,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
         className={formStyles.fieldName}
       />
       <FormItem
-        style={{ color: `${tagColors[eventData.type.toLowerCase()]}` }}
+        style={eventData ? { color: `${tagColors[eventData.type.toLowerCase()]}` } : { color: `black` }}
         label="Event type"
         name="type"
         rules={[{ required: true, message: 'Please select event type!' }]}
