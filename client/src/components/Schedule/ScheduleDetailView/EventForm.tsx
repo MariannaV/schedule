@@ -1,6 +1,6 @@
 import React from 'react';
 import { UploadOutlined } from '@ant-design/icons';
-import { Tag, Form, Input, Select, Switch, Upload, Button, Radio, DatePicker, message } from 'antd';
+import { Form, Input, Select, Switch, Upload, Button, Radio, DatePicker, message } from 'antd';
 import moment from 'moment';
 import { Event, eventTypes } from 'services/event';
 import { FieldTimezone } from 'components/Forms/fields';
@@ -251,26 +251,23 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
         isReadOnly={isReadOnly}
         className={formStyles.fieldName}
       />
-      <Tag color={tagColors[eventData.type.toLowerCase()]}>
-        <FormItem
-          style={{ color: `${tagColors[eventData.type.toLowerCase()]}` }}
-          label="Event type"
-          name="type"
-          rules={[{ required: true, message: 'Please select event type!' }]}
-          type="select"
-          children={
-            <Select
-              onSelect={setEventType as any}
-              children={Object.entries({ ...eventTypes }).map(([key, value]) => (
-                <Select.Option value={value} children={value} key={key} />
-              ))}
-            />
-          }
-          isReadOnly={isReadOnly}
-          className={formStyles.fieldType}
-        />
-      </Tag>
-
+      <FormItem
+        style={{ color: `${tagColors[eventData.type.toLowerCase()]}` }}
+        label="Event type"
+        name="type"
+        rules={[{ required: true, message: 'Please select event type!' }]}
+        type="select"
+        children={
+          <Select
+            onSelect={setEventType as any}
+            children={Object.entries({ ...eventTypes }).map(([key, value]) => (
+              <Select.Option value={value} children={value} key={key} />
+            ))}
+          />
+        }
+        isReadOnly={isReadOnly}
+        className={formStyles.fieldType}
+      />
       {(() => {
         switch (eventType) {
           case eventTypes.codejam:

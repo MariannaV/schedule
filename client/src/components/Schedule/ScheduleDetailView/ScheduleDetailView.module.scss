@@ -22,10 +22,10 @@
 
 
 .ScheduleDetailViewModal {
-  [class~='ant-tag'] {
-    border: none;
-    background: none;
-  } 
+  // [class~='ant-tag'] {
+  //   border: none;
+  //   background: none;
+  // } 
 
   &[class~='ant-modal'] {
     top: 0;
@@ -72,11 +72,11 @@
 }
 
 .viewMode {
-  [class~='ant-tag'] {
-    margin-bottom: 26px;
+  // [class~='ant-tag'] {
+    // margin-bottom: 26px;
     // border: 1px;
     // background: auto;
-  }
+  // }
   .fieldName{
     [class~='ant-form-item-label'] {
       display: none;
