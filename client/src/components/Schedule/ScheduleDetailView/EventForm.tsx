@@ -123,6 +123,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
           type="input"
           children={<Input />}
           isReadOnly={isReadOnly}
+          className={formStyles.fieldDescription}
         />
       ),
       descriptionUrl: ({ isReadOnly }) => (

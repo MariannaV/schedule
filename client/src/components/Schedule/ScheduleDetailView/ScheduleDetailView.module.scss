@@ -1,5 +1,9 @@
 .ScheduleDetailView {
-
+  .fieldName,.fieldType,.fieldLink,.fieldDescription{
+    [class~='ant-col'] {
+      margin-right: 20px;
+    }
+  }
 }
 
 .ScheduleDetailViewHeader {
@@ -10,7 +14,10 @@
   grid-gap: 0.5rem;
   align-items: center;
   position: relative;
-
+  margin-right: 20px;
+  [class~='ant-col'] {
+    margin-right: 20px;
+  }
 }
 
 .EventForm {
@@ -77,7 +84,6 @@
     }
   }
   .fieldType{
-    // margin-bottom: 0px;
     [class~='ant-form-item-label'] {
       display: none;
     }
@@ -97,6 +103,8 @@
       text-decoration: underline;
     }
   }
+  .dropdownButton{
+    margin-right: 20px;
+  }
 
-  
 }

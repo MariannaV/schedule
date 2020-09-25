@@ -35,7 +35,7 @@
   border-radius: 5px;
   border: 1px solid #f0f0f0;
   cursor: pointer;
-  width: 98% !important;
+  width: calc(100% - 10px) !important;
 
 
   .codejam, .codewars, .course, .task {
