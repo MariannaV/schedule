@@ -175,7 +175,7 @@ export function ScheduleTable() {
                 return value === 'Youtube Live' ? (
                   <div>
                     <YoutubeOutlined /> {value}{' '}
-                    <Tooltip title="Ссылка будет в Discord">
+                    <Tooltip title="Link will be in Discord">
                       <QuestionCircleOutlined />
                     </Tooltip>
                   </div>
@@ -187,12 +187,10 @@ export function ScheduleTable() {
               sortDirections: ['ascend', 'descend', 'ascend'],
             },
             {
-              title: 'Organizer',
+              title: 'Organizers',
               width: 120,
-              dataIndex: 'organizer',
-              render: (value: string) => (value ? <GithubUserLink value={value} /> : ''),
-              sorter: (a, b) => (a.organizer > b.organizer ? 1 : -1),
-              sortDirections: ['ascend', 'descend', 'ascend'],
+              dataIndex: 'organizers',
+              render: (value: Array<string>) => organizerRenderer(value),
             },
             {
               title: 'Description URL',
@@ -221,7 +219,7 @@ export function ScheduleTable() {
 export const dateRenderer = (timeZone: string) => (value: string) =>
   value ? moment(value, 'YYYY-MM-DD HH:mmZ').tz(timeZone).format('DD.MM.YYYY HH:mm') : '';
 
-const actionButtonsRenderer = (checker) => {
+const actionButtonsRenderer = (checker: string) => {
   const router = useRouter();
   switch (checker) {
     case 'crossCheck':
@@ -263,6 +261,22 @@ const actionButtonsRenderer = (checker) => {
           <EyeInvisibleOutlined className={styles.iconHide} />
         </>
       );
+    case 'mentor':
+      return (
+        <>
+          <Button type={'primary'} className={styles.btn}>
+            Details
+          </Button>
+          <Button
+            type={'primary'}
+            className={`${styles.btn} ${styles.submit}`}
+            onClick={() => router.push(`/course/student/cross-check-submit?course=test-course`)}
+          >
+            Submit
+          </Button>
+          <EyeInvisibleOutlined className={styles.iconHide} />
+        </>
+      );
     default:
       return (
         <>
@@ -273,4 +287,17 @@ const actionButtonsRenderer = (checker) => {
         </>
       );
   }
+};
+
+const organizerRenderer = (organizers: Array<string>) => {
+  if (organizers && organizers.length) {
+    return (
+      <>
+        {organizers.map((organizer) => (
+          <GithubUserLink value={organizer} />
+        ))}
+      </>
+    );
+  }
+  return '';
 };
