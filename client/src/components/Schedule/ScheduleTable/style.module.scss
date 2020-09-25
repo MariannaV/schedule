@@ -147,3 +147,10 @@
   margin: 0;
   text-transform: capitalize;
 }
+
+.cutted{
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}

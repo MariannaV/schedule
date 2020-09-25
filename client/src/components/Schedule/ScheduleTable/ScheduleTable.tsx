@@ -57,6 +57,7 @@ export function ScheduleTable() {
       </div>
       {checkedColumns.length && (
         <Table
+          className={styles.table}
           rowKey={(record) => record.id.toString()}
           onRow={(record) => {
             return {
@@ -210,6 +211,7 @@ export function ScheduleTable() {
               title: 'Description',
               width: 250,
               dataIndex: 'description',
+              className: `${styles.cutted}`,
             },
           ].filter((column) => checkedColumns.includes(column.title))}
         />
