@@ -58,7 +58,7 @@ export function Header(props: Props) {
           <img
             style={{ height: 30 }}
             className="header-logo"
-            src="/static/images/logo-rsschool3.png"
+            src="/images/logo-rsschool3.png"
             alt="Rolling Scopes School Logo"
           />
         </a>
@@ -75,8 +75,8 @@ export function Header(props: Props) {
         )}
         <Dropdown overlay={menu} trigger={['click']}>
           <Button type="dashed" size="large">
-            <GithubAvatar githubId={props.username} size={24} />
-            <span style={{ marginLeft: '12px' }}>My Profile</span>
+            <GithubAvatar githubId={props.username} size={24} style={{ display: 'none', marginRight: '12px' }} />
+            <span>My Profile</span>
           </Button>
         </Dropdown>
       </div>
