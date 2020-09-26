@@ -1,6 +1,7 @@
 import React from 'react';
 import { IComments, Comments } from 'components/Comments';
 import { NSchedule, ScheduleStore } from 'components/Schedule/store';
+import { GithubAvatar } from 'components/GithubAvatar';
 
 function EventComments() {
   const { dispatch } = React.useContext(ScheduleStore.context),
@@ -32,7 +33,14 @@ function EventComments() {
 
   if (!isReadOnly || !eventData?.commentsEnabled) return null;
 
-  return <Comments.Widget onCommentCreate={onCommentCreate} comments={eventData.comments} />;
+  return (
+    <span>
+      {/* <GithubAvatar githubId={props.username} size={24} /> */}
+
+      <Comments.Widget onCommentCreate={onCommentCreate} comments={eventData.comments} />
+      {/* <GithubAvatar githubId={''} size={24} /> */}
+    </span>
+  );
 }
 
 export { EventComments };
