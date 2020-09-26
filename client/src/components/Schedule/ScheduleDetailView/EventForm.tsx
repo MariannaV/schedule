@@ -43,7 +43,8 @@ export const eventFormId = `eventFormId`;
 
 function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
   const eventId = ScheduleStore.useSelector(ScheduleStore.selectors.getDetailViewOpenedId),
-    eventData = ScheduleStore.useSelector(ScheduleStore.selectors.getEvent({ eventId }));
+    eventData = ScheduleStore.useSelector(ScheduleStore.selectors.getEvent({ eventId })),
+    timeZone = ScheduleStore.useSelector(ScheduleStore.selectors.getUserPreferredTimezone);
 
   const { dispatch } = React.useContext(ScheduleStore.context),
     isMentor = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsMentor),
@@ -175,7 +176,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
             name="dateStartEnd"
             rules={[{ required: true, message: 'Please select event time and deadline!' }]}
             type="time"
-            children={<DatePicker.RangePicker showTime={{ format: 'HH:mm' }} format="YYYY-MM-DD HH:mm" />}
+            children={<DatePicker.RangePicker showTime={{ format: 'HH:mm' }} format="DD.MM.YYYY HH:mm" />}
             isReadOnly={isReadOnly}
           />
         ) : (
@@ -184,17 +185,23 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
               label="Start time"
               name="dateStart"
               type="time"
-              children={<DatePicker showTime />}
               isReadOnly={isReadOnly}
               className={formStyles.fieldDateStart}
+              viewProps={{
+                value: eventData?.dateStart,
+                timeZone,
+              }}
             />
             <FormItem
               label="Deadline time"
               name="dateEnd"
               type="time"
-              children={<DatePicker showTime />}
               isReadOnly={isReadOnly}
               className={formStyles.fieldDateEnd}
+              viewProps={{
+                value: eventData?.dateEnd,
+                timeZone,
+              }}
             />
           </>
         );
@@ -220,7 +227,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
         />
       ),
     }),
-    [],
+    [eventData, timeZone],
   );
 
   const updateAttachmentFileList = (info) => {
