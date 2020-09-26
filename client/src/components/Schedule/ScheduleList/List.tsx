@@ -81,15 +81,10 @@ function ListItem(props: IListItem) {
       };
     }, [props.style]);
 
-
   const ButtonDetails = React.useMemo(
     () => (
       <Tooltip title="Open in new tab">
-        <Button
-          type={'primary'}
-          href={`/course/schedule/event/${eventId}`}
-          target="_blank"
-          children="Details" />
+        <Button type={'primary'} href={`/course/schedule/event/${eventId}`} target="_blank" children="Details" />
       </Tooltip>
     ),
     [eventId],
