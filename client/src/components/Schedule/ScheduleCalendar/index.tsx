@@ -90,20 +90,28 @@ function CalendarEvent(props: ICalendarEvent) {
   const { eventId, changeVisibility } = props,
     eventData = ScheduleStore.useSelector(ScheduleStore.selectors.getEvent({ eventId }));
 
+  const classes = React.useMemo(() => [calendarStyles.calendarEvent, props.className].filter(Boolean).join(' '), [
+    props.className,
+  ]);
+
   const { dispatch } = React.useContext(ScheduleStore.context),
-    onClick = React.useCallback(() => {
-      ScheduleStore.API.detailViewSetOpened(dispatch)({
-        payload: {
-          openedId: eventId,
-        },
-      });
-      ScheduleStore.API.detailViewModeChange(dispatch)({
-        payload: {
-          mode: NSchedule.FormModes.VIEW,
-        },
-      });
-      changeVisibility(true);
-    }, [eventId]);
+    onClick = React.useCallback(
+      (event) => {
+        event.preventDefault();
+        ScheduleStore.API.detailViewSetOpened(dispatch)({
+          payload: {
+            openedId: eventId,
+          },
+        });
+        ScheduleStore.API.detailViewModeChange(dispatch)({
+          payload: {
+            mode: NSchedule.FormModes.VIEW,
+          },
+        });
+        changeVisibility(true);
+      },
+      [eventId],
+    );
 
   const type = React.useMemo(() => {
     switch (true) {
@@ -115,9 +123,9 @@ function CalendarEvent(props: ICalendarEvent) {
   }, [eventData.deadLine]);
 
   return (
-    <article onClick={onClick} className={props.className}>
+    <a href={`/course/schedule/event/${eventId}`} onClick={onClick} className={classes}>
       <Badge status={type} text={eventData.name} />
-    </article>
+    </a>
   );
 }
 
