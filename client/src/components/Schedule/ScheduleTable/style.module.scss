@@ -87,8 +87,9 @@
   }
 }
 
-.iconHide {
+.iconHide, .iconEdit {
   margin-left: 15px;
+  font-size: 20px;
   display: none;
   justify-self: self-end;
   cursor: pointer;
@@ -101,7 +102,7 @@
   & td, td:hover {
     background: $color-background-active !important;
   }
-  & .iconHide {
+  & .iconHide, .iconEdit {
     display: inline-block;
   }
 }

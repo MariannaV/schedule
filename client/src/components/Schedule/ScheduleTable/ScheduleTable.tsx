@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import moment from 'moment-timezone';
 import {
   QuestionCircleOutlined,
@@ -6,13 +6,15 @@ import {
   EyeOutlined,
   EyeInvisibleOutlined,
   ExclamationCircleTwoTone,
+  EditOutlined,
 } from '@ant-design/icons';
-import { Table, Tag, Tooltip, Button } from 'antd';
+import { Table, Tag, Tooltip, Button, Form } from 'antd';
 import { useRouter } from 'next/router';
 import { Event } from 'services/event';
 import { GithubUserLink } from 'components';
 import { ScheduleStore } from 'components/Schedule/store';
 import { Filter } from './components/Filter/Filter';
+import { EditableCell } from './components/EditableCell/EditableCell';
 import { rowsFilter, defaultColumnsFilter } from './config';
 import { tagColors } from '../constants';
 import styles from './style.module.scss';
@@ -29,15 +31,42 @@ export function ScheduleTable() {
   const timeZone = ScheduleStore.useSelector(ScheduleStore.selectors.getUserPreferredTimezone),
     isActiveDates = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsActiveDates),
     eventsData = ScheduleStore.useSelector(ScheduleStore.selectors.getEvents),
+    userIsMentor = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsMentor),
     tableData = React.useMemo(() => eventsData.list.map((eventId) => eventsData.map[eventId]), [eventsData]);
 
+  const [form] = Form.useForm();
   const [checkedColumns, setCheckedColumns] = React.useState(defaultColumnsFilter);
   const [selectedRows, setSelectedRows] = React.useState([] as string[]);
   const [hiddenRows, setHiddenRows] = React.useState([] as string[]);
+  const [editingKey, setEditingKey] = useState('');
+
+  const isEditing = (record) => record.id === editingKey;
 
   const hideRows = () => {
     setHiddenRows([...selectedRows, ...hiddenRows]);
     setSelectedRows([]);
+  };
+
+  const edit = (record) => {
+    console.log(record);
+    console.log(record.id);
+    form.setFieldsValue({
+      dateStart: '',
+      name: '',
+      dateEnd: '',
+      type: '',
+      checker: '',
+      place: '',
+      organizers: [],
+      descriptionUrl: '',
+      description: '',
+      ...record,
+    });
+    setEditingKey(record.id);
+  };
+
+  const cancel = () => {
+    setEditingKey('');
   };
 
   return (
@@ -56,161 +85,185 @@ export function ScheduleTable() {
         )}
       </div>
       {checkedColumns.length && (
-        <Table
-          rowKey={(record) => record.id.toString()}
-          onRow={(record) => {
-            return {
-              onClick: (e) => {
-                if ((e.target as HTMLElement).closest('[data-icon="eye-invisible"]')) {
-                  hideRows();
-                  return;
-                }
-                if (e.shiftKey) {
-                  selectedRows.includes(record.id)
-                    ? setSelectedRows(selectedRows.filter((item) => item !== record.id))
-                    : setSelectedRows([...selectedRows, record.id]);
-                } else {
-                  setSelectedRows([record.id]);
-                }
+        <Form form={form} component={false}>
+          <Table
+            components={{
+              body: {
+                cell: EditableCell,
               },
-            };
-          }}
-          pagination={{ position: ['bottomRight'], showSizeChanger: true }}
-          dataSource={
-            isActiveDates
-              ? tableData.filter(
-                  (data) => !isRowDisabled(data.dateStart, data.dateEnd) && !hiddenRows.includes(data.id),
-                )
-              : tableData.filter((data) => !hiddenRows.includes(data.id))
-          }
-          rowClassName={(record) => {
-            if (selectedRows.includes(record.id)) {
-              return styles.activeRow;
+            }}
+            rowKey={(record) => record.id.toString()}
+            onRow={(record) => {
+              return {
+                onClick: (e) => {
+                  if ((e.target as HTMLElement).closest('[data-icon="eye-invisible"]')) {
+                    hideRows();
+                    return;
+                  }
+                  if ((e.target as HTMLElement).closest('[data-icon="edit"]')) {
+                    edit(record);
+                    return;
+                  }
+                  if (e.shiftKey) {
+                    selectedRows.includes(record.id)
+                      ? setSelectedRows(selectedRows.filter((item) => item !== record.id))
+                      : setSelectedRows([...selectedRows, record.id]);
+                  } else {
+                    setSelectedRows([record.id]);
+                  }
+                },
+              };
+            }}
+            pagination={{ position: ['bottomRight'], showSizeChanger: true }}
+            dataSource={
+              isActiveDates
+                ? tableData.filter(
+                    (data) => !isRowDisabled(data.dateStart, data.dateEnd) && !hiddenRows.includes(data.id),
+                  )
+                : tableData.filter((data) => !hiddenRows.includes(data.id))
             }
-            if (isRowDisabled(record.dateStart, record.dateEnd)) {
-              return 'rs-table-row-disabled';
-            }
-            return styles[record.type.toLowerCase().split(' ').join('')];
-          }}
-          scroll={{ x: 1600 }}
-          // @ts-ignore
-          columns={[
-            {
-              title: 'Start Date',
-              width: 80,
-              align: 'center',
-              dataIndex: 'dateStart',
+            rowClassName={(record) => {
+              if (selectedRows.includes(record.id)) {
+                return styles.activeRow;
+              }
+              if (isRowDisabled(record.dateStart, record.dateEnd)) {
+                return 'rs-table-row-disabled';
+              }
+              return styles[record.type.toLowerCase().split(' ').join('')];
+            }}
+            scroll={{ x: 1600 }}
+            // @ts-ignore
+            columns={[
+              {
+                title: 'Start Date',
+                width: 80,
+                align: 'center',
+                dataIndex: 'dateStart',
 
-              render: dateRenderer(timeZone),
-              defaultSortOrder: 'ascend',
-              sorter: (a, b) => (a.dateStart > b.dateStart ? 1 : -1),
-              sortDirections: ['ascend', 'descend', 'ascend'],
-            },
-            {
-              title: 'Name',
-              width: 185,
-              dataIndex: 'name',
-              sorter: (a, b) => (a.name > b.name ? 1 : -1),
-              sortDirections: ['ascend', 'descend', 'ascend'],
-            },
-            {
-              title: 'DeadLine',
-              width: 120,
-              align: 'center',
-              dataIndex: 'dateEnd',
-              render: (value: string) => {
-                if (!value) return;
-                if (moment(value).isBefore(startOfToday)) {
-                  return dateRenderer(timeZone)(value);
-                }
-                let deadline;
-                if (moment(value).subtract(7, 'days').isBefore(startOfToday)) {
-                  deadline = 'deadline_coming';
-                }
-                if (moment(value).subtract(3, 'days').isBefore(startOfToday)) {
-                  deadline = 'deadline_close';
-                }
-                const warning = moment(value).subtract(1, 'days').isBefore(moment());
-                return (
-                  <div className={styles[deadline]}>
-                    <span>{dateRenderer(timeZone)(value)}</span>
-                    {warning && (
-                      <Tooltip title="Only one day left!">
-                        <ExclamationCircleTwoTone twoToneColor="#f5222d" style={{ fontSize: 22, marginLeft: 5 }} />
-                      </Tooltip>
-                    )}
-                  </div>
-                );
+                render: dateRenderer(timeZone),
+                defaultSortOrder: 'ascend',
+                sorter: (a, b) => (a.dateStart > b.dateStart ? 1 : -1),
+                sortDirections: ['ascend', 'descend', 'ascend'],
               },
-              sorter: (a, b) => (a.dateEnd > b.dateEnd ? 1 : -1),
-              sortDirections: ['ascend', 'descend', 'ascend'],
-            },
-            {
-              title: 'Type',
-              width: 120,
-              align: 'center',
-              dataIndex: 'type' || '',
-              render: (value: keyof typeof tagColors) => (
-                <Tag color={tagColors[value.toLowerCase()]} className={styles.tag}>
-                  {value}
-                </Tag>
-              ),
-              sorter: (a, b) => (a.type > b.type ? 1 : -1),
-              sortDirections: ['ascend', 'descend', 'ascend'],
-              filters: rowsFilter,
-              onFilter: (value: string | number | boolean, record: Event) =>
-                record.type.toLowerCase().indexOf(value.toString().toLowerCase()) === 0,
-            },
-            {
-              title: 'Action',
-              width: 300,
-              dataIndex: 'checker',
-              render: (value: string) => (value ? actionButtonsRenderer(value) : actionButtonsRenderer('')),
-            },
-            {
-              title: 'Place',
-              width: 130,
-              dataIndex: 'place',
-              render: (value: string) => {
-                return value === 'Youtube Live' ? (
-                  <div>
-                    <YoutubeOutlined /> {value}{' '}
-                    <Tooltip title="Link will be in Discord">
-                      <QuestionCircleOutlined />
-                    </Tooltip>
-                  </div>
-                ) : (
-                  value
-                );
+              {
+                title: 'Name',
+                width: 185,
+                dataIndex: 'name',
+                sorter: (a, b) => (a.name > b.name ? 1 : -1),
+                sortDirections: ['ascend', 'descend', 'ascend'],
               },
-              sorter: (a, b) => (a.place > b.place ? 1 : -1),
-              sortDirections: ['ascend', 'descend', 'ascend'],
-            },
-            {
-              title: 'Organizers',
-              width: 120,
-              dataIndex: 'organizers',
-              render: (value: Array<string>) => organizerRenderer(value),
-            },
-            {
-              title: 'Description URL',
-              width: 200,
-              dataIndex: 'descriptionUrl',
-              render: (value: string) => {
-                return (
-                  <a target="_blank" href={value}>
+              {
+                title: 'DeadLine',
+                width: 120,
+                align: 'center',
+                dataIndex: 'dateEnd',
+                render: (value: string) => {
+                  if (!value) return;
+                  if (moment(value).isBefore(startOfToday)) {
+                    return dateRenderer(timeZone)(value);
+                  }
+                  let deadline;
+                  if (moment(value).subtract(7, 'days').isBefore(startOfToday)) {
+                    deadline = 'deadline_coming';
+                  }
+                  if (moment(value).subtract(3, 'days').isBefore(startOfToday)) {
+                    deadline = 'deadline_close';
+                  }
+                  const warning = moment(value).subtract(1, 'days').isBefore(moment());
+                  return (
+                    <div className={styles[deadline]}>
+                      <span>{dateRenderer(timeZone)(value)}</span>
+                      {warning && (
+                        <Tooltip title="Only one day left!">
+                          <ExclamationCircleTwoTone twoToneColor="#f5222d" style={{ fontSize: 22, marginLeft: 5 }} />
+                        </Tooltip>
+                      )}
+                    </div>
+                  );
+                },
+                sorter: (a, b) => (a.dateEnd > b.dateEnd ? 1 : -1),
+                sortDirections: ['ascend', 'descend', 'ascend'],
+              },
+              {
+                title: 'Type',
+                width: 120,
+                align: 'center',
+                dataIndex: 'type' || '',
+                render: (value: keyof typeof tagColors) => (
+                  <Tag color={tagColors[value.toLowerCase()]} className={styles.tag}>
                     {value}
-                  </a>
-                );
+                  </Tag>
+                ),
+                sorter: (a, b) => (a.type > b.type ? 1 : -1),
+                sortDirections: ['ascend', 'descend', 'ascend'],
+                filters: rowsFilter,
+                onFilter: (value: string | number | boolean, record: Event) =>
+                  record.type.toLowerCase().indexOf(value.toString().toLowerCase()) === 0,
               },
-            },
-            {
-              title: 'Description',
-              width: 250,
-              dataIndex: 'description',
-            },
-          ].filter((column) => checkedColumns.includes(column.title))}
-        />
+              {
+                title: 'Action',
+                width: 300,
+                dataIndex: 'checker',
+                render: (value: string) =>
+                  value ? actionButtonsRenderer(value, userIsMentor) : actionButtonsRenderer('', userIsMentor),
+              },
+              {
+                title: 'Place',
+                width: 130,
+                dataIndex: 'place',
+                render: (value: string) => {
+                  return value === 'Youtube Live' ? (
+                    <div>
+                      <YoutubeOutlined /> {value}{' '}
+                      <Tooltip title="Link will be in Discord">
+                        <QuestionCircleOutlined />
+                      </Tooltip>
+                    </div>
+                  ) : (
+                    value
+                  );
+                },
+                sorter: (a, b) => (a.place > b.place ? 1 : -1),
+                sortDirections: ['ascend', 'descend', 'ascend'],
+              },
+              {
+                title: 'Organizers',
+                width: 120,
+                dataIndex: 'organizers',
+                render: (value: Array<string>) => organizerRenderer(value),
+              },
+              {
+                title: 'Description URL',
+                width: 200,
+                dataIndex: 'descriptionUrl',
+                render: (value: string) => {
+                  return (
+                    <a target="_blank" href={value}>
+                      {value}
+                    </a>
+                  );
+                },
+              },
+              {
+                title: 'Description',
+                width: 250,
+                dataIndex: 'description',
+              },
+            ]
+              .filter((column) => checkedColumns.includes(column.title))
+              .map((column) => {
+                return {
+                  ...column,
+                  onCell: (record) => ({
+                    record,
+                    cancel,
+                    editing: isEditing(record),
+                    dataIndex: column.dataIndex,
+                  }),
+                };
+              })}
+          />
+        </Form>
       )}
     </>
   );
@@ -219,7 +272,7 @@ export function ScheduleTable() {
 export const dateRenderer = (timeZone: string) => (value: string) =>
   value ? moment(value, 'YYYY-MM-DD HH:mmZ').tz(timeZone).format('DD.MM.YYYY HH:mm') : '';
 
-const actionButtonsRenderer = (checker: string) => {
+const actionButtonsRenderer = (checker: string, userIsMentor: boolean) => {
   const router = useRouter();
   switch (checker) {
     case 'crossCheck':
@@ -242,7 +295,14 @@ const actionButtonsRenderer = (checker: string) => {
           >
             Crosscheck
           </Button>
-          <EyeInvisibleOutlined className={styles.iconHide} />
+          <Tooltip title="Hide row">
+            <EyeInvisibleOutlined className={styles.iconHide} />
+          </Tooltip>
+          {userIsMentor && (
+            <Tooltip title="Edit event">
+              <EditOutlined className={styles.iconEdit} />
+            </Tooltip>
+          )}
         </>
       );
     case 'auto-test':
@@ -258,7 +318,14 @@ const actionButtonsRenderer = (checker: string) => {
           >
             Auto-Test
           </Button>
-          <EyeInvisibleOutlined className={styles.iconHide} />
+          <Tooltip title="Hide row">
+            <EyeInvisibleOutlined className={styles.iconHide} />
+          </Tooltip>
+          {userIsMentor && (
+            <Tooltip title="Edit event">
+              <EditOutlined className={styles.iconEdit} />
+            </Tooltip>
+          )}
         </>
       );
     case 'mentor':
@@ -274,7 +341,14 @@ const actionButtonsRenderer = (checker: string) => {
           >
             Submit
           </Button>
-          <EyeInvisibleOutlined className={styles.iconHide} />
+          <Tooltip title="Hide row">
+            <EyeInvisibleOutlined className={styles.iconHide} />
+          </Tooltip>
+          {userIsMentor && (
+            <Tooltip title="Edit event">
+              <EditOutlined className={styles.iconEdit} />
+            </Tooltip>
+          )}
         </>
       );
     default:
@@ -283,7 +357,14 @@ const actionButtonsRenderer = (checker: string) => {
           <Button type={'primary'} className={styles.btn}>
             Details
           </Button>
-          <EyeInvisibleOutlined className={styles.iconHide} />
+          <Tooltip title="Hide row">
+            <EyeInvisibleOutlined className={styles.iconHide} />
+          </Tooltip>
+          {userIsMentor && (
+            <Tooltip title="Edit event">
+              <EditOutlined className={styles.iconEdit} />
+            </Tooltip>
+          )}
         </>
       );
   }
