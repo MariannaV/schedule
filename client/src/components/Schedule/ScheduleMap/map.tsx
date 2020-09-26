@@ -118,15 +118,18 @@ class MapView extends React.PureComponent<IMapView, IMapbox> {
     return (
       <section>
         {!isReadOnly && (
-          <header>
+          <header className={mapStyles.header_main}>
             <Geocoder
               mapboxApiAccessToken={mapboxApiKey}
               onSelected={this.onSelected}
               viewport={viewport}
               hideOnSelect={true}
               value=""
+              className={mapStyles.react_geocoder}
             />
-            <Button color="primary" onClick={this.add} children="Add New Mark" />
+            <div className={mapStyles.buttonStyle}>
+              <Button color="primary" onClick={this.add} children="Add New Mark" />
+            </div>
           </header>
         )}
 
