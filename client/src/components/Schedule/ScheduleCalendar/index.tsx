@@ -1,16 +1,27 @@
 import React from 'react';
 import moment from 'moment-timezone';
-import { Calendar, Badge } from 'antd';
+import { Button, Calendar, Badge } from 'antd';
 import { Event } from 'services/event';
 import { ScheduleStore } from 'components/Schedule/store';
 import {
   ScheduleDetailViewModal,
   IScheduleDetailViewModal,
 } from 'components/Schedule/ScheduleDetailView/ScheduleDetailViewModal';
+import calendarStyles from './ScheduleCalendar.module.scss';
 
 export function ScheduleCalendar() {
   const timeZone = ScheduleStore.useSelector(ScheduleStore.selectors.getUserPreferredTimezone),
     eventsMap = ScheduleStore.useSelector(ScheduleStore.selectors.getEventsMap),
+    eventTypesByDate = React.useMemo(
+      () =>
+        (Object.values(eventsMap) as Array<Event>).reduce((acc, currentEvent) => {
+          const currentType = dateRenderer(currentEvent.timeZone)(currentEvent.dateStart);
+          if (!(currentType in acc)) acc[currentType] = [];
+          acc[currentType].push(currentEvent.type);
+          return acc;
+        }, {} as Record<string, Array<Event['type']>>),
+      [eventsMap],
+    ),
     eventIdsByDate = React.useMemo(
       () =>
         (Object.values(eventsMap) as Array<Event>).reduce((acc, currentEvent) => {
@@ -28,14 +39,20 @@ export function ScheduleCalendar() {
 
   function dateCellRender(value) {
     const currentDate = dateRenderer(timeZone)(value),
-      currentEvents = eventIdsByDate[currentDate];
-
-    if (!currentEvents) return null;
+      isMentor = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsMentor),
+      currentEvents = eventIdsByDate[currentDate],
+      currentTypes = eventTypesByDate[currentDate];
 
     return (
-      <section className="events">
-        {currentEvents.map((eventId) => (
-          <CalendarEvent eventId={eventId} changeVisibility={setVisibleDetailViewModal} key={eventId} />
+      <section>
+        {isMentor && <Button children="+" type="primary" size="small" />}
+        {currentEvents?.map((eventId, index) => (
+          <CalendarEvent
+            eventId={eventId}
+            className={calendarStyles[currentTypes[index].toLowerCase()]}
+            changeVisibility={setVisibleDetailViewModal}
+            key={eventId}
+          />
         ))}
       </section>
     );
@@ -43,7 +60,7 @@ export function ScheduleCalendar() {
 
   return (
     <>
-      <Calendar dateCellRender={dateCellRender} />
+      <Calendar className={calendarStyles.calendar} dateCellRender={dateCellRender} />
       <ScheduleDetailViewModal isVisible={isVisibleDetailViewModal} changeVisibility={setVisibleDetailViewModal} />
     </>
   );
@@ -51,6 +68,7 @@ export function ScheduleCalendar() {
 
 interface ICalendarEvent extends Pick<IScheduleDetailViewModal, 'changeVisibility'> {
   eventId: Event['id'];
+  className?: string;
 }
 
 function CalendarEvent(props: ICalendarEvent) {
@@ -77,7 +95,7 @@ function CalendarEvent(props: ICalendarEvent) {
   }, [eventData.deadLine]);
 
   return (
-    <article onClick={onClick}>
+    <article onClick={onClick} className={props.className}>
       <Badge status={type} text={eventData.name} />
     </article>
   );

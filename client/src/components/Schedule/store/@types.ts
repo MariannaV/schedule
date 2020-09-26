@@ -6,7 +6,7 @@ export namespace NSchedule {
   export interface IStore {
     events: {
       list: Array<Event['id']>;
-      map: Record<Event['id'], Event>;
+      map: Record<Event['id'], Event & { loading?: boolean }>;
       loading: boolean | null;
     };
     detailView: {
@@ -49,6 +49,8 @@ export namespace NSchedule {
     | IUserScheduleViewChange
     | IEventsFetchStart
     | IEventsSet
+    | IEventFetch
+    | IEventFetchSuccessful
     | IEventCreate
     | IEventUpdate
     | IEventDelete
@@ -64,6 +66,8 @@ export namespace NSchedule {
     EVENTS_FETCH_START,
     EVENTS_SET,
     IS_ACTIVE_DATES_SET,
+    EVENT_FETCH,
+    EVENT_FETCH_SUCCESSFUL,
     EVENT_CREATE,
     EVENT_UPDATE,
     EVENT_DELETE,
@@ -95,6 +99,20 @@ export namespace NSchedule {
 
   export interface IEventsFetchStart {
     type: ActionTypes.EVENTS_FETCH_START;
+  }
+
+  export interface IEventFetch {
+    type: ActionTypes.EVENT_FETCH;
+    payload: {
+      eventId: Event['id'];
+    };
+  }
+
+  export interface IEventFetchSuccessful {
+    type: ActionTypes.EVENT_FETCH_SUCCESSFUL;
+    payload: {
+      eventData: Event;
+    };
   }
 
   export interface IEventsSet {

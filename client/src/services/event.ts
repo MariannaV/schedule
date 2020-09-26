@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { UploadFile } from 'antd/lib/upload/interface';
 import { IComments } from 'components/Comments';
+import { IPlace } from 'components/Schedule/ScheduleMap/map';
 
 export interface Event {
   id: string;
@@ -16,6 +17,7 @@ export interface Event {
   place: string;
   checker: string;
   'online/offline': string;
+  places: Array<IPlace>;
   organizer: string;
   commentsEnabled: boolean;
   comments: Array<IComments.Comment>;

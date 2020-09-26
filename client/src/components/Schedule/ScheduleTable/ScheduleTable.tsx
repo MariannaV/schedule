@@ -9,7 +9,6 @@ import {
   EditOutlined,
 } from '@ant-design/icons';
 import { Table, Tag, Tooltip, Button, Form } from 'antd';
-import { useRouter } from 'next/router';
 import { Event } from 'services/event';
 import { GithubUserLink } from 'components';
 import { ScheduleStore } from 'components/Schedule/store';
@@ -204,8 +203,7 @@ export function ScheduleTable() {
                 title: 'Action',
                 width: 300,
                 dataIndex: 'checker',
-                render: (value: string) =>
-                  value ? actionButtonsRenderer(value, userIsMentor) : actionButtonsRenderer('', userIsMentor),
+                render: (value: string, eventData: Event, userIsMentor: boolean) => actionButtonsRenderer(value ?? '', eventData, userIsMentor),
               },
               {
                 title: 'Place',
@@ -272,99 +270,94 @@ export function ScheduleTable() {
 export const dateRenderer = (timeZone: string) => (value: string) =>
   value ? moment(value, 'YYYY-MM-DD HH:mmZ').tz(timeZone).format('DD.MM.YYYY HH:mm') : '';
 
-const actionButtonsRenderer = (checker: string, userIsMentor: boolean) => {
-  const router = useRouter();
+const actionButtonsRenderer = (checker: string, eventData: Event, userIsMentor: boolean) => {
+  const ButtonDetails = React.useMemo(
+    () => (
+      <Button
+        type={'primary'}
+        className={styles.btn}
+        children="Details"
+        href={`/course/schedule/event/${eventData.id}`}
+        target="_blank"
+      />
+    ),
+    [eventData.id],
+  );
+
+  const ButtonSubmit = (
+    <Button
+      type={'primary'}
+      className={`${styles.btn} ${styles.submit}`}
+      children="Submit"
+      href={'/course/student/cross-check-submit?course=test-course'}
+      target="_blank"
+    />
+  );
+
+  const ButtonAutoTest = (
+    <Button
+      type={'primary'}
+      className={`${styles.btn} ${styles.check}`}
+      children="Auto-Test"
+      href={'/course/student/auto-test?course=test-course'}
+      target="_blank"
+    />
+  );
+
+  const ButtonCrossCheck = (
+    <Button
+      type={'primary'}
+      className={`${styles.btn} ${styles.check}`}
+      children="Crosscheck"
+      href={'/course/student/cross-check-review?course=test-course'}
+      target="_blank"
+    />
+  );
+
+  const icons = (
+    <>
+      <Tooltip title="Hide row">
+        <EyeInvisibleOutlined className={styles.iconHide} />
+      </Tooltip>
+      {userIsMentor && (
+        <Tooltip title="Edit event">
+          <EditOutlined className={styles.iconEdit} />
+        </Tooltip>
+      )}
+    </>
+  );
+
   switch (checker) {
     case 'crossCheck':
       return (
         <>
-          <Button type={'primary'} className={styles.btn}>
-            Details
-          </Button>
-          <Button
-            type={'primary'}
-            className={`${styles.btn} ${styles.submit}`}
-            onClick={() => router.push(`/course/student/cross-check-submit?course=test-course`)}
-          >
-            Submit
-          </Button>
-          <Button
-            type={'primary'}
-            className={`${styles.btn} ${styles.check}`}
-            onClick={() => router.push(`/course/student/cross-check-review?course=test-course`)}
-          >
-            Crosscheck
-          </Button>
-          <Tooltip title="Hide row">
-            <EyeInvisibleOutlined className={styles.iconHide} />
-          </Tooltip>
-          {userIsMentor && (
-            <Tooltip title="Edit event">
-              <EditOutlined className={styles.iconEdit} />
-            </Tooltip>
-          )}
+          {ButtonDetails}
+          {ButtonSubmit}
+          {ButtonCrossCheck}
+          {icons}
         </>
       );
     case 'auto-test':
       return (
         <>
-          <Button type={'primary'} className={styles.btn}>
-            Details
-          </Button>
-          <Button
-            type={'primary'}
-            className={`${styles.btn} ${styles.check}`}
-            onClick={() => router.push(`/course/student/auto-test?course=test-course`)}
-          >
-            Auto-Test
-          </Button>
-          <Tooltip title="Hide row">
-            <EyeInvisibleOutlined className={styles.iconHide} />
-          </Tooltip>
-          {userIsMentor && (
-            <Tooltip title="Edit event">
-              <EditOutlined className={styles.iconEdit} />
-            </Tooltip>
-          )}
+          {ButtonDetails}
+          {ButtonAutoTest}
+          {icons}
         </>
       );
     case 'mentor':
       return (
         <>
-          <Button type={'primary'} className={styles.btn}>
-            Details
-          </Button>
-          <Button
-            type={'primary'}
-            className={`${styles.btn} ${styles.submit}`}
-            onClick={() => router.push(`/course/student/cross-check-submit?course=test-course`)}
-          >
-            Submit
-          </Button>
-          <Tooltip title="Hide row">
-            <EyeInvisibleOutlined className={styles.iconHide} />
-          </Tooltip>
-          {userIsMentor && (
-            <Tooltip title="Edit event">
-              <EditOutlined className={styles.iconEdit} />
-            </Tooltip>
-          )}
+          {ButtonDetails}
+          {ButtonSubmit}
+          {icons}
         </>
       );
     default:
       return (
         <>
-          <Button type={'primary'} className={styles.btn}>
-            Details
-          </Button>
-          <Tooltip title="Hide row">
-            <EyeInvisibleOutlined className={styles.iconHide} />
-          </Tooltip>
-          {userIsMentor && (
-            <Tooltip title="Edit event">
-              <EditOutlined className={styles.iconEdit} />
-            </Tooltip>
-          )}
+          {ButtonDetails}
+          {icons}
         </>
       );
   }
