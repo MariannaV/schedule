@@ -14,6 +14,7 @@ import { tagColors } from '../constants';
 const eventFormHelpers = {
   formatTo: (sendingData: any) => {
     return {
+      'online/offline': true,
       ...sendingData,
       // @ts-ignore
       attachments: sendingData?.attachments?.fileList,
@@ -28,6 +29,8 @@ const eventFormHelpers = {
   },
   formatFrom: (eventData: Event) => {
     return {
+      // @ts-ignore
+      'online/offline': true,
       ...eventData,
       dateStart: moment(eventData?.dateStart),
       ...(eventData?.dateEnd && {
@@ -56,10 +59,10 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
     formInitialValues = React.useMemo(() => eventFormHelpers.formatFrom(eventData), [eventData]),
     [eventType, setEventType] = React.useState<eventTypes>(eventData?.type),
     [attachmentFiles, setAttachmentFiles] = React.useState(eventData?.attachments),
-    [isOnline, changePlaceType] = React.useState(eventData?.['online/offline']),
+    [isOnline, changePlaceType] = React.useState(eventData?.['online/offline'] ?? true),
     onSubmit = React.useCallback(
       async (sendingData: Event) => {
-        const newEventData = eventFormHelpers.formatTo({ ...sendingData, comments: eventData?.comments });
+        const newEventData = eventFormHelpers.formatTo({ ...sendingData, comments: eventData?.comments, isOnline });
         try {
           props.setSubmitting(true);
           if (isCreation) {
@@ -92,7 +95,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
           props.setSubmitting(false);
         }
       },
-      [eventId, isCreation, eventData?.comments],
+      [eventId, isCreation, eventData?.comments, isOnline],
     );
 
   React.useEffect(
@@ -158,6 +161,10 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
           children={<DatePicker showTime />}
           isReadOnly={isReadOnly}
           className={formStyles.fieldDateStart}
+          viewProps={{
+            value: eventData?.dateEnd,
+            timeZone,
+          }}
         />
       ),
       organizers: ({ isReadOnly }) => (
@@ -221,13 +228,13 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
           label="Is online?"
           name="online/offline"
           type="switch"
-          rules={[{ required: true }]}
-          children={<Switch defaultChecked onChange={changePlaceType} />}
+          children={<Switch onChange={changePlaceType} defaultChecked={isOnline} />}
           isReadOnly={isReadOnly}
+          className={formStyles.fieldIsOnline}
         />
       ),
     }),
-    [eventData, timeZone],
+    [eventData, timeZone, isOnline],
   );
 
   const updateAttachmentFileList = (info) => {
