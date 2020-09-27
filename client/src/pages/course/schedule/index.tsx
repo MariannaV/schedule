@@ -101,7 +101,7 @@ const ScheduleHeader = React.memo(() => {
 
   return (
     <>
-      <Row justify="space-between" style={{ marginBottom: 16 }}>
+      <Row justify="space-between" style={{ marginBottom: 16, flexShrink: 0 }}>
         <FieldTimezone
           style={{ width: 200, marginRight: '250px' }}
           defaultValue={timeZone}
@@ -121,7 +121,7 @@ const ScheduleHeader = React.memo(() => {
           <Select.Option value={NSchedule.ScheduleView.calendar} children="Calendar" />
         </Select>
       </Row>
-      <Row justify="space-between" style={{ marginBottom: 10 }}>
+      <Row justify="space-between" style={{ marginBottom: 10, flexShrink: 0 }}>
         <Switch
           checkedChildren="Only active"
           unCheckedChildren="All events"

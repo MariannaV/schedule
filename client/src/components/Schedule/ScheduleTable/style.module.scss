@@ -110,6 +110,8 @@
 .settings {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
+
   & span {
     cursor: pointer;
   }
