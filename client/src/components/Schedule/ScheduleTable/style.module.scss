@@ -12,7 +12,8 @@
     background-color: $color-btn-check-hover;
     border-color: $color-btn-check-hover;
   }
-  &:active,  &:focus {
+  &:active,
+  &:focus {
     background-color: $color-btn-check-active;
     border-color: $color-btn-check-active;
   }
@@ -25,7 +26,8 @@
     background-color: $color-btn-submit-hover;
     border-color: $color-btn-submit-hover;
   }
-  &:active, &:focus {
+  &:active,
+  &:focus {
     &:hover {
       background-color: $color-btn-submit-active;
       border-color: $color-btn-submit-active;
@@ -33,7 +35,10 @@
   }
 }
 
-.codejam, .codewars, .course, .task {
+.codejam,
+.codewars,
+.course,
+.task {
   & td {
     background-color: $color-task-background;
   }
@@ -51,7 +56,8 @@
   }
 }
 
-.lecture, .video {
+.lecture,
+.video {
   & td {
     background-color: $color-lecture-background;
   }
@@ -87,7 +93,9 @@
   }
 }
 
-.iconHide, .iconEdit, .iconDelete {
+.iconHide,
+.iconEdit,
+.iconDelete {
   margin-left: 15px;
   font-size: 20px;
   display: none;
@@ -99,10 +107,13 @@
 }
 
 .activeRow {
-  & td, td:hover {
+  & td,
+  td:hover {
     background: $color-background-active !important;
   }
-  & .iconHide, .iconEdit, .iconDelete {
+  & .iconHide,
+  .iconEdit,
+  .iconDelete {
     display: inline-block;
   }
 }
@@ -124,7 +135,8 @@
   margin-right: 5px;
 }
 
-.deadline_close, .deadline_coming {
+.deadline_close,
+.deadline_coming {
   padding: 0 5px;
   position: absolute;
   top: 0;
@@ -154,7 +166,7 @@
   text-transform: capitalize;
 }
 
-.cutted{
+.cutted {
   max-height: 40px;
   display: -webkit-box;
   -webkit-box-orient: vertical;
