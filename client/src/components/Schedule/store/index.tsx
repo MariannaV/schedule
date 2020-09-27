@@ -187,8 +187,8 @@ const API_Schedule = {
         },
       });
     } catch (error) {
-      console.error(error);
-      throw Error('eventFetch went wrong');
+      console.error('eventFetch went wrong');
+      throw error;
     }
   },
   eventCreate: (dispatch: Dispatch<NSchedule.IActions>) => async (params: Omit<NSchedule.IEventCreate, 'type'>) => {

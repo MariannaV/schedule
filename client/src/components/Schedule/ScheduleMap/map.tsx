@@ -73,25 +73,29 @@ class MapView extends React.PureComponent<IMapView, IMapbox> {
     );
   }
 
-  customMarker = ({ marker }) => (
-    <>
-      <Marker longitude={marker.longitude} latitude={marker.latitude}>
-        <img src="https://image.flaticon.com/icons/png/512/8/8168.png" className={mapStyles.mapIcon} alt="marker" />
-      </Marker>
-      {this.state.showPopup && (
-        <Popup
-          latitude={marker.latitude}
-          longitude={marker.longitude}
-          dynamicPosition={false}
-          closeButton={false}
-          tipSize={5}
-          anchor="top"
-        >
-          <div>{marker.name}</div>
-        </Popup>
-      )}
-    </>
-  );
+  customMarker = ({ marker }) => {
+    if (!marker) return null;
+    return (
+      <>
+        <Marker longitude={marker.longitude} latitude={marker.latitude}>
+          <img src="https://image.flaticon.com/icons/png/512/8/8168.png" className={mapStyles.mapIcon} alt="marker" />
+        </Marker>
+
+        {this.state.showPopup && (
+          <Popup
+            latitude={marker.latitude}
+            longitude={marker.longitude}
+            dynamicPosition={false}
+            closeButton={false}
+            tipSize={5}
+            anchor="top"
+          >
+            <div>{marker.name}</div>
+          </Popup>
+        )}
+      </>
+    );
+  };
 
   onSelected = (viewport, item) =>
     this.setState({

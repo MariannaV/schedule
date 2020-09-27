@@ -2,7 +2,7 @@ import React from 'react';
 import moment from 'moment-timezone';
 import { Button, Calendar, Badge } from 'antd';
 import { Event } from 'services/event';
-import { ScheduleStore } from 'components/Schedule/store';
+import { NSchedule, ScheduleStore } from 'components/Schedule/store';
 import {
   ScheduleDetailViewModal,
   IScheduleDetailViewModal,
@@ -37,6 +37,21 @@ export function ScheduleCalendar() {
     null,
   );
 
+  const { dispatch } = React.useContext(ScheduleStore.context),
+    onCellClickByCreateNewEvent = React.useCallback(() => {
+      ScheduleStore.API.detailViewSetOpened(dispatch)({
+        payload: {
+          openedId: null,
+        },
+      });
+      ScheduleStore.API.detailViewModeChange(dispatch)({
+        payload: {
+          mode: NSchedule.FormModes.CREATE,
+        },
+      });
+      setVisibleDetailViewModal(true);
+    }, []);
+
   function dateCellRender(value) {
     const currentDate = dateRenderer(timeZone)(value),
       isMentor = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsMentor),
@@ -45,7 +60,7 @@ export function ScheduleCalendar() {
 
     return (
       <section>
-        {isMentor && <Button children="+" type="primary" size="small" />}
+        {isMentor && <Button children="+" type="primary" size="small" onClick={onCellClickByCreateNewEvent} />}
         {currentEvents?.map((eventId, index) => (
           <CalendarEvent
             eventId={eventId}
@@ -75,15 +90,28 @@ function CalendarEvent(props: ICalendarEvent) {
   const { eventId, changeVisibility } = props,
     eventData = ScheduleStore.useSelector(ScheduleStore.selectors.getEvent({ eventId }));
 
+  const classes = React.useMemo(() => [calendarStyles.calendarEvent, props.className].filter(Boolean).join(' '), [
+    props.className,
+  ]);
+
   const { dispatch } = React.useContext(ScheduleStore.context),
-    onClick = React.useCallback(() => {
-      ScheduleStore.API.detailViewSetOpened(dispatch)({
-        payload: {
-          openedId: eventId,
-        },
-      });
-      changeVisibility(true);
-    }, [eventId]);
+    onClick = React.useCallback(
+      (event) => {
+        event.preventDefault();
+        ScheduleStore.API.detailViewSetOpened(dispatch)({
+          payload: {
+            openedId: eventId,
+          },
+        });
+        ScheduleStore.API.detailViewModeChange(dispatch)({
+          payload: {
+            mode: NSchedule.FormModes.VIEW,
+          },
+        });
+        changeVisibility(true);
+      },
+      [eventId],
+    );
 
   const type = React.useMemo(() => {
     switch (true) {
@@ -95,9 +123,9 @@ function CalendarEvent(props: ICalendarEvent) {
   }, [eventData.deadLine]);
 
   return (
-    <article onClick={onClick} className={props.className}>
+    <a href={`/course/schedule/event/${eventId}`} onClick={onClick} className={classes}>
       <Badge status={type} text={eventData.name} />
-    </article>
+    </a>
   );
 }
 

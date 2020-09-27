@@ -11,10 +11,11 @@ import { Table, Tag, Tooltip, Button } from 'antd';
 import { useRouter } from 'next/router';
 import { Event } from 'services/event';
 import { GithubUserLink } from 'components';
-import { ScheduleStore } from 'components/Schedule/store';
+import { NSchedule, ScheduleStore } from 'components/Schedule/store';
 import { Filter } from './components/Filter/Filter';
 import { rowsFilter, defaultColumnsFilter } from './config';
 import { tagColors } from '../constants';
+import { IScheduleDetailViewModal, ScheduleDetailViewModal } from '../ScheduleDetailView/ScheduleDetailViewModal';
 import styles from './style.module.scss';
 
 const startOfToday = moment().startOf('day');
@@ -39,6 +40,10 @@ export function ScheduleTable() {
     setHiddenRows([...selectedRows, ...hiddenRows]);
     setSelectedRows([]);
   };
+
+  const [isVisibleDetailViewModal, setVisibleDetailViewModal] = React.useState<IScheduleDetailViewModal['isVisible']>(
+    null,
+  );
 
   return (
     <>
@@ -165,7 +170,8 @@ export function ScheduleTable() {
               title: 'Action',
               width: 300,
               dataIndex: 'checker',
-              render: (value: string, eventData: Event) => actionButtonsRenderer(value ?? '', eventData),
+              render: (value: string, eventData: Event) =>
+                actionButtonsRenderer(value ?? '', eventData, setVisibleDetailViewModal),
             },
             {
               title: 'Place',
@@ -214,6 +220,7 @@ export function ScheduleTable() {
           ].filter((column) => checkedColumns.includes(column.title))}
         />
       )}
+      <ScheduleDetailViewModal isVisible={isVisibleDetailViewModal} changeVisibility={setVisibleDetailViewModal} />
     </>
   );
 }
@@ -221,8 +228,14 @@ export function ScheduleTable() {
 export const dateRenderer = (timeZone: string) => (value: string) =>
   value ? moment(value, 'YYYY-MM-DD HH:mmZ').tz(timeZone).format('DD.MM.YYYY HH:mm') : '';
 
-const actionButtonsRenderer = (checker, eventData: Event) => {
-  const router = useRouter();
+const actionButtonsRenderer = (
+  checker,
+  eventData: Event,
+  setVisibleDetailViewModal: React.Dispatch<null | boolean>,
+) => {
+  const router = useRouter(),
+    { dispatch } = React.useContext(ScheduleStore.context);
+
   const ButtonDetails = React.useMemo(
     () => (
       <Button
@@ -231,6 +244,20 @@ const actionButtonsRenderer = (checker, eventData: Event) => {
         children="Details"
         href={`/course/schedule/event/${eventData.id}`}
         target="_blank"
+        onClick={(event) => {
+          event.preventDefault();
+          ScheduleStore.API.detailViewSetOpened(dispatch)({
+            payload: {
+              openedId: eventData.id,
+            },
+          });
+          ScheduleStore.API.detailViewModeChange(dispatch)({
+            payload: {
+              mode: NSchedule.FormModes.VIEW,
+            },
+          });
+          setVisibleDetailViewModal(true);
+        }}
       />
     ),
     [eventData.id],
