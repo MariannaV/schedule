@@ -19,7 +19,7 @@
 
 ### Команды для быстрого старта:
 
-1. git clone [репозитория] (https://github.com/MariannaV/schedule)
+1. git clone [репозитория](https://github.com/MariannaV/schedule)
 2. yarn install
 3. yarn start:client
 4. открыть на http://localhost:3000/course/schedule
