@@ -7,6 +7,7 @@ import {
   EyeInvisibleOutlined,
   ExclamationCircleTwoTone,
   EditOutlined,
+  DeleteOutlined,
 } from '@ant-design/icons';
 import { Table, Tag, Tooltip, Button, Form } from 'antd';
 import { Event, EventService } from 'services/event';
@@ -41,6 +42,7 @@ export function ScheduleTable() {
   const [hiddenRows, setHiddenRows] = React.useState([] as string[]);
   const [editingKey, setEditingKey] = useState('');
   const [dataSource, setDataSource] = useState(tableData);
+  const [deletingEvent, setDeletingEvent] = useState(null);
 
   const isEditing = (record) => record.id === editingKey;
 
@@ -63,6 +65,21 @@ export function ScheduleTable() {
       ...record,
     });
     setEditingKey(record.id);
+  };
+
+  const deleteRow = async (record) => {
+    await ScheduleStore.API.eventDelete(dispatch)({
+      payload: {
+        eventId: record.id,
+      },
+    });
+    ScheduleStore.API.eventsFetchStart(dispatch)();
+    const events = await new EventService().getEvents();
+    ScheduleStore.API.eventsSet(dispatch)({
+      payload: {
+        events,
+      },
+    });
   };
 
   const addRow = () => {
@@ -155,6 +172,10 @@ export function ScheduleTable() {
                     edit(record);
                     return;
                   }
+                  if ((e.target as HTMLElement).closest('[data-icon="delete"]')) {
+                    deleteRow(record);
+                    return;
+                  }
                   if (e.shiftKey) {
                     selectedRows.includes(record.id)
                       ? setSelectedRows(selectedRows.filter((item) => item !== record.id))
@@ -182,12 +203,12 @@ export function ScheduleTable() {
               }
               return styles[record.type.toLowerCase().split(' ').join('')];
             }}
-            scroll={{ x: 1600 }}
+            scroll={{ x: 1920 }}
             // @ts-ignore
             columns={[
               {
                 title: 'Start Date',
-                width: 80,
+                width: 110,
                 align: 'center',
                 dataIndex: 'dateStart',
 
@@ -253,12 +274,12 @@ export function ScheduleTable() {
               },
               {
                 title: 'Action',
-                width: 300,
+                width: 320,
                 dataIndex: 'checker',
                 render: (value: string, eventData: Event) => {
                   return !value
-                    ? actionButtonsRenderer('', eventData, userIsMentor)
-                    : actionButtonsRenderer(value, eventData, userIsMentor);
+                    ? actionButtonsRenderer('', eventData, userIsMentor, deleteRow)
+                    : actionButtonsRenderer(value, eventData, userIsMentor, deleteRow);
                 },
               },
               {
@@ -377,9 +398,14 @@ const actionButtonsRenderer = (checker: string, eventData: Event, userIsMentor: 
         <EyeInvisibleOutlined className={styles.iconHide} />
       </Tooltip>
       {userIsMentor && (
-        <Tooltip title="Edit event">
-          <EditOutlined className={styles.iconEdit} />
-        </Tooltip>
+        <>
+          <Tooltip title="Edit event">
+            <EditOutlined className={styles.iconEdit} />
+          </Tooltip>
+          <Tooltip title="Delete event">
+            <DeleteOutlined className={styles.iconDelete} />
+          </Tooltip>
+        </>
       )}
     </>
   );
