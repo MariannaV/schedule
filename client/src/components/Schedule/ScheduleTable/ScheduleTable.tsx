@@ -114,13 +114,6 @@ export function ScheduleTable() {
             },
           },
         });
-        ScheduleStore.API.eventsFetchStart(dispatch)();
-        const events = await new EventService().getEvents();
-        ScheduleStore.API.eventsSet(dispatch)({
-          payload: {
-            events,
-          },
-        });
         setDataSource(tableData);
       } else {
         await ScheduleStore.API.eventUpdate(dispatch)({
