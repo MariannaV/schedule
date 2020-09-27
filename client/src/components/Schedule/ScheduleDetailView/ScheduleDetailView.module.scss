@@ -18,6 +18,7 @@
 }
 
 .ScheduleDetailViewModal {
+
   &[class~='ant-modal'] {
     top: 0;
     min-width: 100vw;
@@ -63,6 +64,11 @@
 }
 
 .viewMode {
+
+  [class~='ant-btn-primary'] {
+    margin-bottom: 20px;
+  }
+
   .fieldName {
     [class~='ant-form-item-label'] {
       display: none;
@@ -116,4 +122,5 @@
   .dropdownButton {
     margin-right: 20px;
   }
+  
 }
