@@ -139,7 +139,7 @@ const ScheduleHeader = React.memo(() => {
   );
 });
 
-function FetcherCommonData() {
+export function FetcherCommonData() {
   const { dispatch } = React.useContext(ScheduleStore.context);
 
   React.useEffect(function fetchData() {
