@@ -211,7 +211,9 @@ export function ScheduleTable() {
               title: 'Description',
               width: 250,
               dataIndex: 'description',
-              className: `${styles.cutted}`,
+              render: (value: string) => {
+                return <div className={styles.cutted}>{value}</div>;
+              },
             },
           ].filter((column) => checkedColumns.includes(column.title))}
         />
