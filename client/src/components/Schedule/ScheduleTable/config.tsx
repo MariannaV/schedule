@@ -6,7 +6,7 @@ export const defaultColumnsFilter = [
   'Action',
   'Place',
   'Description URL',
-  'Organizer',
+  'Organizers',
   'Description',
 ];
 

@@ -1,5 +1,4 @@
 .ScheduleDetailView {
-  position: relative;
 }
 
 .ScheduleDetailViewHeader {
@@ -9,6 +8,7 @@
   grid-auto-columns: max-content;
   grid-gap: 0.5rem;
   align-items: center;
+  position: relative;
 }
 
 .EventForm {
@@ -63,4 +63,57 @@
 }
 
 .viewMode {
+  .fieldName {
+    [class~='ant-form-item-label'] {
+      display: none;
+    }
+    [class~='ant-form-item-control'] {
+      font-weight: bold;
+      font-size: 1.6em;
+    }
+  }
+
+  .fieldType {
+    color: var(--eventTypeColor, black);
+
+    [class~='ant-form-item-label'] {
+      display: none;
+    }
+    [class~='ant-form-item-control-input-content'] > p {
+      padding: 2px;
+      width: 120px;
+      text-align: center;
+      white-space: nowrap;
+      background: #fafafa;
+      border: 1px solid #d9d9d9;
+      border-radius: 2px;
+    }
+  }
+
+  .fieldDescription {
+    white-space: pre-line;
+  }
+
+  .fieldLink {
+    [class~='ant-form-item-control'] {
+      color: blue;
+      text-decoration: underline;
+    }
+  }
+
+  .fieldDateStart {
+    color: green;
+  }
+
+  .fieldDateEnd {
+    color: red;
+  }
+
+  .fieldIsOnline {
+    display: none;
+  }
+
+  .dropdownButton {
+    margin-right: 20px;
+  }
 }

@@ -9,6 +9,7 @@ import { ScheduleTable, ScheduleListWrapper, ScheduleCalendar } from 'components
 import { NSchedule } from 'components/Schedule/store/@types';
 import { ScheduleStore } from 'components/Schedule/store';
 import { EventService } from 'services/event';
+import pageScheduleStyles from 'components/Schedule/SchedulePage.module.scss';
 
 const SchedulePageWrapper = () => (
   <ScheduleStore.provider>
@@ -20,7 +21,12 @@ const SchedulePageWrapper = () => (
 function SchedulePage() {
   const isLoading = ScheduleStore.useSelector(ScheduleStore.selectors.getEventsLoading);
   return (
-    <PageLayout title="Schedule" githubId={'props.session.githubId'} loading={isLoading}>
+    <PageLayout
+      title="Schedule"
+      githubId={'props.session.githubId'}
+      loading={isLoading}
+      classes={pageScheduleStyles.pageSchedule}
+    >
       {isLoading === false && (
         <>
           <ScheduleHeader />
@@ -133,7 +139,7 @@ const ScheduleHeader = React.memo(() => {
   );
 });
 
-function FetcherCommonData() {
+export function FetcherCommonData() {
   const { dispatch } = React.useContext(ScheduleStore.context);
 
   React.useEffect(function fetchData() {

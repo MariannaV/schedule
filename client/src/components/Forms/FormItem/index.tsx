@@ -1,17 +1,20 @@
 import React from 'react';
 import { Form, Checkbox, Switch, Tag } from 'antd';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import { FormItemProps } from 'antd/lib/form';
 import formItemStyles from './FormItem.module.scss';
+import { MapView } from 'components/Schedule/ScheduleMap/map';
 
 export interface IFormItem extends FormItemProps {
   isReadOnly?: boolean;
-  type: 'input' | 'select' | 'time' | 'checkbox' | 'switch' | 'files';
+  type: 'input' | 'select' | 'time' | 'checkbox' | 'switch' | 'files' | 'map';
   name: string;
+  style?: React.CSSProperties;
+  viewProps?: Record<string, any>;
 }
 
 export const FormItem: React.FC<IFormItem> = React.memo((props) => {
-  const { isReadOnly = false, className, type, ...formItemProps } = props,
+  const { isReadOnly = false, className, type, viewProps, ...formItemProps } = props,
     classes = React.useMemo(
       () => [formItemStyles.field, isReadOnly && 'isReadOnly', className].filter(Boolean).join(' '),
       [className, isReadOnly],
@@ -21,24 +24,27 @@ export const FormItem: React.FC<IFormItem> = React.memo((props) => {
     <Form.Item
       {...formItemProps}
       className={classes}
-      children={isReadOnly ? <FieldView type={type} /> : props.children}
+      children={isReadOnly ? <FieldView type={type} viewProps={viewProps} /> : props.children}
     />
   );
 });
 
 interface IFieldView {
   type: IFormItem['type'];
+  viewProps?: IFormItem['viewProps'];
   value?: any;
 }
 
 function FieldView(props: IFieldView) {
-  const { type, value } = props,
+  const { type, value, viewProps } = props,
     ref = React.useRef(null),
     fieldValue = React.useMemo(() => {
       switch (type) {
-        case 'time':
-          //TODO: need to add selected timezone
-          return moment(value).format('DD.MM.YYYY HH:mm');
+        case 'time': {
+          return moment(viewProps?.value ?? value)
+            .tz(viewProps?.timeZone)
+            .format('DD.MM.YYYY HH:mm');
+        }
 
         case 'checkbox':
           return <Checkbox disabled checked={!!value} />;
@@ -51,10 +57,13 @@ function FieldView(props: IFieldView) {
           return files.map((file) => <Tag children={file.name} key={`attachment-${file.uid}`} />);
         }
 
+        case 'map':
+          return <MapView isReadOnly markers={value} />;
+
         default:
           return value;
       }
-    }, [value, type]);
+    }, [viewProps, value, type]);
 
   React.useEffect(function hideEmptyField() {
     const formItemNode = (ref.current as any).closest('.ant-form-item'),

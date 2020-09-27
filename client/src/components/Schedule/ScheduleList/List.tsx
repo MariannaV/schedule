@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Typography, Tag } from 'antd';
+import { Button, Typography, Tag, Tooltip } from 'antd';
 import moment from 'moment-timezone';
 import { FixedSizeList as List } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
@@ -22,7 +22,6 @@ function ScheduleList(props: IScheduleList) {
     renderEventList = React.useCallback(
       ({ height, width }) => (
         <List
-          className="List"
           itemKey={getRowKey}
           itemCount={eventsList.length}
           itemSize={200}
@@ -31,7 +30,7 @@ function ScheduleList(props: IScheduleList) {
           children={renderEventItem}
         />
       ),
-      [],
+      [eventsList, renderEventItem],
     ),
     classes = React.useMemo(() => [listStyles.ScheduleListWrapper, props.className].filter(Boolean).join(' '), [
       props.className,
@@ -82,11 +81,21 @@ function ListItem(props: IListItem) {
       };
     }, [props.style]);
 
+  const ButtonDetails = React.useMemo(
+    () => (
+      <Tooltip title="Open in new tab">
+        <Button type={'primary'} href={`/course/schedule/event/${eventId}`} target="_blank" children="Details" />
+      </Tooltip>
+    ),
+    [eventId],
+  );
+
   return (
     <article className={classes} onClick={onItemClick} style={containerStyle}>
       <header>
         <Typography.Title children={eventData.name} level={3} />
         <Tag color={tagColors[eventData.type.toLowerCase()]}>{eventData.type}</Tag>
+        {ButtonDetails}
       </header>
 
       <main>

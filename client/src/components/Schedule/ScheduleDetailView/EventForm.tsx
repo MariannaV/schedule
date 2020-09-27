@@ -1,17 +1,20 @@
 import React from 'react';
 import { UploadOutlined } from '@ant-design/icons';
-import { Form, Input, Select, Switch, Upload, Button, Radio, DatePicker, message } from 'antd';
+import { Form, Input, Select, Switch, Upload, Button, DatePicker, message } from 'antd';
 import moment from 'moment';
 import { Event, eventTypes } from 'services/event';
 import { FieldTimezone } from 'components/Forms/fields';
 import { FieldOrganizers } from 'components/Forms/fields/FieldOrganizers';
+import { MapView } from 'components/Schedule/ScheduleMap/map';
 import { FormItem, IFormItem } from 'components/Forms/FormItem';
 import { NSchedule, ScheduleStore } from 'components/Schedule/store';
 import formStyles from './ScheduleDetailView.module.scss';
+import { tagColors } from '../constants';
 
 const eventFormHelpers = {
   formatTo: (sendingData: any) => {
     return {
+      'online/offline': true,
       ...sendingData,
       // @ts-ignore
       attachments: sendingData?.attachments?.fileList,
@@ -26,6 +29,8 @@ const eventFormHelpers = {
   },
   formatFrom: (eventData: Event) => {
     return {
+      // @ts-ignore
+      'online/offline': true,
       ...eventData,
       dateStart: moment(eventData?.dateStart),
       ...(eventData?.dateEnd && {
@@ -41,7 +46,8 @@ export const eventFormId = `eventFormId`;
 
 function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
   const eventId = ScheduleStore.useSelector(ScheduleStore.selectors.getDetailViewOpenedId),
-    eventData = ScheduleStore.useSelector(ScheduleStore.selectors.getEvent({ eventId }));
+    eventData = ScheduleStore.useSelector(ScheduleStore.selectors.getEvent({ eventId })),
+    timeZone = ScheduleStore.useSelector(ScheduleStore.selectors.getUserPreferredTimezone);
 
   const { dispatch } = React.useContext(ScheduleStore.context),
     isMentor = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsMentor),
@@ -52,10 +58,11 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
   const [form] = Form.useForm(),
     formInitialValues = React.useMemo(() => eventFormHelpers.formatFrom(eventData), [eventData]),
     [eventType, setEventType] = React.useState<eventTypes>(eventData?.type),
-    [attachmentfiles, setAttachmentFiles] = React.useState(eventData?.attachments),
+    [attachmentFiles, setAttachmentFiles] = React.useState(eventData?.attachments),
+    [isOnline, changePlaceType] = React.useState(eventData?.['online/offline'] ?? true),
     onSubmit = React.useCallback(
       async (sendingData: Event) => {
-        const newEventData = eventFormHelpers.formatTo({ ...sendingData, comments: eventData?.comments });
+        const newEventData = eventFormHelpers.formatTo({ ...sendingData, comments: eventData?.comments, isOnline });
         try {
           props.setSubmitting(true);
           if (isCreation) {
@@ -88,7 +95,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
           props.setSubmitting(false);
         }
       },
-      [eventId, isCreation, eventData?.comments],
+      [eventId, isCreation, eventData?.comments, isOnline],
     );
 
   React.useEffect(
@@ -120,8 +127,9 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
           name="description"
           rules={[{ required: true, message: 'Please input event description!' }]}
           type="input"
-          children={<Input />}
+          children={<Input.TextArea autoSize />}
           isReadOnly={isReadOnly}
+          className={formStyles.fieldDescription}
         />
       ),
       descriptionUrl: ({ isReadOnly }) => (
@@ -131,6 +139,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
           type="input"
           children={<Input />}
           isReadOnly={isReadOnly}
+          className={formStyles.fieldLink}
         />
       ),
       timeZone: ({ isReadOnly }) => (
@@ -151,6 +160,11 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
           type="time"
           children={<DatePicker showTime />}
           isReadOnly={isReadOnly}
+          className={formStyles.fieldDateStart}
+          viewProps={{
+            value: eventData?.dateEnd,
+            timeZone,
+          }}
         />
       ),
       organizers: ({ isReadOnly }) => (
@@ -169,7 +183,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
             name="dateStartEnd"
             rules={[{ required: true, message: 'Please select event time and deadline!' }]}
             type="time"
-            children={<DatePicker.RangePicker showTime={{ format: 'HH:mm' }} format="YYYY-MM-DD HH:mm" />}
+            children={<DatePicker.RangePicker showTime={{ format: 'HH:mm' }} format="DD.MM.YYYY HH:mm" />}
             isReadOnly={isReadOnly}
           />
         ) : (
@@ -178,39 +192,49 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
               label="Start time"
               name="dateStart"
               type="time"
-              children={<DatePicker showTime />}
               isReadOnly={isReadOnly}
+              className={formStyles.fieldDateStart}
+              viewProps={{
+                value: eventData?.dateStart,
+                timeZone,
+              }}
             />
             <FormItem
               label="Deadline time"
               name="dateEnd"
               type="time"
-              children={<DatePicker showTime />}
               isReadOnly={isReadOnly}
+              className={formStyles.fieldDateEnd}
+              viewProps={{
+                value: eventData?.dateEnd,
+                timeZone,
+              }}
             />
           </>
         );
       },
       place: ({ isReadOnly }) => (
-        <FormItem label="Place" name="place" type="input" children={<Input />} isReadOnly={isReadOnly} />
-      ),
-      onlineOffline: ({ isReadOnly }) => (
         <FormItem
-          label="Online or offline"
-          name="online/offline"
-          type="checkbox" //radio
+          label="Place"
+          name="places"
+          type="map"
+          children={<MapView markers={eventData?.places} />}
           rules={[{ required: true }]}
-          children={
-            <Radio.Group>
-              <Radio value="Offline" children="Offline" checked />
-              <Radio value="Online" children="Online" />
-            </Radio.Group>
-          }
           isReadOnly={isReadOnly}
         />
       ),
+      onlineOffline: ({ isReadOnly }) => (
+        <FormItem
+          label="Is online?"
+          name="online/offline"
+          type="switch"
+          children={<Switch onChange={changePlaceType} defaultChecked={isOnline} />}
+          isReadOnly={isReadOnly}
+          className={formStyles.fieldIsOnline}
+        />
+      ),
     }),
-    [],
+    [eventData, timeZone, isOnline],
   );
 
   const updateAttachmentFileList = (info) => {
@@ -244,8 +268,8 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
         type="input"
         children={<Input />}
         isReadOnly={isReadOnly}
+        className={formStyles.fieldName}
       />
-
       <FormItem
         label="Event type"
         name="type"
@@ -260,8 +284,11 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
           />
         }
         isReadOnly={isReadOnly}
+        className={formStyles.fieldType}
+        style={{
+          ['--eventTypeColor' as any]: tagColors[eventData?.type.toLowerCase()],
+        }}
       />
-
       {(() => {
         switch (eventType) {
           case eventTypes.codejam:
@@ -303,7 +330,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
               <>
                 <fields.description isReadOnly={isReadOnly} />
                 <fields.onlineOffline isReadOnly={isReadOnly} />
-                <fields.place isReadOnly={isReadOnly} />
+                {!isOnline && <fields.place isReadOnly={isReadOnly} />}
                 <fields.timeZone isReadOnly={isReadOnly} />
                 <fields.dateTimeRange isReadOnly={isReadOnly} />
                 <fields.descriptionUrl isReadOnly={isReadOnly} />
@@ -316,7 +343,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
               <>
                 <fields.description isReadOnly={isReadOnly} />
                 <fields.onlineOffline isReadOnly={isReadOnly} />
-                <fields.place isReadOnly={isReadOnly} />
+                {!isOnline && <fields.place isReadOnly={isReadOnly} />}
                 <fields.timeZone isReadOnly={isReadOnly} />
                 <fields.dateTime isReadOnly={isReadOnly} />
                 <fields.descriptionUrl isReadOnly={isReadOnly} />
@@ -327,7 +354,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
       })()}
 
       <FormItem label="Attachments" name="attachments" type="files" isReadOnly={isReadOnly}>
-        <Upload multiple={true} defaultFileList={attachmentfiles} onChange={updateAttachmentFileList}>
+        <Upload multiple={true} defaultFileList={attachmentFiles} onChange={updateAttachmentFileList}>
           <Button icon={<UploadOutlined />} children="Click to upload" />
         </Upload>
       </FormItem>
@@ -339,6 +366,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
           type="switch"
           children={<Switch defaultChecked={eventData?.commentsEnabled} />}
           isReadOnly={isReadOnly}
+          className={formStyles.fieldComment}
         />
       )}
     </Form>
