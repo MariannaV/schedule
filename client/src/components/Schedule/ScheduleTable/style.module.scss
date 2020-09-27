@@ -151,3 +151,11 @@
   margin: 0;
   text-transform: capitalize;
 }
+
+.cutted{
+  max-height: 40px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}

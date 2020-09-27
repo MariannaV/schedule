@@ -157,6 +157,7 @@ export function ScheduleTable() {
       {checkedColumns.length && (
         <Form form={form} component={false}>
           <Table
+            className={styles.table}
             components={{
               body: {
                 cell: EditableCell,
@@ -321,6 +322,9 @@ export function ScheduleTable() {
                 title: 'Description',
                 width: 250,
                 dataIndex: 'description',
+                render: (value: string) => {
+                  return <div className={styles.cutted}>{value}</div>;
+                },
               },
             ]
               .filter((column) => checkedColumns.includes(column.title))
