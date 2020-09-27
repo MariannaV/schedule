@@ -45,13 +45,6 @@ export function ScheduleTable() {
   const [dataSource, setDataSource] = React.useState(tableData);
   // const [deletingEvent, setDeletingEvent] = React.useState(null);
 
-  const isEditing = (record) => record.id === editingKey;
-
-  const hideRows = () => {
-    setHiddenRows([...selectedRows, ...hiddenRows]);
-    setSelectedRows([]);
-  };
-
   const [isVisibleDetailViewModal, setVisibleDetailViewModal] = React.useState<IScheduleDetailViewModal['isVisible']>(
     null,
   );
@@ -142,6 +135,7 @@ export function ScheduleTable() {
         });
       }
       setEditingKey('');
+      form.setFieldsValue(initialFormValues);
     } catch (error) {
       console.log(error);
     }
