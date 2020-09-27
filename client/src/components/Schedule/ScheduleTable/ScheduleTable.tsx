@@ -9,7 +9,7 @@ import {
   EditOutlined,
 } from '@ant-design/icons';
 import { Table, Tag, Tooltip, Button, Form } from 'antd';
-import { Event } from 'services/event';
+import { Event, EventService } from 'services/event';
 import { GithubUserLink } from 'components';
 import { ScheduleStore } from 'components/Schedule/store';
 import { Filter } from './components/Filter/Filter';
@@ -20,7 +20,8 @@ import styles from './style.module.scss';
 
 const startOfToday = moment().startOf('day');
 
-function isRowDisabled(dateTime, deadLine) {
+function isRowDisabled(dateTime: string, deadLine: string, id?: string) {
+  if (id === 'new') return false;
   return deadLine
     ? moment(dateTime).isBefore(startOfToday) && moment(deadLine).isBefore(startOfToday)
     : moment(dateTime).isBefore(startOfToday);
@@ -39,6 +40,7 @@ export function ScheduleTable() {
   const [selectedRows, setSelectedRows] = React.useState([] as string[]);
   const [hiddenRows, setHiddenRows] = React.useState([] as string[]);
   const [editingKey, setEditingKey] = useState('');
+  const [dataSource, setDataSource] = useState(tableData);
 
   const isEditing = (record) => record.id === editingKey;
 
@@ -48,8 +50,6 @@ export function ScheduleTable() {
   };
 
   const edit = (record) => {
-    console.log(record);
-    console.log(record.id);
     form.setFieldsValue({
       dateStart: '',
       name: '',
@@ -65,15 +65,50 @@ export function ScheduleTable() {
     setEditingKey(record.id);
   };
 
+  const addRow = () => {
+    const newRow = {
+      id: 'new',
+      dateStart: '',
+      name: '',
+      dateEnd: '',
+      type: '',
+      checker: '',
+      place: '',
+      organizers: [],
+      descriptionUrl: '',
+      description: '',
+    };
+    setDataSource([newRow, ...dataSource]);
+    setEditingKey('new');
+  };
+
   const save = async () => {
     try {
       const newEventData = await form.validateFields();
-      await ScheduleStore.API.eventUpdate(dispatch)({
-        payload: {
-          eventId: editingKey,
-          eventData: newEventData,
-        },
-      });
+      if (editingKey === 'new') {
+        await ScheduleStore.API.eventCreate(dispatch)({
+          payload: {
+            // @ts-ignore
+            eventData: newEventData,
+          },
+        });
+        ScheduleStore.API.eventsFetchStart(dispatch)();
+        const events = await new EventService().getEvents();
+        ScheduleStore.API.eventsSet(dispatch)({
+          payload: {
+            events,
+          },
+        });
+        setDataSource(tableData);
+      } else {
+        await ScheduleStore.API.eventUpdate(dispatch)({
+          payload: {
+            eventId: editingKey,
+            // @ts-ignore
+            eventData: newEventData,
+          },
+        });
+      }
       setEditingKey('');
     } catch (error) {
       console.log(error);
@@ -87,6 +122,7 @@ export function ScheduleTable() {
   return (
     <>
       <div className={styles.settings}>
+        {userIsMentor && <Button children="+ Add a row" type="primary" onClick={addRow} />}
         <Filter
           checkedColumns={checkedColumns}
           setCheckedColumns={setCheckedColumns}
@@ -132,10 +168,10 @@ export function ScheduleTable() {
             pagination={{ position: ['bottomRight'], showSizeChanger: true }}
             dataSource={
               isActiveDates
-                ? tableData.filter(
-                    (data) => !isRowDisabled(data.dateStart, data.dateEnd) && !hiddenRows.includes(data.id),
+                ? dataSource.filter(
+                    (data) => !isRowDisabled(data.dateStart, data.dateEnd, data.id) && !hiddenRows.includes(data.id),
                   )
-                : tableData.filter((data) => !hiddenRows.includes(data.id))
+                : dataSource.filter((data) => !hiddenRows.includes(data.id))
             }
             rowClassName={(record) => {
               if (selectedRows.includes(record.id)) {
@@ -219,8 +255,11 @@ export function ScheduleTable() {
                 title: 'Action',
                 width: 300,
                 dataIndex: 'checker',
-                render: (value: string, eventData: Event, userIsMentor: boolean) =>
-                  actionButtonsRenderer(value ?? '', eventData, userIsMentor),
+                render: (value: string, eventData: Event) => {
+                  return !value
+                    ? actionButtonsRenderer('', eventData, userIsMentor)
+                    : actionButtonsRenderer(value, eventData, userIsMentor);
+                },
               },
               {
                 title: 'Place',

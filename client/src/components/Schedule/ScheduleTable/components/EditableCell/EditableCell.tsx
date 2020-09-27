@@ -24,7 +24,11 @@ export const EditableCell = ({ editing, dataIndex, record, save, cancel, childre
           getValueProps={(value) => moment(value)}
           type="time"
         >
-          <DatePicker showTime defaultValue={moment(record.dateStart)} format="DD.MM.YYYY HH:mm" />
+          <DatePicker
+            showTime
+            defaultValue={record.dateEnd !== '' && record.dateEnd !== null ? moment(record.dateEnd) : undefined}
+            format="DD.MM.YYYY HH:mm"
+          />
         </FormItem>
       );
       break;
@@ -39,9 +43,34 @@ export const EditableCell = ({ editing, dataIndex, record, save, cancel, childre
         </FormItem>
       );
       break;
+    case 'name':
+      cell = (
+        <FormItem
+          name={dataIndex}
+          type="input"
+          rules={[
+            {
+              required: true,
+              message: 'Please type event name!',
+            },
+          ]}
+        >
+          <Input />
+        </FormItem>
+      );
+      break;
     case 'type':
       cell = (
-        <FormItem name={dataIndex} type="select">
+        <FormItem
+          name={dataIndex}
+          type="select"
+          rules={[
+            {
+              required: true,
+              message: 'Please select event type!',
+            },
+          ]}
+        >
           <Select
             children={Object.entries({ ...eventTypes }).map(([key, value]) => (
               <Select.Option value={value} children={value} key={key} />
