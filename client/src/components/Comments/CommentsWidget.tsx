@@ -3,6 +3,7 @@ import { IComments } from './@types';
 import { CommentsList } from './CommentsList';
 import { CommentItem } from './CommentItem';
 import { GithubAvatar } from 'components/GithubAvatar';
+import { UserOutlined } from '@ant-design/icons';
 
 export const CommentsContext = React.createContext<IComments.Widget>({});
 
@@ -12,7 +13,7 @@ const CommentsWidget: React.FC<IComments.Widget> = (props) => {
     <section>
       <h6 children={`${comments?.length || 'No'} comments`} />
       <CommentsContext.Provider value={props}>
-        <GithubAvatar githubId={''} size={24} />
+        <GithubAvatar githubId={''} size={24} style={{ backgroundImage: `${(<UserOutlined />)}` }} />
         <CommentItem />
         {!!comments?.length && <CommentsList />}
       </CommentsContext.Provider>
