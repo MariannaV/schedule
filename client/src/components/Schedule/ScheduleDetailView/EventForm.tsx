@@ -14,6 +14,7 @@ import { tagColors } from '../constants';
 const eventFormHelpers = {
   formatTo: (sendingData: any) => {
     return {
+      'online/offline': true,
       ...sendingData,
       // @ts-ignore
       attachments: sendingData?.attachments?.fileList,
@@ -28,6 +29,8 @@ const eventFormHelpers = {
   },
   formatFrom: (eventData: Event) => {
     return {
+      // @ts-ignore
+      'online/offline': true,
       ...eventData,
       dateStart: moment(eventData?.dateStart),
       ...(eventData?.dateEnd && {
@@ -43,7 +46,8 @@ export const eventFormId = `eventFormId`;
 
 function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
   const eventId = ScheduleStore.useSelector(ScheduleStore.selectors.getDetailViewOpenedId),
-    eventData = ScheduleStore.useSelector(ScheduleStore.selectors.getEvent({ eventId }));
+    eventData = ScheduleStore.useSelector(ScheduleStore.selectors.getEvent({ eventId })),
+    timeZone = ScheduleStore.useSelector(ScheduleStore.selectors.getUserPreferredTimezone);
 
   const { dispatch } = React.useContext(ScheduleStore.context),
     isMentor = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsMentor),
@@ -55,10 +59,10 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
     formInitialValues = React.useMemo(() => eventFormHelpers.formatFrom(eventData), [eventData]),
     [eventType, setEventType] = React.useState<eventTypes>(eventData?.type),
     [attachmentFiles, setAttachmentFiles] = React.useState(eventData?.attachments),
-    [isOnline, changePlaceType] = React.useState(eventData?.['online/offline']),
+    [isOnline, changePlaceType] = React.useState(eventData?.['online/offline'] ?? true),
     onSubmit = React.useCallback(
       async (sendingData: Event) => {
-        const newEventData = eventFormHelpers.formatTo({ ...sendingData, comments: eventData?.comments });
+        const newEventData = eventFormHelpers.formatTo({ ...sendingData, comments: eventData?.comments, isOnline });
         try {
           props.setSubmitting(true);
           if (isCreation) {
@@ -91,7 +95,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
           props.setSubmitting(false);
         }
       },
-      [eventId, isCreation, eventData?.comments],
+      [eventId, isCreation, eventData?.comments, isOnline],
     );
 
   React.useEffect(
@@ -123,7 +127,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
           name="description"
           rules={[{ required: true, message: 'Please input event description!' }]}
           type="input"
-          children={<Input />}
+          children={<Input.TextArea autoSize />}
           isReadOnly={isReadOnly}
           className={formStyles.fieldDescription}
         />
@@ -157,6 +161,10 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
           children={<DatePicker showTime />}
           isReadOnly={isReadOnly}
           className={formStyles.fieldDateStart}
+          viewProps={{
+            value: eventData?.dateEnd,
+            timeZone,
+          }}
         />
       ),
       organizers: ({ isReadOnly }) => (
@@ -175,7 +183,7 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
             name="dateStartEnd"
             rules={[{ required: true, message: 'Please select event time and deadline!' }]}
             type="time"
-            children={<DatePicker.RangePicker showTime={{ format: 'HH:mm' }} format="YYYY-MM-DD HH:mm" />}
+            children={<DatePicker.RangePicker showTime={{ format: 'HH:mm' }} format="DD.MM.YYYY HH:mm" />}
             isReadOnly={isReadOnly}
           />
         ) : (
@@ -184,17 +192,23 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
               label="Start time"
               name="dateStart"
               type="time"
-              children={<DatePicker showTime />}
               isReadOnly={isReadOnly}
               className={formStyles.fieldDateStart}
+              viewProps={{
+                value: eventData?.dateStart,
+                timeZone,
+              }}
             />
             <FormItem
               label="Deadline time"
               name="dateEnd"
               type="time"
-              children={<DatePicker showTime />}
               isReadOnly={isReadOnly}
               className={formStyles.fieldDateEnd}
+              viewProps={{
+                value: eventData?.dateEnd,
+                timeZone,
+              }}
             />
           </>
         );
@@ -214,13 +228,13 @@ function EventForm(props: { setSubmitting: React.Dispatch<null | boolean> }) {
           label="Is online?"
           name="online/offline"
           type="switch"
-          rules={[{ required: true }]}
-          children={<Switch defaultChecked onChange={changePlaceType} />}
+          children={<Switch onChange={changePlaceType} defaultChecked={isOnline} />}
           isReadOnly={isReadOnly}
+          className={formStyles.fieldIsOnline}
         />
       ),
     }),
-    [],
+    [eventData, timeZone, isOnline],
   );
 
   const updateAttachmentFileList = (info) => {

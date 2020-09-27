@@ -32,11 +32,19 @@ function PageEvent() {
           },
         });
 
-        ScheduleStore.API.eventFetch(dispatch)({
-          payload: {
-            eventId,
-          },
-        });
+        fetchEventData();
+      }
+
+      async function fetchEventData() {
+        try {
+          await ScheduleStore.API.eventFetch(dispatch)({
+            payload: {
+              eventId,
+            },
+          });
+        } catch (error) {
+          currentRoute.push(`/course/schedule`);
+        }
       }
     },
     [eventId],

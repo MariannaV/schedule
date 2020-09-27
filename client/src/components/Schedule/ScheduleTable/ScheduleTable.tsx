@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import moment from 'moment-timezone';
 import {
   QuestionCircleOutlined,
@@ -12,11 +12,12 @@ import {
 import { Table, Tag, Tooltip, Button, Form } from 'antd';
 import { Event, EventService } from 'services/event';
 import { GithubUserLink } from 'components';
-import { ScheduleStore } from 'components/Schedule/store';
+import { NSchedule, ScheduleStore } from 'components/Schedule/store';
 import { Filter } from './components/Filter/Filter';
 import { EditableCell } from './components/EditableCell/EditableCell';
 import { rowsFilter, defaultColumnsFilter } from './config';
 import { tagColors } from '../constants';
+import { IScheduleDetailViewModal, ScheduleDetailViewModal } from '../ScheduleDetailView/ScheduleDetailViewModal';
 import styles from './style.module.scss';
 
 const startOfToday = moment().startOf('day');
@@ -40,9 +41,9 @@ export function ScheduleTable() {
   const [checkedColumns, setCheckedColumns] = React.useState(defaultColumnsFilter);
   const [selectedRows, setSelectedRows] = React.useState([] as string[]);
   const [hiddenRows, setHiddenRows] = React.useState([] as string[]);
-  const [editingKey, setEditingKey] = useState('');
-  const [dataSource, setDataSource] = useState(tableData);
-  const [deletingEvent, setDeletingEvent] = useState(null);
+  const [editingKey, setEditingKey] = React.useState('');
+  const [dataSource, setDataSource] = React.useState(tableData);
+  // const [deletingEvent, setDeletingEvent] = React.useState(null);
 
   const isEditing = (record) => record.id === editingKey;
 
@@ -50,6 +51,10 @@ export function ScheduleTable() {
     setHiddenRows([...selectedRows, ...hiddenRows]);
     setSelectedRows([]);
   };
+
+  const [isVisibleDetailViewModal, setVisibleDetailViewModal] = React.useState<IScheduleDetailViewModal['isVisible']>(
+    null,
+  );
 
   const edit = (record) => {
     form.setFieldsValue({
@@ -211,7 +216,6 @@ export function ScheduleTable() {
                 width: 110,
                 align: 'center',
                 dataIndex: 'dateStart',
-
                 render: dateRenderer(timeZone),
                 defaultSortOrder: 'ascend',
                 sorter: (a, b) => (a.dateStart > b.dateStart ? 1 : -1),
@@ -276,11 +280,8 @@ export function ScheduleTable() {
                 title: 'Action',
                 width: 320,
                 dataIndex: 'checker',
-                render: (value: string, eventData: Event) => {
-                  return !value
-                    ? actionButtonsRenderer('', eventData, userIsMentor, deleteRow)
-                    : actionButtonsRenderer(value, eventData, userIsMentor, deleteRow);
-                },
+                render: (value: string, eventData: Event) =>
+                  actionButtonsRenderer(value ?? '', eventData, setVisibleDetailViewModal, userIsMentor),
               },
               {
                 title: 'Place',
@@ -341,6 +342,7 @@ export function ScheduleTable() {
           />
         </Form>
       )}
+      <ScheduleDetailViewModal isVisible={isVisibleDetailViewModal} changeVisibility={setVisibleDetailViewModal} />
     </>
   );
 }
@@ -348,7 +350,14 @@ export function ScheduleTable() {
 export const dateRenderer = (timeZone: string) => (value: string) =>
   value ? moment(value, 'YYYY-MM-DD HH:mmZ').tz(timeZone).format('DD.MM.YYYY HH:mm') : '';
 
-const actionButtonsRenderer = (checker: string, eventData: Event, userIsMentor: boolean) => {
+const actionButtonsRenderer = (
+  checker: string,
+  eventData: Event,
+  setVisibleDetailViewModal: React.Dispatch<null | boolean>,
+  userIsMentor: boolean,
+) => {
+  const { dispatch } = React.useContext(ScheduleStore.context);
+
   const ButtonDetails = React.useMemo(
     () => (
       <Button
@@ -357,6 +366,20 @@ const actionButtonsRenderer = (checker: string, eventData: Event, userIsMentor: 
         children="Details"
         href={`/course/schedule/event/${eventData.id}`}
         target="_blank"
+        onClick={(event) => {
+          event.preventDefault();
+          ScheduleStore.API.detailViewSetOpened(dispatch)({
+            payload: {
+              openedId: eventData.id,
+            },
+          });
+          ScheduleStore.API.detailViewModeChange(dispatch)({
+            payload: {
+              mode: NSchedule.FormModes.VIEW,
+            },
+          });
+          setVisibleDetailViewModal(true);
+        }}
       />
     ),
     [eventData.id],

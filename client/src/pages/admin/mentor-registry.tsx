@@ -274,7 +274,7 @@ const styles = css`
   }
 
   .icon-flag-uk {
-    background-image: url(/static/images/united-kingdom.png);
+    background-image: url(/images/united-kingdom.png);
     background-position: center;
     background-size: contain;
     width: 16px;
@@ -282,7 +282,7 @@ const styles = css`
   }
 
   .icon-mentor {
-    background-image: url(/static/svg/master-yoda.svg);
+    background-image: url(/svg/master-yoda.svg);
     background-position: center;
     background-size: contain;
     width: 16px;
