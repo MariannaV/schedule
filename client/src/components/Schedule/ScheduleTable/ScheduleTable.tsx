@@ -10,6 +10,7 @@ import {
   DeleteOutlined,
 } from '@ant-design/icons';
 import { Table, Tag, Tooltip, Button, Form } from 'antd';
+import { useMedia } from 'react-use';
 import { Event, EventService } from 'services/event';
 import { GithubUserLink } from 'components';
 import { NSchedule, ScheduleStore } from 'components/Schedule/store';
@@ -34,6 +35,7 @@ export function ScheduleTable() {
     isActiveDates = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsActiveDates),
     eventsData = ScheduleStore.useSelector(ScheduleStore.selectors.getEvents),
     userIsMentor = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsMentor),
+    isMinDesktop = useMedia('(min-width: 1024px)'),
     tableData = React.useMemo(() => eventsData.list.map((eventId) => eventsData.map[eventId]), [eventsData]),
     { dispatch } = React.useContext(ScheduleStore.context);
 
@@ -332,7 +334,7 @@ export function ScheduleTable() {
               },
               {
                 title: 'Action',
-                fixed: 'right',
+                fixed: isMinDesktop && 'right',
                 dataIndex: 'checker',
                 render: (value: string, eventData: Event) =>
                   actionButtonsRenderer(value ?? '', eventData, setVisibleDetailViewModal, userIsMentor),

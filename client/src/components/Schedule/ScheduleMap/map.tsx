@@ -120,7 +120,7 @@ class MapView extends React.PureComponent<IMapView, IMapbox> {
       { viewport, tempMarker } = this.state;
 
     return (
-      <section>
+      <section className={mapStyles.mapWrapper}>
         {!isReadOnly && (
           <header>
             <Geocoder

@@ -3,3 +3,33 @@
   margin-top: -55px;
   margin-left: -15px;
 }
+
+.mapWrapper {
+  & > header {
+    display: grid;
+    grid-auto-flow: column;
+    grid-gap: 0.5rem;
+    grid-template-columns: auto max-content;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 0.5rem;
+
+    [class~='react-geocoder'] {
+      position: relative;
+      & > input {
+        width: 300px;
+        height: 32px;
+      }
+    }
+
+    [class~='react-geocoder-results'] {
+      position: absolute;
+      left: 0;
+      top: calc(100% + 0.5rem);
+      z-index: 1;
+      background-color: white;
+      border: 1px solid lightgray;
+      width: max-content;
+    }
+  }
+}
