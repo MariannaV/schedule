@@ -56,8 +56,9 @@ export function ScheduleTable() {
     null,
   );
 
-  const edit = (record) => {
-    form.setFieldsValue({
+  const initialFormValues = React.useMemo(
+    () => ({
+      id: 'new',
       dateStart: '',
       name: '',
       dateEnd: '',
@@ -67,6 +68,21 @@ export function ScheduleTable() {
       organizers: [],
       descriptionUrl: '',
       description: '',
+      timeZone,
+    }),
+    [],
+  );
+
+  const isEditing = (record) => record.id === editingKey;
+
+  const hideRows = () => {
+    setHiddenRows([...selectedRows, ...hiddenRows]);
+    setSelectedRows([]);
+  };
+
+  const edit = (record) => {
+    form.setFieldsValue({
+      ...initialFormValues,
       ...record,
     });
     setEditingKey(record.id);
@@ -88,19 +104,7 @@ export function ScheduleTable() {
   };
 
   const addRow = () => {
-    const newRow = {
-      id: 'new',
-      dateStart: '',
-      name: '',
-      dateEnd: '',
-      type: '',
-      checker: '',
-      place: '',
-      organizers: [],
-      descriptionUrl: '',
-      description: '',
-    };
-    setDataSource([newRow, ...dataSource]);
+    setDataSource([initialFormValues, ...dataSource]);
     setEditingKey('new');
   };
 
@@ -111,7 +115,10 @@ export function ScheduleTable() {
         await ScheduleStore.API.eventCreate(dispatch)({
           payload: {
             // @ts-ignore
-            eventData: newEventData,
+            eventData: {
+              ...initialFormValues,
+              ...newEventData,
+            },
           },
         });
         ScheduleStore.API.eventsFetchStart(dispatch)();
@@ -127,7 +134,10 @@ export function ScheduleTable() {
           payload: {
             eventId: editingKey,
             // @ts-ignore
-            eventData: newEventData,
+            eventData: {
+              ...initialFormValues,
+              ...newEventData,
+            },
           },
         });
       }
