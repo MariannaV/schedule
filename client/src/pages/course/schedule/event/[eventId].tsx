@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { NSchedule, ScheduleStore } from 'components/Schedule/store';
 import { PageLayout } from 'components';
 import { ScheduleDetailView } from 'components/Schedule/ScheduleDetailView';
+import pageEventStyles from 'components/Schedule/SchedulePage.module.scss';
 
 const PageEventWrapper = () => (
   <ScheduleStore.provider>
@@ -51,7 +52,12 @@ function PageEvent() {
   );
 
   return (
-    <PageLayout title="Event" githubId={'props.session.githubId'} loading={isLoading}>
+    <PageLayout
+      title="Event"
+      classes={pageEventStyles.pageEvent}
+      githubId={'props.session.githubId'}
+      loading={isLoading}
+    >
       {!isLoading && <ScheduleDetailView />}
     </PageLayout>
   );

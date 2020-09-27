@@ -12,3 +12,10 @@
     }
   }
 }
+
+.pageSchedule,
+.pageEvent {
+  & > main {
+    margin: 0.5rem !important;
+  }
+}
