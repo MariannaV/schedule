@@ -58,7 +58,7 @@ export class App {
       }),
     );
 
-    process.on('unhandledRejection', reason => this.appLogger.error(reason as any));
+    process.on('unhandledRejection', (reason) => this.appLogger.error(reason as any));
   }
 
   public start(): Server {

@@ -1,0 +1,21 @@
+.pageSchedule {
+  & > main {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 56px - 3 * 1rem);
+
+    & > [class~='ant-spin-nested-loading'] {
+      &,
+      & > [class~='ant-spin-container'] {
+        display: contents;
+      }
+    }
+  }
+}
+
+.pageSchedule,
+.pageEvent {
+  & > main {
+    margin: 0.5rem !important;
+  }
+}

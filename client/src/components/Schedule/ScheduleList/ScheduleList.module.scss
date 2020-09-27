@@ -1,0 +1,117 @@
+@import '../../../styles/variables.scss';
+
+.ScheduleListHeader {
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ScheduleListHeaderTitle {
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  column-gap: 0.5rem;
+
+  &::after {
+    content: attr(data-events-amount);
+    display: block;
+    color: gray;
+    font-size: 0.7em;
+  }
+}
+
+.ScheduleListItem {
+  display: grid;
+  grid-gap: 1rem;
+  padding: 1rem;
+  border-radius: 5px;
+  border: 1px solid #f0f0f0;
+  cursor: pointer;
+  max-width: calc(100% - 1rem);
+
+  .codejam,
+  .codewars,
+  .course,
+  .task {
+    background-color: $color-task-background;
+    &:hover {
+      background: rgb(209 233 255);
+      border-radius: 2px;
+    }
+    & .ant-table-column-sort {
+      background-color: $color-task-background;
+    }
+  }
+
+  .interview {
+    background-color: $color-interview-background;
+    &:hover {
+      background: rgb(209 233 255);
+      border-radius: 2px;
+    }
+  }
+
+  .lecture {
+    background-color: $color-lecture-background;
+    &:hover {
+      background: rgb(209 233 255);
+      border-radius: 2px;
+    }
+  }
+
+  .self-education {
+    background-color: $color-self-education-background;
+    &:hover {
+      background: rgb(209 233 255);
+      border-radius: 2px;
+    }
+  }
+
+  .test {
+    background-color: $color-test-background;
+    &:hover {
+      background: rgb(209 233 255);
+      border-radius: 2px;
+    }
+  }
+
+  & > header {
+    display: flex;
+    align-items: center;
+
+    & > h3 {
+      margin: 0 auto 0 0;
+    }
+  }
+
+  & > main {
+    .description {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+    }
+  }
+
+  & > footer {
+    display: grid;
+    align-items: center;
+    grid-auto-flow: column;
+    justify-content: space-between;
+    grid-gap: 0.5rem;
+  }
+
+  .dateStart {
+    color: green;
+  }
+
+  .dateDeadline {
+    color: red;
+  }
+
+  &.isOpened {
+    border-color: lightskyblue;
+    background-color: #e6f7ff;
+  }
+}

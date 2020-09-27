@@ -1,6 +1,6 @@
 html,
 body,
-#root {
+#__next {
   height: 100%;
 }
 
@@ -44,4 +44,8 @@ span.ant-table-filter-column-title {
 
 thead.ant-table-thead > tr > th {
   font-size: 12px;
+}
+
+th.ant-table-column-sort.ant-table-column-has-sorters {
+  background: #fafafa;
 }

@@ -1,0 +1,14 @@
+.CommentItem {
+  & > header {
+    display: grid;
+    grid-auto-flow: column;
+    justify-content: flex-start;
+    align-items: center;
+    grid-gap: 0.5rem;
+    margin-bottom: 0.5rem;
+
+    & > h2 {
+      margin: 0;
+    }
+  }
+}

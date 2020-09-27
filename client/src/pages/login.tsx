@@ -9,7 +9,7 @@ export default function LoginPage() {
   return (
     <main>
       <div className="login-form">
-        <img className="login-image" src="/static/images/logo-rs-school.svg" alt="RS School Logo" />
+        <img className="login-image" src="/images/logo-rs-school.svg" alt="RS School Logo" />
 
         <Card
           style={{ width: 320 }}

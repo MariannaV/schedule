@@ -69,7 +69,7 @@ const getSearch = (_: ILogger) => (searchConfig: SearchConfigItem[]) => async (c
   setResponse(
     ctx,
     OK,
-    entities.map(user => {
+    entities.map((user) => {
       const response = generateResponse(user, searchConfig);
       const { lastName, firstName, ...other } = response;
       return { ...other, id: user.id, name: userService.createName({ lastName, firstName }) };
