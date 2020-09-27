@@ -43,7 +43,13 @@ export function ScheduleTable() {
   const [hiddenRows, setHiddenRows] = React.useState([] as string[]);
   const [editingKey, setEditingKey] = React.useState('');
   const [dataSource, setDataSource] = React.useState(tableData);
-  // const [deletingEvent, setDeletingEvent] = React.useState(null);
+
+  React.useEffect(
+    function tableDataUpdate() {
+      setDataSource(tableData);
+    },
+    [tableData],
+  );
 
   const [isVisibleDetailViewModal, setVisibleDetailViewModal] = React.useState<IScheduleDetailViewModal['isVisible']>(
     null,
