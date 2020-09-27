@@ -1,28 +1,27 @@
 import React from 'react';
 import moment from 'moment-timezone';
-import { dateRenderer } from '../../ScheduleTable';
-import { FormItem, IFormItem } from 'components/Forms/FormItem';
+import { FormItem } from 'components/Forms/FormItem';
 import { FieldOrganizers } from 'components/Forms/fields/FieldOrganizers';
 import { DatePicker, Input, Select, Tooltip } from 'antd';
 import { CloseOutlined, SaveOutlined } from '@ant-design/icons';
-import { Event, eventTypes } from 'services/event';
+import { eventTypes } from 'services/event';
 
 import styles from './EditableCell.module.scss';
 
-export const EditableCell = ({ editing, dataIndex, record, cancel, children, ...restProps }) => {
-  let cell = '';
-  if (editing) console.log(record);
+export const EditableCell = ({ editing, dataIndex, record, save, cancel, children, ...restProps }) => {
+  let cell: JSX.Element;
   switch (dataIndex) {
     case 'dateStart':
       cell = (
         <FormItem
-          name="date start"
+          name={dataIndex}
           rules={[
             {
               required: true,
               message: 'Please select event time!',
             },
           ]}
+          getValueProps={(value) => moment(value)}
           type="time"
         >
           <DatePicker showTime defaultValue={moment(record.dateStart)} format="DD.MM.YYYY HH:mm" />
@@ -31,28 +30,12 @@ export const EditableCell = ({ editing, dataIndex, record, cancel, children, ...
       break;
     case 'dateEnd':
       cell = (
-        <FormItem
-          name="date end"
-          rules={[
-            {
-              required: true,
-              message: 'Please select event deadline time!',
-            },
-          ]}
-          type="time"
-        >
-          {!record.dateEnd || record.dateEnd === '' ? (
-            <DatePicker showTime />
-          ) : (
-            <DatePicker showTime defaultValue={moment(record.dateEnd)} format="DD.MM.YYYY HH:mm" />
-          )}
-        </FormItem>
-      );
-      break;
-    case 'name':
-      cell = (
-        <FormItem name={dataIndex} type="input">
-          <Input />
+        <FormItem name={dataIndex} getValueProps={(value) => moment(value)} type="time">
+          <DatePicker
+            showTime
+            defaultValue={record.dateEnd !== '' && record.dateEnd !== null ? moment(record.dateEnd) : undefined}
+            format="DD.MM.YYYY HH:mm"
+          />
         </FormItem>
       );
       break;
@@ -81,16 +64,9 @@ export const EditableCell = ({ editing, dataIndex, record, cancel, children, ...
             <CloseOutlined className={styles.icon} onClick={cancel} />
           </Tooltip>
           <Tooltip title="Save">
-            <SaveOutlined className={styles.icon} />
+            <SaveOutlined className={styles.icon} onClick={save} />
           </Tooltip>
         </div>
-      );
-      break;
-    case 'place':
-      cell = (
-        <FormItem name={dataIndex} type="input">
-          <Input />
-        </FormItem>
       );
       break;
     case 'organizers':
@@ -100,22 +76,12 @@ export const EditableCell = ({ editing, dataIndex, record, cancel, children, ...
         </FormItem>
       );
       break;
-    case 'descriptionUrl':
-      cell = (
-        <FormItem name={dataIndex} type="input">
-          <Input />
-        </FormItem>
-      );
-      break;
-    case 'description':
-      cell = (
-        <FormItem name={dataIndex} type="input">
-          <Input />
-        </FormItem>
-      );
-      break;
     default:
-      cell = '';
+      cell = (
+        <FormItem name={dataIndex} type="input">
+          <Input />
+        </FormItem>
+      );
       break;
   }
 
@@ -123,7 +89,7 @@ export const EditableCell = ({ editing, dataIndex, record, cancel, children, ...
 };
 
 enum checkers {
-  crossCheck = 'crosscheck',
+  crosscheck = 'crosscheck',
   autoTest = 'auto-test',
   mentor = 'mentor',
   none = 'none',

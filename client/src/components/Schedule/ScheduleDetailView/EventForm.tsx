@@ -1,6 +1,6 @@
 import React from 'react';
 import { UploadOutlined } from '@ant-design/icons';
-import { Form, Input, Select, Switch, Upload, Button, Radio, DatePicker, message } from 'antd';
+import { Form, Input, Select, Switch, Upload, Button, DatePicker, message } from 'antd';
 import moment from 'moment';
 import { Event, eventTypes } from 'services/event';
 import { FieldTimezone } from 'components/Forms/fields';

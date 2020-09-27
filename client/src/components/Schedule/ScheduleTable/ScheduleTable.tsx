@@ -31,7 +31,8 @@ export function ScheduleTable() {
     isActiveDates = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsActiveDates),
     eventsData = ScheduleStore.useSelector(ScheduleStore.selectors.getEvents),
     userIsMentor = ScheduleStore.useSelector(ScheduleStore.selectors.getUserIsMentor),
-    tableData = React.useMemo(() => eventsData.list.map((eventId) => eventsData.map[eventId]), [eventsData]);
+    tableData = React.useMemo(() => eventsData.list.map((eventId) => eventsData.map[eventId]), [eventsData]),
+    { dispatch } = React.useContext(ScheduleStore.context);
 
   const [form] = Form.useForm();
   const [checkedColumns, setCheckedColumns] = React.useState(defaultColumnsFilter);
@@ -62,6 +63,21 @@ export function ScheduleTable() {
       ...record,
     });
     setEditingKey(record.id);
+  };
+
+  const save = async () => {
+    try {
+      const newEventData = await form.validateFields();
+      await ScheduleStore.API.eventUpdate(dispatch)({
+        payload: {
+          eventId: editingKey,
+          eventData: newEventData,
+        },
+      });
+      setEditingKey('');
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const cancel = () => {
@@ -203,7 +219,8 @@ export function ScheduleTable() {
                 title: 'Action',
                 width: 300,
                 dataIndex: 'checker',
-                render: (value: string, eventData: Event, userIsMentor: boolean) => actionButtonsRenderer(value ?? '', eventData, userIsMentor),
+                render: (value: string, eventData: Event, userIsMentor: boolean) =>
+                  actionButtonsRenderer(value ?? '', eventData, userIsMentor),
               },
               {
                 title: 'Place',
@@ -255,6 +272,7 @@ export function ScheduleTable() {
                   onCell: (record) => ({
                     record,
                     cancel,
+                    save,
                     editing: isEditing(record),
                     dataIndex: column.dataIndex,
                   }),
@@ -328,7 +346,7 @@ const actionButtonsRenderer = (checker: string, eventData: Event, userIsMentor: 
   );
 
   switch (checker) {
-    case 'crossCheck':
+    case 'crosscheck':
       return (
         <>
           {ButtonDetails}
