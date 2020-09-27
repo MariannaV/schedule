@@ -217,7 +217,7 @@ export function ScheduleTable() {
             columns={[
               {
                 title: 'Start Date',
-                width: 110,
+                width: 250,
                 align: 'center',
                 dataIndex: 'dateStart',
                 render: dateRenderer(timeZone),
@@ -226,15 +226,8 @@ export function ScheduleTable() {
                 sortDirections: ['ascend', 'descend', 'ascend'],
               },
               {
-                title: 'Name',
-                width: 185,
-                dataIndex: 'name',
-                sorter: (a, b) => (a.name > b.name ? 1 : -1),
-                sortDirections: ['ascend', 'descend', 'ascend'],
-              },
-              {
                 title: 'DeadLine',
-                width: 120,
+                width: 250,
                 align: 'center',
                 dataIndex: 'dateEnd',
                 render: (value: string) => {
@@ -265,8 +258,16 @@ export function ScheduleTable() {
                 sortDirections: ['ascend', 'descend', 'ascend'],
               },
               {
+                title: 'Name',
+                width: 185,
+                dataIndex: 'name',
+                align: 'center',
+                sorter: (a, b) => (a.name > b.name ? 1 : -1),
+                sortDirections: ['ascend', 'descend', 'ascend'],
+              },
+              {
                 title: 'Type',
-                width: 120,
+                width: 180,
                 align: 'center',
                 dataIndex: 'type' || '',
                 render: (value: keyof typeof tagColors) => (
@@ -281,15 +282,9 @@ export function ScheduleTable() {
                   record.type.toLowerCase().indexOf(value.toString().toLowerCase()) === 0,
               },
               {
-                title: 'Action',
-                width: 320,
-                dataIndex: 'checker',
-                render: (value: string, eventData: Event) =>
-                  actionButtonsRenderer(value ?? '', eventData, setVisibleDetailViewModal, userIsMentor),
-              },
-              {
                 title: 'Place',
                 width: 130,
+                align: 'center',
                 dataIndex: 'place',
                 render: (value: string) => {
                   return value === 'Youtube Live' ? (
@@ -308,17 +303,19 @@ export function ScheduleTable() {
               },
               {
                 title: 'Organizers',
-                width: 120,
+                width: 200,
                 dataIndex: 'organizers',
+                align: 'center',
                 render: (value: Array<string>) => organizerRenderer(value),
               },
               {
                 title: 'Description URL',
                 width: 200,
                 dataIndex: 'descriptionUrl',
+                align: 'center',
                 render: (value: string) => {
                   return (
-                    <a target="_blank" href={value}>
+                    <a target="_blank" href={value} className={styles.cutted}>
                       {value}
                     </a>
                   );
@@ -328,9 +325,17 @@ export function ScheduleTable() {
                 title: 'Description',
                 width: 250,
                 dataIndex: 'description',
+                align: 'center',
                 render: (value: string) => {
                   return <div className={styles.cutted}>{value}</div>;
                 },
+              },
+              {
+                title: 'Action',
+                fixed: 'right',
+                dataIndex: 'checker',
+                render: (value: string, eventData: Event) =>
+                  actionButtonsRenderer(value ?? '', eventData, setVisibleDetailViewModal, userIsMentor),
               },
             ]
               .filter((column) => checkedColumns.includes(column.title))
