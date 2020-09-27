@@ -15,7 +15,6 @@ export function ScheduleCalendar() {
     eventTypesByDate = React.useMemo(
       () =>
         (Object.values(eventsMap) as Array<Event>).reduce((acc, currentEvent) => {
-          console.log('@@', currentEvent);
           const currentType = dateRenderer(currentEvent.timeZone)(currentEvent.dateStart);
           if (!(currentType in acc)) acc[currentType] = [];
           acc[currentType].push(currentEvent.type);
